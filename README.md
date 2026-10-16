@@ -4,7 +4,15 @@ Projeto semestral da disciplina **Qualidade de Software** (TADS · Senac · 2026
 
 O sistema organiza a reserva de **salas, professores e materiais** de uma instituição de ensino, sem conflitos de horário. O foco da avaliação não é só fazer o sistema funcionar: é apresentar **evidências objetivas** de qualidade, segurança, rastreabilidade e desempenho.
 
-> **Status:** em construção. O projeto evolui semana a semana, seguindo o cronograma da disciplina (ver [Roadmap](#roadmap)).
+> **Status:** em construção, em quatro sprints até a entrega (ver [Roadmap](#roadmap)).
+
+## Como trabalhamos
+
+Toda task nasce no Jira e segue o fluxo **Spec-Driven Development**: spec → revisão por pares → spec validation → grill-with-docs (regras críticas) → TDD → pull request. Leia antes de começar:
+
+- [AI Workflow](docs/processo/ai-workflow.md): o passo a passo de cada task;
+- [CONTRIBUTING](CONTRIBUTING.md): branches, commits e pull requests;
+- [Índice da documentação](docs/README.md).
 
 ## O problema
 
@@ -83,50 +91,60 @@ Cobertura alta, sozinha, não garante qualidade. Cada teste precisa ter asserç�
 
 ## Tecnologias
 
-- Java 21
-- Spring Boot 3.x (Web, Security, Data JPA, Validation)
-- PostgreSQL
-- Maven (via `./mvnw`)
-- JUnit 5, Testcontainers, WireMock, JaCoCo
-- GitHub Actions, SonarCloud
+- Java 21 e Spring Boot 3.5 (Web, Security, Data JPA, Validation)
+- PostgreSQL 16, com migrações Flyway
+- Interface Thymeleaf + Bootstrap (responsiva)
+- Maven, via wrapper (`./mvnw`)
+- JUnit 5, Testcontainers, WireMock, Cucumber e JaCoCo
+- GitHub Actions e SonarCloud
 - JMeter
 - [AIOX](https://www.npmjs.com/package/aiox-core) para apoio ao desenvolvimento com agentes de IA
 
 ## Como executar
 
-> Instruções serão adicionadas quando a aplicação for criada (semana 34 do cronograma).
+### Pré-requisitos
+
+- **Java 21.** Confira com `java -version`. Outra versão não serve.
+- **Docker** rodando. Ele é usado pelo banco local e pelos testes.
+- Não precisa instalar o Maven: o projeto usa o wrapper `./mvnw`.
+
+### Rodar os testes
+
+```bash
+./mvnw verify
+```
+
+Os testes sobem um PostgreSQL real em container (Testcontainers). Não há H2 nem banco em memória.
+
+### Subir a aplicação
+
+```bash
+./mvnw spring-boot:run
+```
+
+O banco local do `compose.yaml` sobe sozinho. A aplicação fica em http://localhost:8080.
+
+### Abrir no IntelliJ
+
+1. **File → Open** e escolha a pasta do repositório (o IntelliJ reconhece o `pom.xml`).
+2. Em **File → Project Structure → Project → SDK**, selecione um **JDK 21**.
+3. Para rodar: abra `OrganizacaoRecursosApplication` e clique em ▶ ao lado do `main`.
+   Para rodar sem o `compose.yaml`, use `TestOrganizacaoRecursosApplication` (em `src/test`), que sobe o banco com Testcontainers.
 
 ## Documentação
 
-| Documento | Conteúdo | Situação |
-|---|---|---|
-| `docs/prd.md` | Visão do produto, personas e escopos | A criar |
-| `docs/arquitetura.md` | Diagramas C4, decisões (ADRs) e análise ATAM | A criar |
-| `docs/plano-de-teste.md` | Estratégia, níveis de teste e critérios de entrada e saída | A criar |
-| `docs/rtm.md` | Matriz de rastreabilidade: requisito → risco → teste → evidência | A criar |
-| `docs/defeitos/` | Registro de defeitos encontrados, priorizados e corrigidos | A criar |
-| `docs/relatorio-qualidade.md` | Relatório final de qualidade | A criar |
+O índice completo, com a situação de cada documento, está em [`docs/README.md`](docs/README.md).
 
 ## Roadmap
 
-O projeto segue o cronograma da disciplina. Cada técnica vista em aula é aplicada ao projeto na mesma semana.
+| Sprint | Período | Semanas do curso | Foco | Status |
+|---|---|---|---|---|
+| 1 | 15/10 a 21/10 | 32 a 35 | Ambiente, diagnóstico, PRD, plano de teste, arquitetura e ATAM | ⬜ |
+| 2 | 22/10 a 28/10 | 36 a 39 | Autenticação, cadastros, TDD das reservas, CI, JaCoCo, SonarCloud, Testcontainers e WireMock | ⬜ |
+| 3 | 29/10 a 04/11 | 41 a 43 | Aprovação e manutenção (BDD), dupla reserva, carga, auditoria e relatórios | ⬜ |
+| 4 | 05/11 a 11/11 | 44 a 46 | Interface, autorização, RTM, relatório de qualidade e release `v1.0.0-rc1` | ⬜ |
 
-| Semana | Tema da aula | Entrega no projeto | Status |
-|---|---|---|---|
-| 32 | Introdução à Qualidade de Software | Diagnóstico de qualidade de um projeto existente | ⬜ |
-| 33 | ATAM e planejamento de casos de teste | Utility tree, cenários e casos de teste | ⬜ |
-| 34 | Caixa branca vs caixa preta | Repositório, ambiente, escopo e perfis definidos | ⬜ |
-| 35 | Arquitetura e análise ATAM | C4, utility tree, riscos, trade-offs e ADRs | ⬜ |
-| 36 | Gestão de erros e bugs | Plano de TDD e testes na fase red | ⬜ |
-| 37 | Testes automatizados em CI | Fase green e pipeline no GitHub Actions | ⬜ |
-| 38 | JUnit 5, JaCoCo e SonarCloud | Cobertura de ramo nas regras de sobreposição e Quality Gate | ⬜ |
-| 39 | WireMock e Testcontainers | Banco em container e integração externa isolada | ⬜ |
-| 41 | TDD e BDD | Regras de aprovação e bloqueio guiadas por teste | ⬜ |
-| 42 | Testes de carga com JMeter | Reservas simultâneas do mesmo recurso sob carga | ⬜ |
-| 43 | Auditoria e relatórios | Histórico auditável e relatório de utilização | ⬜ |
-| 44 | Autorização e RTM | Matriz de autorização testada e RTM fechada | ⬜ |
-| 45 | Preparação para a prova oral | Relatório de qualidade | ⬜ |
-| 46 | Entrega | Release candidate e pacote de evidências | ⬜ |
+Detalhes em [sprints](docs/planejamento/sprints.md) e [backlog](docs/planejamento/backlog.md). Entrega na semana 46 e prova oral na semana 47.
 
 ## Referências
 
@@ -134,6 +152,10 @@ O projeto segue o cronograma da disciplina. Cada técnica vista em aula é aplic
 - [Especificação do projeto](https://afonsolelis.github.io/aulas_senac/pages/qualidade2/especificacao-projeto.html)
 - [CineSenac](https://github.com/afonsolelis/cinesenac): referência de organização do PRD
 
-## Autoria
+## Equipe
 
-Projeto individual desenvolvido por [@renatarsilva](https://github.com/renatarsilva).
+| Nome | GitHub |
+|---|---|
+| Renata | [@renatarsilva](https://github.com/renatarsilva) |
+| Samuel | [@Samwel-Merces](https://github.com/Samwel-Merces) |
+| Caio | [@CaiosAguiar](https://github.com/CaiosAguiar) |

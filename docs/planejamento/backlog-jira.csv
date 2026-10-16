@@ -1,0 +1,1041 @@
+Summary,Issue Type,Priority,Assignee,Description,Labels,Labels,Labels,Labels,Labels
+[T-01] S32 · Infra · Preparar o ambiente de cada integrante,Task,Highest,,"*Área:* Infra  |  *Semana:* 32 (Aula 01 · Introdução à Qualidade de Software)  |  *Sprint:* 1
+*Dono:* Todos  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-07
+
+h3. O que fazer
+Cada integrante instala Java 21, Docker e IntelliJ; clona o repositório; configura git config user.name e user.email com o e-mail da conta do GitHub; abre o projeto no IntelliJ e roda ./mvnw verify até ficar verde; faz um commit de teste numa branch própria; entra no Discord da turma.
+
+h3. Por que (explicação)
+Na Aula 01 o professor exige que ninguém saia da sala sem um push funcionando. Sem o e-mail certo no git, os commits não aparecem no seu nome, e a autoria vale 10% da nota.
+
+h3. Critérios de aceite
+* As três pessoas rodaram ./mvnw verify verde na própria máquina
+* Um commit de cada pessoa aparece no GitHub com o avatar correto
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: —
+* Processo: docs/processo/ai-workflow.md",semana-32,sprint-1,area-infra,sem-spec,qualidade-senac
+"[T-02] S32 · Infra · Configurar Jira, board e proteção da branch main",Task,High,Renata,"*Área:* Infra  |  *Semana:* 32 (Aula 01 · Introdução à Qualidade de Software)  |  *Sprint:* 1
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* —
+
+h3. O que fazer
+Seguir docs/processo/configuracao-github-e-jira.md: merge commit como única forma de merge, ruleset protegendo a main (PR obrigatório, 1 aprovação, sem bypass), colunas do board, importação deste backlog e app GitHub for Jira.
+
+h3. Por que (explicação)
+A especificação pede 'repositório com histórico e revisão por pares'. A proteção da main garante que todo código passa por PR revisado por outra pessoa. A Aula 06 também pede branch protection.
+
+h3. Critérios de aceite
+* Push direto na main é recusado
+* As 58 tasks estão no Jira, nas sprints certas
+* Branch com a chave KAN aparece dentro da task no Jira
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: docs/processo/configuracao-github-e-jira.md
+* Processo: docs/processo/ai-workflow.md",semana-32,sprint-1,area-infra,sem-spec,qualidade-senac
+[T-03] S32 · Documentação · Diagnóstico de qualidade do projeto da disciplina (Atividade #1),Task,Medium,Renata,"*Área:* Documentação  |  *Semana:* 32 (Aula 01 · Introdução à Qualidade de Software)  |  *Sprint:* 1
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* —
+
+h3. O que fazer
+Clonar github.com/afonsolelis/qualidade_software, seguir o README, rodar a suíte e registrar o que passou, falhou, foi pulado e o que não tem teste. Ler o código procurando problemas que a suíte não pega. Escrever um documento de 1 a 2 páginas com a saída dos testes, no mínimo 5 achados (onde, o quê, por que é problema), a característica ISO/IEC 25010 de cada um e a priorização com critério explícito. Não escrever testes.
+
+h3. Por que (explicação)
+É a primeira etapa da evolução do projeto na especificação ('diagnóstico inicial'). Treina o vocabulário da ISO 25010, que cai na prova escrita e na oral. Cinco achados bem argumentados valem mais do que vinte listados.
+
+h3. Critérios de aceite
+* Pelo menos 5 achados com onde, o quê e por quê
+* Cada achado ligado a uma das 9 características da ISO 25010:2023
+* Critério de priorização explícito
+* Nenhuma credencial do repositório analisado copiada para o documento
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: docs/diagnostico/diagnostico-inicial.md
+* Processo: docs/processo/ai-workflow.md",semana-32,sprint-1,area-documentacao,sem-spec,qualidade-senac
+[T-04] S33 · Documentação · Personas dos três perfis,Task,High,Caio,"*Área:* Documentação  |  *Semana:* 33 (Aula 02 · ATAM e planejamento de casos de teste)  |  *Sprint:* 1
+*Dono:* Caio  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-07
+
+h3. O que fazer
+Escrever 3 personas (Solicitante, Responsável, Administrador), cada uma com objetivo, contexto e frustração, na seção 3 do docs/prd.md.
+
+h3. Por que (explicação)
+A Aula 02 pede 3 personas como base para elicitar requisitos. Na Aula 03 elas viram a origem dos RF e RNF; na Aula 04, os stakeholders da arquitetura.
+
+h3. Critérios de aceite
+* 3 personas com objetivo, contexto e frustração
+* Cada persona ligada a um perfil de acesso da especificação
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: docs/prd.md (seção 3)
+* Processo: docs/processo/ai-workflow.md",semana-33,sprint-1,area-documentacao,sem-spec,qualidade-senac
+"[T-05] S33 · Documentação · Utility tree, cenários (A, A) e casos de teste (Atividade #2)",Task,High,Caio,"*Área:* Documentação  |  *Semana:* 33 (Aula 02 · ATAM e planejamento de casos de teste)  |  *Sprint:* 1
+*Dono:* Caio  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-04
+
+h3. O que fazer
+Montar uma utility tree com pelo menos 3 atributos de qualidade e 6 cenários folha, cada um com (Importância, Dificuldade) justificado em uma linha. Escrever os 3 cenários (A, A) completos nas 6 partes (fonte, estímulo, ambiente, artefato, resposta, medida). Derivar pelo menos 1 caso de teste completo por cenário (A, A): ID, título, pré-condições, dados concretos, passos, resultado esperado e rastreabilidade. Identificar 1 ponto de sensibilidade, 1 ponto de trade-off e 1 não-risco (com a premissa), um parágrafo cada.
+
+h3. Por que (explicação)
+Liga atributo de qualidade a teste verificável. Regra da Aula 02: cenário sem número na medida da resposta não pontua. Os cenários (A, A) voltam na semana 42, no JMeter.
+
+h3. Critérios de aceite
+* ≥ 3 atributos e ≥ 6 folhas com (I, D) justificado
+* 3 cenários (A, A) com medida numérica
+* ≥ 3 casos de teste com todos os campos
+* Sensibilidade, trade-off e não-risco justificados
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: docs/atam/utility-tree-inicial.md
+* Processo: docs/processo/ai-workflow.md",semana-33,sprint-1,area-documentacao,sem-spec,qualidade-senac
+[T-06] S33 · Documentação · Plano de teste (ISO/IEC/IEEE 29119-3),Task,High,Samuel,"*Área:* Documentação  |  *Semana:* 33 (Aula 02 · ATAM e planejamento de casos de teste)  |  *Sprint:* 1
+*Dono:* Samuel  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-07
+
+h3. O que fazer
+Preencher docs/plano-de-teste.md: estratégia, níveis (unitário, integração com Testcontainers, API caixa-preta, end-to-end, concorrência, carga), itens a testar e a NÃO testar, critérios de entrada, saída e suspensão, metas de cobertura (80% linhas, 70% branches), ambiente de teste, riscos e recursos.
+
+h3. Por que (explicação)
+A especificação lista 'plano, suíte e relatório de testes' como entregável, e o peso 'estratégia e documentação de testes' vale 15%. A Aula 02 apresenta o modelo da 29119-3.
+
+h3. Critérios de aceite
+* Todas as seções preenchidas
+* Cada nível aponta ferramenta e tipo de evidência
+* Lista explícita do que não será testado, com motivo
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: docs/plano-de-teste.md
+* Processo: docs/processo/ai-workflow.md",semana-33,sprint-1,area-documentacao,sem-spec,qualidade-senac
+[T-07] S34 · Infra · Criar o projeto Spring Boot 3 e o esqueleto de documentação,Task,Highest,Renata,"*Área:* Infra  |  *Semana:* 34 (Aula 03 · Caixa branca × caixa preta (nasce o projeto))  |  *Sprint:* 1
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* —
+
+h3. O que fazer
+Projeto Maven com Java 21, Spring Boot 3.5 (última linha 3.x estável), group br.senac e as dependências da Aula 03 (Web, Security, Data JPA, Validation, PostgreSQL, Testcontainers), mais Thymeleaf e Flyway. compose.yaml com PostgreSQL local. Esqueletos de docs/prd.md, docs/arquitetura.md e docs/plano-de-teste.md com as seções da aula. README com 'como subir' e 'como rodar os testes'. (Gerado pelo Claude em 15/10; falta o commit.)
+
+h3. Por que (explicação)
+É o 'marco zero': a suíte roda verde sem nenhum teste escrito por vocês. A aplicação que não executa é limitador de nota.
+
+h3. Critérios de aceite
+* ./mvnw verify verde com Java 21
+* ./mvnw spring-boot:run sobe com o PostgreSQL do compose
+* Projeto abre no IntelliJ sem erros
+* docs/prd.md, docs/arquitetura.md e docs/plano-de-teste.md existem
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: pom.xml, compose.yaml, src/, docs/
+* Processo: docs/processo/ai-workflow.md",semana-34,sprint-1,area-infra,sem-spec,qualidade-senac
+[T-08] S34 · Infra · Instalar o AIOX no repositório,Task,Medium,Samuel,"*Área:* Infra  |  *Semana:* 34 (Aula 03 · Caixa branca × caixa preta (nasce o projeto))  |  *Sprint:* 1
+*Dono:* Samuel  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-07
+
+h3. O que fazer
+Rodar npx aiox-core@latest install (squad development) na raiz do repositório e versionar a pasta .aiox-core/. Ler como o fluxo de histórias do AIOX se encaixa no nosso ai-workflow e registrar a conclusão no PR.
+
+h3. Por que (explicação)
+A Aula 03 lista .aiox-core/ no checklist 'precisa existir'. É a ferramenta de agentes que o professor usa nas práticas.
+
+h3. Critérios de aceite
+* .aiox-core/ versionado
+* Nota no PR explicando como o AIOX convive com o ai-workflow
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: .aiox-core/
+* Processo: docs/processo/ai-workflow.md",semana-34,sprint-1,area-infra,sem-spec,qualidade-senac
+"[T-09] S34 · Documentação · PRD: visão, escopos, RF e RNF numerados e regras de negócio",Task,High,Renata,"*Área:* Documentação  |  *Semana:* 34 (Aula 03 · Caixa branca × caixa preta (nasce o projeto))  |  *Sprint:* 1
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-04
+
+h3. O que fazer
+Preencher docs/prd.md: 1 Visão, 2 Problema, 3 Personas (T-04), 4 Escopos, 5 Fora de escopo, 6 Métricas de sucesso. Elicitar com IA, a partir das personas, os requisitos funcionais (RF-01 a RF-14 da especificação) e não funcionais (RNF-01...), todos os RNF medíveis (ex.: p95 < 2 s), cada um ligado ao escopo de origem. Numerar as regras de negócio (RN-01...) a partir das regras críticas. Registrar necessidades implícitas e o que fica fora da v1 (ex.: reserva recorrente).
+
+h3. Por que (explicação)
+Requisitos e regras de negócio valem 15%. As specs, os testes e a RTM citam esses IDs: sem PRD numerado não há rastreabilidade.
+
+h3. Critérios de aceite
+* RF e RNF numerados e ligados a um escopo
+* Todo RNF tem número na medida
+* Regras críticas da especificação numeradas como RN
+* Seção 'fora de escopo' com justificativa
+
+h3. Rastreabilidade
+* Requisitos: RF-01 a RF-14
+* Arquivos: docs/prd.md
+* Processo: docs/processo/ai-workflow.md",semana-34,sprint-1,area-documentacao,sem-spec,qualidade-senac
+"[T-10] S35 · Documentação · Arquitetura: descoberta, C4 e diagramas de sequência",Task,High,Samuel,"*Área:* Documentação  |  *Semana:* 35 (Aula 04 · Arquitetura e ATAM com IA agêntica)  |  *Sprint:* 1
+*Dono:* Samuel  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-09
+
+h3. O que fazer
+Em docs/arquitetura.md: (1) descoberta: contexto, stakeholders, fonte de verdade, requisitos significativos, drivers priorizados, glossário, fatos, lacunas, suposições (S-01...) e decisões (D-01...), preservando os IDs do PRD. (2) Diagramas Mermaid C4 de contexto, contêineres e componentes. (3) Sequências críticas: criar reserva, aprovar recurso restrito, duas solicitações simultâneas e o fluxo batch diário (adaptação proposta: job no fim do dia que marca NAO_COMPARECEU e conclui reservas vencidas). (4) Comparar pelo menos 2 alternativas quando faltar dado.
+
+h3. Por que (explicação)
+A especificação pede 'diagramas de contexto, componentes e sequências críticas'. O DoD da Aula 04: outra equipe entende, rastreia e contesta a arquitetura sem explicação oral.
+
+h3. Critérios de aceite
+* C4 em 3 níveis renderizando no GitHub
+* Sequências online e batch
+* Suposições e decisões com ID
+* Nenhuma decisão sem requisito de origem sem estar marcada
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: docs/arquitetura.md
+* Processo: docs/processo/ai-workflow.md",semana-35,sprint-1,area-documentacao,sem-spec,qualidade-senac
+[T-11] S35 · Documentação · Modelo de dados,Task,High,Caio,"*Área:* Documentação  |  *Semana:* 35 (Aula 04 · Arquitetura e ATAM com IA agêntica)  |  *Sprint:* 1
+*Dono:* Caio  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-09
+
+h3. O que fazer
+Diagrama ER em Mermaid na seção 3 de docs/arquitetura.md: usuário (com perfil), sala, professor e competências, material, reserva (com intervalo e estado), período de manutenção, retirada/devolução e auditoria. Descrever as restrições do banco que impedem conflito (FKs, unicidade, e a opção de EXCLUDE USING gist sobre tstzrange).
+
+h3. Por que (explicação)
+O modelo é a base das migrações Flyway e das regras de sobreposição. Decidir as restrições cedo evita retrabalho na semana 42 (dupla reserva).
+
+h3. Critérios de aceite
+* Todas as entidades dos 14 RFs presentes
+* Restrições anti-conflito descritas
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: docs/arquitetura.md (seção 3)
+* Processo: docs/processo/ai-workflow.md",semana-35,sprint-1,area-documentacao,sem-spec,qualidade-senac
+"[T-12] S35 · Documentação · ATAM: utility tree, cenários, táticas e riscos",Task,High,Caio,"*Área:* Documentação  |  *Semana:* 35 (Aula 04 · Arquitetura e ATAM com IA agêntica)  |  *Sprint:* 1
+*Dono:* Caio  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-05, T-10
+
+h3. O que fazer
+Em docs/arquitetura.md: utility tree completa com (I, D) justificados; cenários em 6 partes (faixa marcada 'validação pendente' quando faltar meta); situações de falha aplicáveis (falha parcial, reexecução, jobs sobrepostos, dados duplicados, impacto do batch no online etc.); tática de Len Bass e métrica para cada abordagem; sensibilidades, trade-offs, riscos, não-riscos e temas de risco. Baixar o catálogo de táticas do site e guardá-lo em docs/.
+
+h3. Por que (explicação)
+O ATAM é método de identificação de riscos. 'Arquitetura sem trade-off é sinal de análise superficial'. Cai na prova e alimenta o ciclo-01 da semana 37.
+
+h3. Critérios de aceite
+* Cada cenário com medida numérica ou marcado 'validação pendente'
+* Pelo menos 1 trade-off real e 1 tema de risco
+* Catálogo de táticas versionado
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: docs/arquitetura.md, docs/taticas-arquiteturais-len-bass.md
+* Processo: docs/processo/ai-workflow.md",semana-35,sprint-1,area-documentacao,sem-spec,qualidade-senac
+[T-13] S35 · Documentação · ADRs e matriz requisito → decisão → componente → evidência,Task,High,Samuel,"*Área:* Documentação  |  *Semana:* 35 (Aula 04 · Arquitetura e ATAM com IA agêntica)  |  *Sprint:* 1
+*Dono:* Samuel  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-10
+
+h3. O que fazer
+Revisão cruzada com 6 papéis (Analista, Arquiteto, Dados, Segurança/LGPD, Ops, Custos) registrando objeções. ADRs em docs/adr/ (status, contexto, alternativas, decisão, consequências, riscos, evidência necessária, condição de revisão) para: PostgreSQL, Flyway, Thymeleaf no mesmo projeto, autenticação (sessão nas telas e token na API), Clock injetado, entidade Usuario com perfil. Matriz requisito → decisão → componente → evidência e listas de requisitos sem cobertura, decisões sem requisito, suposições, perguntas e riscos aceitos.
+
+h3. Por que (explicação)
+ADR é a memória das decisões e assunto certo da prova oral ('por que PostgreSQL?'). A matriz é o começo da rastreabilidade.
+
+h3. Critérios de aceite
+* Um ADR por decisão, no template
+* Matriz cobrindo os 14 RFs
+* Listas de lacunas e riscos preenchidas
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: docs/adr/, docs/arquitetura.md
+* Processo: docs/processo/ai-workflow.md",semana-35,sprint-1,area-documentacao,sem-spec,qualidade-senac
+[T-14] S36 · Documentação · Processo e registro de defeitos,Task,High,Renata,"*Área:* Documentação  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* —
+
+h3. O que fazer
+Criar docs/defeitos/README.md com o ciclo de vida (Novo → Triado → Em correção → Em verificação → Fechado; Duplicado, Não reproduzível, Não será corrigido, Reaberto), severidade × prioridade, 5 porquês e métricas (sem contar bugs por pessoa). Criar .github/ISSUE_TEMPLATE/bug.md com as seções da Aula 05 e labels bug e needs-triage. Registrar e triar os primeiros defeitos encontrados (ex.: divergências achadas na arquitetura).
+
+h3. Por que (explicação)
+Registro de defeitos é entregável, e rastreabilidade e gestão de defeitos valem 10%. Nas semanas 42 e 44 o professor manda registrar defeito antes de corrigir.
+
+h3. Critérios de aceite
+* Template de relato reproduzível com dados fictícios (domínio .invalid)
+* Pelo menos 1 defeito registrado e triado com severidade e prioridade justificadas
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: docs/defeitos/, .github/ISSUE_TEMPLATE/bug.md
+* Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-documentacao,sem-spec,qualidade-senac
+[T-15] S36 · Backend · Autenticação e autorização por perfil,Task,Highest,Samuel,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
+*Dono:* Samuel  |  *Fluxo:* Regra crítica: spec + revisão + validação + grill-with-docs  |  *Depende de:* T-07, T-13
+
+h3. O que fazer
+Spring Security com os perfis SOLICITANTE, RESPONSAVEL e ADMINISTRADOR; usuários em banco (migração Flyway) com senha em hash; login por formulário (sessão) para as telas e endpoint de login que devolve token para a API (MockMvc, Cucumber e JMeter usam token); gestão de usuários pelo Administrador; 401 sem autenticação e 403 para perfil sem permissão, sem vazar detalhes.
+
+h3. Por que (explicação)
+RF01. Falha de autorização é limitador de nota. As Aulas 09, 10 e 12 dependem de tokens de cada perfil.
+
+h3. Critérios de aceite
+* Spec liberada
+* Testes de 401 e 403 por perfil passando
+* Nenhuma senha em texto puro no banco ou em log
+
+h3. Rastreabilidade
+* Requisitos: RF-01
+* Arquivos: src/main/java/.../seguranca/, db/migration/
+* Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-backend,regra-critica,qualidade-senac
+[T-16] S36 · Backend · Cadastro e consulta de salas,Task,Medium,Caio,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
+*Dono:* Caio  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-15
+
+h3. O que fazer
+Entidade, migração, repositório, serviço e API REST de salas (tipo, capacidade, localização, restrita ou não). Cadastro e alteração só pelo Administrador; consulta por usuários autenticados. Validação de entrada (capacidade > 0, campos obrigatórios).
+
+h3. Por que (explicação)
+RF02. Sala é o recurso principal das reservas.
+
+h3. Critérios de aceite
+* Spec validada
+* Testes de validação com valor limite (capacidade 0, 1)
+* 403 para não administrador
+
+h3. Rastreabilidade
+* Requisitos: RF-02
+* Arquivos: src/main/java/.../sala/
+* Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-backend,spec,qualidade-senac
+[T-17] S36 · Backend · Cadastro e consulta de professores e competências,Task,Medium,Samuel,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
+*Dono:* Samuel  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-15
+
+h3. O que fazer
+CRUD de professores com suas competências, restrito ao Administrador para escrita.
+
+h3. Por que (explicação)
+RF02. O professor também é recurso reservável: a agenda dele não pode ter sobreposição.
+
+h3. Critérios de aceite
+* Spec validada
+* Testes de validação e de permissão
+
+h3. Rastreabilidade
+* Requisitos: RF-02
+* Arquivos: src/main/java/.../professor/
+* Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-backend,spec,qualidade-senac
+[T-18] S36 · Backend · Cadastro e consulta de materiais e equipamentos,Task,Medium,Samuel,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
+*Dono:* Samuel  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-15
+
+h3. O que fazer
+CRUD de materiais (tipo, patrimônio, restrito ou não, situação), restrito ao Administrador para escrita.
+
+h3. Por que (explicação)
+RF02. Material é o terceiro tipo de recurso e a base da retirada e devolução (RF09).
+
+h3. Critérios de aceite
+* Spec validada
+* Testes de validação e de permissão
+
+h3. Rastreabilidade
+* Requisitos: RF-02
+* Arquivos: src/main/java/.../material/
+* Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-backend,spec,qualidade-senac
+[T-19] S36 · Testes · Plano TDD: inventário de todas as regras de negócio,Task,High,Renata,"*Área:* Testes  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-09
+
+h3. O que fazer
+Criar docs/testes/plano-tdd.md com TODAS as regras de negócio do PRD, cada uma com o ID de origem e os casos com resultado esperado: caminho feliz, valores-limite, entradas inválidas, conflitos e estados proibidos. Ambiguidades e perguntas em seção separada. Matriz regra → caso → teste → status (atualizada pelas tasks seguintes). Indicar em que semana cada regra ganha teste: intervalo, sobreposição e estados na 36/37; aprovação e manutenção na 41 (BDD); concorrência na 42; auditoria na 43; autorização na 44.
+
+h3. Por que (explicação)
+Prompt 1 da Aula 05. É o mapa que garante que nenhuma regra fica sem teste ('só encerre quando todas as regras estiverem cobertas').
+
+h3. Critérios de aceite
+* Toda RN do PRD aparece com casos
+* Matriz regra → caso → teste → status criada
+* Não contém código nem testes
+
+h3. Rastreabilidade
+* Requisitos: Todas as RN
+* Arquivos: docs/testes/plano-tdd.md
+* Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-testes,sem-spec,qualidade-senac
+[T-20] S36 · Testes · Fase red: testes de intervalo e sobreposição de horários,Task,Highest,Renata,"*Área:* Testes  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
+*Dono:* Renata  |  *Fluxo:* Regra crítica: spec + revisão + validação + grill-with-docs  |  *Depende de:* T-16, T-17, T-18, T-19
+
+h3. O que fazer
+Escrever a spec da reserva (intervalo e sobreposição em sala, material e professor). Depois, testes JUnit 5 para cada caso do plano TDD dessas regras, com nome citando o ID da regra e estrutura Arrange-Act-Assert. Criar só as assinaturas mínimas para compilar. Rodar e confirmar que cada teste falha por asserção, não por compilação. Commits test(red).
+
+h3. Por que (explicação)
+Prompt 2 da Aula 05. Teste que nasce vermelho prova que testa alguma coisa. O commit vermelho é a evidência de TDD que o professor procura no histórico.
+
+h3. Critérios de aceite
+* Spec liberada
+* ≥ 1 teste por caso do plano para essas regras
+* Todos falham por asserção
+* Matriz do plano TDD atualizada
+
+h3. Rastreabilidade
+* Requisitos: RF-04, RF-05
+* Arquivos: docs/specs/, src/test/java/.../reserva/
+* Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-testes,regra-critica,qualidade-senac
+[T-21] S36 · Testes · Fase red: testes do ciclo de vida da reserva,Task,High,Caio,"*Área:* Testes  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
+*Dono:* Caio  |  *Fluxo:* Regra crítica: spec + revisão + validação + grill-with-docs  |  *Depende de:* T-19
+
+h3. O que fazer
+Escrever a spec do ciclo de vida: transições válidas (SOLICITADA → APROVADA → EM_USO → CONCLUIDA) e alternativas (REJEITADA, CANCELADA, NAO_COMPARECEU), transições proibidas, alteração e cancelamento pelo dono, e reserva iniciada não pode ser apagada. Depois, testes JUnit 5 parametrizados (tabela de transições) falhando por asserção. Commits test(red).
+
+h3. Por que (explicação)
+Regras críticas da especificação. A tabela de transições é ótima para @ParameterizedTest e será usada pela aprovação (semana 41) e pela auditoria (43).
+
+h3. Critérios de aceite
+* Spec liberada
+* Toda transição válida e inválida tem caso
+* Todos falham por asserção
+
+h3. Rastreabilidade
+* Requisitos: RF-04
+* Arquivos: docs/specs/, src/test/java/.../reserva/
+* Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-testes,regra-critica,qualidade-senac
+[T-22] S36 · Backend · Tratamento padronizado de erros e validação de entrada,Task,High,Caio,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
+*Dono:* Caio  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-07
+
+h3. O que fazer
+@RestControllerAdvice devolvendo ProblemDetail (RFC 9457) com mensagem compreensível em português; 400 para validação (com o campo e o motivo), 404, 409 para conflito de regra; erro inesperado vira 500 neutro, sem stack trace, SQL ou nome de classe. Nas telas, página de erro amigável.
+
+h3. Por que (explicação)
+RF13 (mensagens compreensíveis) e 'tratamento seguro de erros'. Na Aula 12 o professor provoca um erro e lê o corpo da resposta. Fazer agora evita que cada endpoint trate erro de um jeito.
+
+h3. Critérios de aceite
+* Spec validada
+* Teste prova que nenhum erro expõe stack trace ou SQL
+* Formato único para todos os endpoints
+
+h3. Rastreabilidade
+* Requisitos: RF-13
+* Arquivos: src/main/java/.../erro/
+* Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-backend,spec,qualidade-senac
+[T-23] S37 · Backend · Fase green: criar e alterar reserva com intervalo e sobreposição,Task,Highest,Renata,"*Área:* Backend  |  *Semana:* 37 (Aula 06 · Testes automatizados em CI (fase green))  |  *Sprint:* 2
+*Dono:* Renata  |  *Fluxo:* Usa a spec da T-20  |  *Depende de:* T-20
+
+h3. O que fazer
+Implementar a criação e a alteração de reserva até todos os testes da T-20 passarem: término posterior ao início, sem sobreposição no mesmo recurso (sala, material ou professor), Clock injetado. Um caso por vez; refatorar só com tudo verde. Sem @Disabled, sem enfraquecer asserção, sem mudar o resultado esperado. Commits feat(green) e refactor.
+
+h3. Por que (explicação)
+Prompt 1 da Aula 06. É o núcleo do sistema e a base de quase todas as outras tasks.
+
+h3. Critérios de aceite
+* Todos os testes da T-20 verdes
+* ./mvnw -B verify verde
+* Matriz do plano TDD atualizada
+
+h3. Rastreabilidade
+* Requisitos: RF-04, RF-05
+* Arquivos: src/main/java/.../reserva/
+* Processo: docs/processo/ai-workflow.md",semana-37,sprint-2,area-backend,spec,qualidade-senac
+"[T-24] S37 · Backend · Fase green: ciclo de vida, alteração e cancelamento",Task,High,Caio,"*Área:* Backend  |  *Semana:* 37 (Aula 06 · Testes automatizados em CI (fase green))  |  *Sprint:* 2
+*Dono:* Caio  |  *Fluxo:* Usa a spec da T-21  |  *Depende de:* T-21, T-23
+
+h3. O que fazer
+Implementar a máquina de estados, o cancelamento e a regra de que reserva iniciada não pode ser apagada até todos os testes da T-21 passarem. Commits feat(green) e refactor.
+
+h3. Por que (explicação)
+Regras críticas de estado. Base para aprovação (41) e auditoria (43).
+
+h3. Critérios de aceite
+* Todos os testes da T-21 verdes
+* ./mvnw -B verify verde
+
+h3. Rastreabilidade
+* Requisitos: RF-04
+* Arquivos: src/main/java/.../reserva/
+* Processo: docs/processo/ai-workflow.md",semana-37,sprint-2,area-backend,spec,qualidade-senac
+[T-25] S37 · Infra · Pipeline de CI no GitHub Actions,Task,Highest,Samuel,"*Área:* Infra  |  *Semana:* 37 (Aula 06 · Testes automatizados em CI (fase green))  |  *Sprint:* 2
+*Dono:* Samuel  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-07
+
+h3. O que fazer
+Criar .github/workflows/ci.yml (name: qualidade) disparando em pull_request e push na main; permissions contents: read; concurrency com cancel-in-progress; timeout de 10 minutos; Java 21 temurin com cache Maven; ./mvnw -B verify; upload dos relatórios surefire e failsafe como artifact com if: always(). Quebrar uma asserção de propósito, registrar o run vermelho, reverter e confirmar o verde; anotar os IDs dos runs no README. Adicionar o check do CI como obrigatório na proteção da main.
+
+h3. Por que (explicação)
+Pipeline ausente é limitador de nota. CI, cobertura e análise estática valem 15%. O professor confere o run do CI ligado à tag na entrega.
+
+h3. Critérios de aceite
+* CI verde em um PR
+* Run vermelho intencional e recuperação registrados no README
+* Merge bloqueado com check falhando
+* Relatórios baixáveis em sucesso e falha
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: .github/workflows/ci.yml, README.md
+* Processo: docs/processo/ai-workflow.md",semana-37,sprint-2,area-infra,sem-spec,qualidade-senac
+[T-26] S37 · Documentação · Avaliação arquitetural: ciclo 01,Task,Medium,Caio,"*Área:* Documentação  |  *Semana:* 37 (Aula 06 · Testes automatizados em CI (fase green))  |  *Sprint:* 2
+*Dono:* Caio  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-12, T-23
+
+h3. O que fazer
+Criar docs/avaliacao-arquitetural/ciclo-01.md: direcionadores de negócio, cenários em 6 partes, utility tree A/M/B, táticas encontradas no código com arquivo e linha como evidência, sensibilidades, trade-offs, riscos, não-riscos, temas de risco, divergências entre docs/arquitetura.md e o código, e ações priorizadas para o próximo ciclo.
+
+h3. Por que (explicação)
+Prompt 3 da Aula 06: confronta o que foi planejado com o que foi construído. Divergência encontrada vira defeito ou ADR.
+
+h3. Critérios de aceite
+* Toda tática citada tem arquivo e linha
+* Divergências listadas com ação
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: docs/avaliacao-arquitetural/ciclo-01.md
+* Processo: docs/processo/ai-workflow.md",semana-37,sprint-2,area-documentacao,sem-spec,qualidade-senac
+[T-27] S38 · Infra · JaCoCo com gate de 80% de linhas e 70% de branches,Task,High,Caio,"*Área:* Infra  |  *Semana:* 38 (Aula 07 · JUnit 5, JaCoCo e SonarCloud)  |  *Sprint:* 2
+*Dono:* Caio  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-25
+
+h3. O que fazer
+Adicionar o JaCoCo 0.8.15 ao pom.xml (prepare-agent, report e check na fase verify com LINE 0.80 e BRANCH 0.70, relatórios HTML e XML). Confirmar que o build falha abaixo da meta e volta a passar. Publicar o relatório como artifact no ci.yml.
+
+h3. Por que (explicação)
+A meta 80/70 é piso da especificação. Sem o gate no verify, a cobertura pode cair sem ninguém perceber.
+
+h3. Critérios de aceite
+* verify falha abaixo de 80/70 (com evidência)
+* Relatório JaCoCo como artifact do CI
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: pom.xml, .github/workflows/ci.yml
+* Processo: docs/processo/ai-workflow.md",semana-38,sprint-2,area-infra,sem-spec,qualidade-senac
+[T-28] S38 · Testes · Cobertura de ramo nas regras de sobreposição,Task,High,Renata,"*Área:* Testes  |  *Semana:* 38 (Aula 07 · JUnit 5, JaCoCo e SonarCloud)  |  *Sprint:* 2
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-23, T-27
+
+h3. O que fazer
+Listar as linhas e branches não cobertos nas regras de reserva, classificando cada um como lacuna de risco ou cosmética. Testar só as lacunas de risco com @ParameterizedTest na trinca -1 / 0 / +1 (ex.: reserva que termina 1 s antes, exatamente no início e 1 s depois de outra) e Clock fixo. Atualizar a matriz do plano TDD.
+
+h3. Por que (explicação)
+Entregável da especificação para a semana 38: 'cobertura de ramo nas regras de sobreposição'. Testar getters para subir a cobertura não pontua.
+
+h3. Critérios de aceite
+* 100% de branches na regra de sobreposição
+* Nenhum teste sem asserção
+* Lista de lacunas com classificação
+
+h3. Rastreabilidade
+* Requisitos: RF-05
+* Arquivos: src/test/java/.../reserva/
+* Processo: docs/processo/ai-workflow.md",semana-38,sprint-2,area-testes,sem-spec,qualidade-senac
+[T-29] S38 · Infra · SonarCloud com Quality Gate no PR,Task,High,Samuel,"*Área:* Infra  |  *Semana:* 38 (Aula 07 · JUnit 5, JaCoCo e SonarCloud)  |  *Sprint:* 2
+*Dono:* Samuel  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-25, T-26
+
+h3. O que fazer
+Importar o repositório no SonarCloud; a Renata (admin) cria o secret SONAR_TOKEN; configurar sonar.organization e sonar.projectKey no pom.xml; desligar a análise automática; step no ci.yml com fetch-depth: 0 e ./mvnw -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar; definir 'novo código'. Tratar cada issue (corrigir, aceitar com justificativa ou falso positivo com evidência). Atualizar o ciclo-01 com as medidas do JaCoCo e do SonarCloud.
+
+h3. Por que (explicação)
+A especificação exige SonarCloud e a meta de 0 bugs ou vulnerabilidades críticas. Marcar falso positivo para 'ficar verde' não vale.
+
+h3. Critérios de aceite
+* Quality Gate aparece e passa no PR
+* Nenhum token versionado
+* ciclo-01 atualizado com as medidas
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: pom.xml, .github/workflows/ci.yml, docs/avaliacao-arquitetural/ciclo-01.md
+* Processo: docs/processo/ai-workflow.md",semana-38,sprint-2,area-infra,sem-spec,qualidade-senac
+[T-30] S39 · Testes · Testes de integração com PostgreSQL real (Testcontainers),Task,High,Caio,"*Área:* Testes  |  *Semana:* 39 (Aula 08 · WireMock, Testcontainers e chamadas seguras)  |  *Sprint:* 2
+*Dono:* Caio  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-23
+
+h3. O que fazer
+Criar a base de testes de integração com Testcontainers (PostgreSQL real, sem H2) e cobrir os repositórios e as restrições do banco: migrações Flyway aplicadas, FKs, unicidade e consultas de disponibilidade.
+
+h3. Por que (explicação)
+A especificação exige que a persistência seja verificada em ambiente real. A Aula 10 depende dessa base para o teste de concorrência.
+
+h3. Critérios de aceite
+* Testes de integração rodando no CI
+* Nenhum uso de H2 ou mock de repositório nesses testes
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: src/test/java/.../integracao/
+* Processo: docs/processo/ai-workflow.md",semana-39,sprint-2,area-testes,sem-spec,qualidade-senac
+[T-31] S39 · Backend · Notificação externa com WireMock,Task,High,Samuel,"*Área:* Backend  |  *Semana:* 39 (Aula 08 · WireMock, Testcontainers e chamadas seguras)  |  *Sprint:* 2
+*Dono:* Samuel  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-24
+
+h3. O que fazer
+Porta Notificador e adapter HTTP para um serviço externo de notificação (avisar aprovação, rejeição e cancelamento). URL base, token e timeouts por configuração (connect 500 ms, read 1500 ms), nunca fixos. Testes com WireMock: INT-01 200 válido, INT-02 404, INT-03 500 → 503 controlado, INT-04 timeout não persiste, INT-05 JSON inválido rejeitado. Teste negativo: o provedor devolve o próprio token no corpo de erro e ele não vaza pela API. Falha na notificação não quebra a reserva.
+
+h3. Por que (explicação)
+RF11 e Aula 08. Mostra isolamento de dependência externa, que é exigido pela estratégia de qualidade.
+
+h3. Critérios de aceite
+* Spec validada
+* Matriz INT-01 a INT-05 testada
+* Suíte roda offline e no CI
+* Nenhuma credencial real em código, fixture ou log
+
+h3. Rastreabilidade
+* Requisitos: RF-11
+* Arquivos: src/main/java/.../notificacao/
+* Processo: docs/processo/ai-workflow.md",semana-39,sprint-2,area-backend,spec,qualidade-senac
+[T-32] S39 · Documentação · Iniciar a RTM,Task,High,Renata,"*Área:* Documentação  |  *Semana:* 39 (Aula 08 · WireMock, Testcontainers e chamadas seguras)  |  *Sprint:* 2
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-25
+
+h3. O que fazer
+Criar docs/rtm.md com uma linha por requisito: requisito → risco → teste (caminho e nome) → nível → evidência (run do CI) → situação. Preencher o que já existe e identificar os requisitos de aprovação e manutenção (pré-requisito da Aula 09). A partir daqui, todo PR de feature atualiza a RTM.
+
+h3. Por que (explicação)
+RTM é entregável e a meta é 100% dos requisitos críticos rastreados. 'Não escreva testado sem apontar para uma execução.'
+
+h3. Critérios de aceite
+* 14 RFs e todas as regras críticas na tabela
+* Toda linha marcada como testada aponta um run
+
+h3. Rastreabilidade
+* Requisitos: Todos
+* Arquivos: docs/rtm.md
+* Processo: docs/processo/ai-workflow.md",semana-39,sprint-2,area-documentacao,sem-spec,qualidade-senac
+[T-33] S41 · Documentação · Cenários BDD de aprovação e bloqueio,Task,High,Caio,"*Área:* Documentação  |  *Semana:* 41 (Aula 09 · TDD e BDD no projeto)  |  *Sprint:* 3
+*Dono:* Caio  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-24, T-32
+
+h3. O que fazer
+Escrever docs/testes/bdd-aprovacao-bloqueio.md em Dado/Quando/Então para 4 regras: recurso restrito exige aprovação do Responsável; Solicitante não aprova a própria reserva; recurso em manutenção não pode ser reservado; transições de estado só pelos caminhos permitidos. Tabela de fronteiras da manutenção: reserva que termina exatamente no início, que começa exatamente no fim e que cruza um segundo. Fronteira indefinida vira pergunta. Indicar quais cenários viram teste de unidade e quais viram teste de API.
+
+h3. Por que (explicação)
+Prompt 1 da Aula 09. BDD transforma regra em exemplo verificável antes do código. Cada cenário tem um único Quando e um Então observável.
+
+h3. Critérios de aceite
+* 4 regras com cenários
+* Tabela de fronteiras
+* Cada cenário com um único Quando
+
+h3. Rastreabilidade
+* Requisitos: RF-07, RF-08
+* Arquivos: docs/testes/bdd-aprovacao-bloqueio.md
+* Processo: docs/processo/ai-workflow.md",semana-41,sprint-3,area-documentacao,sem-spec,qualidade-senac
+[T-34] S41 · Backend · Aprovação de recurso restrito com TDD estrito,Task,High,Caio,"*Área:* Backend  |  *Semana:* 41 (Aula 09 · TDD e BDD no projeto)  |  *Sprint:* 3
+*Dono:* Caio  |  *Fluxo:* Regra crítica: spec + revisão + validação + grill-with-docs  |  *Depende de:* T-15, T-33
+
+h3. O que fazer
+Um cenário por vez: 1 teste JUnit 5 → ./mvnw -B test falhando por asserção → commit test(red): <cenário> → mínimo para ficar verde → commit feat(green): <cenário> → refatoração → commit refactor: <motivo>. Regras: reserva de recurso restrito fica SOLICITADA até o Responsável aprovar ou rejeitar; só o Responsável aprova; o Solicitante não aprova a própria reserva.
+
+h3. Por que (explicação)
+RF07 e o item 'TDD ou BDD com evidência' da especificação. O professor abre o histórico e procura o commit vermelho.
+
+h3. Critérios de aceite
+* Spec liberada
+* Commits red, green e refactor por cenário no histórico
+* 403 para quem não é Responsável
+
+h3. Rastreabilidade
+* Requisitos: RF-07
+* Arquivos: src/main/java/.../reserva/aprovacao/
+* Processo: docs/processo/ai-workflow.md",semana-41,sprint-3,area-backend,regra-critica,qualidade-senac
+[T-35] S41 · Backend · Bloqueio de recursos em manutenção com TDD estrito,Task,High,Samuel,"*Área:* Backend  |  *Semana:* 41 (Aula 09 · TDD e BDD no projeto)  |  *Sprint:* 3
+*Dono:* Samuel  |  *Fluxo:* Regra crítica: spec + revisão + validação + grill-with-docs  |  *Depende de:* T-33
+
+h3. O que fazer
+Mesmo ciclo red → green → refactor da T-34, com commits separados. O Administrador registra períodos de manutenção; reservas que tocam o período são recusadas, seguindo a tabela de fronteiras do BDD. Clock injetado nas regras de manutenção.
+
+h3. Por que (explicação)
+RF08. Na mesa, o professor pede para quebrar a regra de manutenção e mostrar qual teste falha.
+
+h3. Critérios de aceite
+* Spec liberada
+* Commits red, green e refactor por cenário
+* Fronteiras da tabela testadas
+
+h3. Rastreabilidade
+* Requisitos: RF-08
+* Arquivos: src/main/java/.../manutencao/
+* Processo: docs/processo/ai-workflow.md",semana-41,sprint-3,area-backend,regra-critica,qualidade-senac
+[T-36] S41 · Testes · Feature Cucumber executável e evidência de TDD,Task,High,Renata,"*Área:* Testes  |  *Semana:* 41 (Aula 09 · TDD e BDD no projeto)  |  *Sprint:* 3
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-34, T-35
+
+h3. O que fazer
+Adicionar cucumber-java e cucumber-junit-platform-engine; escrever src/test/resources/features/aprovacao-bloqueio.feature a partir do BDD; steps chamando a API via MockMvc com tokens de cada perfil; o verify roda as features no CI e o gate do JaCoCo continua passando. Montar docs/testes/evidencia-tdd.md (cenário → commit red → commit green → commit refactor → trecho da saída) com os commits das T-34 e T-35. Atualizar a RTM com requisito → cenário → feature → commit.
+
+h3. Por que (explicação)
+Fecha o entregável da Aula 09: PR com commits red/green/refactor, feature executável, evidência de TDD e RTM atualizada.
+
+h3. Critérios de aceite
+* Features rodando no CI
+* evidencia-tdd.md com links para os commits
+* RTM atualizada
+
+h3. Rastreabilidade
+* Requisitos: RF-07, RF-08
+* Arquivos: src/test/resources/features/, docs/testes/evidencia-tdd.md, docs/rtm.md
+* Processo: docs/processo/ai-workflow.md",semana-41,sprint-3,area-testes,sem-spec,qualidade-senac
+[T-37] S42 · Backend · Proteção contra dupla reserva com teste de concorrência,Task,Highest,Samuel,"*Área:* Backend  |  *Semana:* 42 (Aula 10 · Carga e concorrência)  |  *Sprint:* 3
+*Dono:* Samuel  |  *Fluxo:* Regra crítica: spec + revisão + validação + grill-with-docs  |  *Depende de:* T-30
+
+h3. O que fazer
+Teste de integração JUnit 5 + Testcontainers: 20 solicitações simultâneas (ExecutorService + CountDownLatch) para a mesma sala e horário; esperado exatamente 1 aceita e 19 recusadas com 409, e 1 única linha no banco, verificada por consulta. Repetir para a agenda do professor. Rodar 5 vezes seguidas. Se falhar, registrar o defeito em docs/defeitos/ e proteger no banco com EXCLUDE USING gist sobre tstzrange ou lock pessimista, com ADR curto.
+
+h3. Por que (explicação)
+RF06. Possibilidade de dupla reserva é limitador de nota. Na mesa, o professor pede para remover a proteção e rodar o teste: ele precisa ficar vermelho.
+
+h3. Critérios de aceite
+* Spec liberada
+* Vermelho sem a proteção e verde com ela
+* Contagem vem do banco
+* ADR da proteção
+* Estável em 5 execuções seguidas
+
+h3. Rastreabilidade
+* Requisitos: RF-06
+* Arquivos: src/test/java/.../concorrencia/, db/migration/, docs/adr/
+* Processo: docs/processo/ai-workflow.md",semana-42,sprint-3,area-backend,regra-critica,qualidade-senac
+"[T-38] S42 · Testes · Teste de carga com JMeter: RNF, plano, execução e resultado",Task,High,Renata,"*Área:* Testes  |  *Semana:* 42 (Aula 10 · Carga e concorrência)  |  *Sprint:* 3
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-15, T-37
+
+h3. O que fazer
+Escrever o RNF antes da ferramenta em docs/performance/rnf.md (ex.: p95 até 300 ms com 50 usuários e erro < 1% para consulta de disponibilidade e criação de reserva) e o modelo de carga. Plano perf/reservas.jmx com login e JSON Extractor do token, CSV Data Set (perf/usuarios.csv, usuários fictícios), consulta e criação disputando o mesmo recurso; asserção: criação responde 201 ou 409, nunca 500. Executar em CLI: jmeter -n -t perf/reservas.jmx -l perf/resultados/rodada-01.jtl -e -o perf/relatorio-01. Escrever docs/performance/resultado-01.md com ambiente, carga, p50/p95/p99, vazão e erro (separando 409 esperado de erro real), consulta ao banco confirmando no máximo 1 reserva por intervalo, decisão e hipótese de gargalo. Ligar RNF → plano → resultado na RTM.
+
+h3. Por que (explicação)
+Plano e resultado de carga são entregáveis; performance, segurança e robustez valem 10%. O professor pergunta de onde saiu o p95 e confere se o 409 foi contado como erro.
+
+h3. Critérios de aceite
+* RNF escrito antes da execução
+* Relatório HTML fora do Git (.gitignore)
+* 409 separado de erro real
+* Decisão: atende, não atende ou inconclusivo
+
+h3. Rastreabilidade
+* Requisitos: RNF de desempenho
+* Arquivos: docs/performance/, perf/reservas.jmx, perf/usuarios.csv
+* Processo: docs/processo/ai-workflow.md",semana-42,sprint-3,area-testes,sem-spec,qualidade-senac
+[T-39] S43 · Documentação · Status dos requisitos,Task,High,Renata,"*Área:* Documentação  |  *Semana:* 43 (Aula 11 · Auditoria, relatórios e requisitos restantes)  |  *Sprint:* 3
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-32
+
+h3. O que fazer
+Escrever docs/status-requisitos.md com os 14 RFs e as regras críticas: situação (feito, parcial, ausente) → evidência (arquivo e nome do teste) → risco se ficar de fora. Só marcar 'feito' quando houver teste que falharia se a regra quebrasse. Ordenar começando pelos limitadores de nota e propor a divisão das pendências até a semana 46.
+
+h3. Por que (explicação)
+Prompt 1 da Aula 11. Mostra com honestidade o que falta. Na mesa, o professor escolhe um item marcado como feito e pede o teste.
+
+h3. Critérios de aceite
+* 14 RFs e todas as regras críticas
+* Todo 'feito' aponta um teste
+* Pendências com responsável
+
+h3. Rastreabilidade
+* Requisitos: Todos
+* Arquivos: docs/status-requisitos.md
+* Processo: docs/processo/ai-workflow.md",semana-43,sprint-3,area-documentacao,sem-spec,qualidade-senac
+[T-40] S43 · Backend · Histórico auditável de mudanças de estado,Task,High,Renata,"*Área:* Backend  |  *Semana:* 43 (Aula 11 · Auditoria, relatórios e requisitos restantes)  |  *Sprint:* 3
+*Dono:* Renata  |  *Fluxo:* Regra crítica: spec + revisão + validação + grill-with-docs  |  *Depende de:* T-24, T-30
+
+h3. O que fazer
+Por TDD (commits separados de teste e código): toda mudança de estado grava um registro com reserva, usuário, instante (Clock), estado anterior, estado novo e motivo; o registro é imutável pela API; reserva iniciada não pode ser apagada. Teste de integração com Testcontainers provando a gravação na mesma transação e que rollback não deixa auditoria órfã. Consulta do histórico só para Responsável e Administrador (403 para Solicitante).
+
+h3. Por que (explicação)
+RF10 e regra crítica 'toda mudança de estado gera auditoria'. Na mesa, o professor pede o registro de auditoria de uma reserva cancelada.
+
+h3. Critérios de aceite
+* Spec liberada
+* Teste de rollback sem registro órfão
+* Nenhum endpoint altera ou apaga auditoria
+* 403 para Solicitante
+
+h3. Rastreabilidade
+* Requisitos: RF-10
+* Arquivos: src/main/java/.../auditoria/
+* Processo: docs/processo/ai-workflow.md",semana-43,sprint-3,area-backend,regra-critica,qualidade-senac
+[T-41] S43 · Backend · Relatório de utilização com oráculo calculado à mão,Task,High,Caio,"*Área:* Backend  |  *Semana:* 43 (Aula 11 · Auditoria, relatórios e requisitos restantes)  |  *Sprint:* 3
+*Dono:* Caio  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-24, T-37
+
+h3. O que fazer
+GET /relatorios/utilizacao?inicio=&fim= com horas reservadas por recurso, carga horária por professor e conflitos evitados (tentativas recusadas por sobreposição). Testes de API caixa-preta com massa pequena semeada e valores esperados calculados à mão, com a conta num comentário do teste. Cobrir período vazio, reserva cruzando a borda do período e reservas canceladas (não contam). 401 sem token e 403 para Solicitante.
+
+h3. Por que (explicação)
+RF12. 'Os valores esperados não foram copiados da saída da própria aplicação.' Na mesa, o professor refaz uma linha à mão.
+
+h3. Critérios de aceite
+* Spec validada
+* Conta do oráculo em comentário
+* Bordas cobertas
+* 401 e 403 testados
+
+h3. Rastreabilidade
+* Requisitos: RF-12
+* Arquivos: src/main/java/.../relatorio/
+* Processo: docs/processo/ai-workflow.md",semana-43,sprint-3,area-backend,spec,qualidade-senac
+[T-42] S43 · Backend · Registro de retirada e devolução de materiais,Task,Medium,Samuel,"*Área:* Backend  |  *Semana:* 43 (Aula 11 · Auditoria, relatórios e requisitos restantes)  |  *Sprint:* 3
+*Dono:* Samuel  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-24
+
+h3. O que fazer
+O Responsável registra a retirada e a devolução de um material ligado a uma reserva aprovada; devolução atrasada fica sinalizada; não é possível retirar material sem reserva aprovada.
+
+h3. Por que (explicação)
+RF09. Nenhuma aula cobre este requisito, mas ele é obrigatório.
+
+h3. Critérios de aceite
+* Spec validada
+* Testes de retirada sem reserva, devolução atrasada e permissão
+
+h3. Rastreabilidade
+* Requisitos: RF-09
+* Arquivos: src/main/java/.../material/
+* Processo: docs/processo/ai-workflow.md",semana-43,sprint-3,area-backend,spec,qualidade-senac
+"[T-43] S43 · Backend · Pesquisa de recursos por tipo, capacidade, localização, competência e disponibilidade",Task,Medium,Caio,"*Área:* Backend  |  *Semana:* 43 (Aula 11 · Auditoria, relatórios e requisitos restantes)  |  *Sprint:* 3
+*Dono:* Caio  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-23, T-35
+
+h3. O que fazer
+Endpoint de busca combinando filtros, incluindo disponibilidade num intervalo de tempo (exclui recursos com reserva sobreposta ou em manutenção).
+
+h3. Por que (explicação)
+RF03. Nenhuma aula cobre este requisito, mas ele é obrigatório e é a tela mais usada pelo Solicitante.
+
+h3. Critérios de aceite
+* Spec validada
+* Testes com classes de equivalência dos filtros
+* Disponibilidade respeita manutenção
+
+h3. Rastreabilidade
+* Requisitos: RF-03
+* Arquivos: src/main/java/.../pesquisa/
+* Processo: docs/processo/ai-workflow.md",semana-43,sprint-3,area-backend,spec,qualidade-senac
+"[T-44] S43 · Frontend · Layout base responsivo, login e navegação por perfil",Task,High,Samuel,"*Área:* Frontend  |  *Semana:* 43 (Aula 11 · Auditoria, relatórios e requisitos restantes)  |  *Sprint:* 3
+*Dono:* Samuel  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-15, T-22
+
+h3. O que fazer
+Layout Thymeleaf com Bootstrap (responsivo em celular e desktop), tela de login, menu que muda conforme o perfil (thymeleaf-extras-springsecurity6), exibição padronizada de mensagens de sucesso e de erro compreensíveis, página de erro amigável.
+
+h3. Por que (explicação)
+RF13. É a base de todas as telas; fazer uma vez evita que cada tela tenha um visual diferente.
+
+h3. Critérios de aceite
+* Spec validada
+* Telas utilizáveis em 375 px de largura
+* Menu mostra só o que o perfil pode fazer
+
+h3. Rastreabilidade
+* Requisitos: RF-13
+* Arquivos: src/main/resources/templates/, src/main/java/.../web/
+* Processo: docs/processo/ai-workflow.md",semana-43,sprint-3,area-frontend,spec,qualidade-senac
+[T-45] S44 · Frontend · Telas do Solicitante,Task,High,Renata,"*Área:* Frontend  |  *Semana:* 44 (Aula 12 · Autorização, RTM e interface)  |  *Sprint:* 4
+*Dono:* Renata  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-43, T-44
+
+h3. O que fazer
+Pesquisa e consulta de disponibilidade, criação, alteração e cancelamento de reserva, lista 'minhas reservas' com estado. Mensagens de erro compreensíveis (ex.: 'A sala 12 já está reservada das 14h às 16h').
+
+h3. Por que (explicação)
+RF13 e RF04 pela interface. É o fluxo principal da demonstração na prova oral.
+
+h3. Critérios de aceite
+* Spec validada
+* Fluxo completo de reserva pela tela
+* Erros de regra exibidos em linguagem clara
+
+h3. Rastreabilidade
+* Requisitos: RF-03, RF-04, RF-13
+* Arquivos: src/main/resources/templates/solicitante/
+* Processo: docs/processo/ai-workflow.md",semana-44,sprint-4,area-frontend,spec,qualidade-senac
+[T-46] S44 · Frontend · Telas do Responsável e do Administrador,Task,High,Caio,"*Área:* Frontend  |  *Semana:* 44 (Aula 12 · Autorização, RTM e interface)  |  *Sprint:* 4
+*Dono:* Caio  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-41, T-42, T-44
+
+h3. O que fazer
+Responsável: fila de aprovação (aprovar ou rejeitar), retirada e devolução, histórico de auditoria. Administrador: cadastros de salas, professores, materiais e usuários, períodos de manutenção e relatório de utilização.
+
+h3. Por que (explicação)
+RF13 aplicado aos outros dois perfis.
+
+h3. Critérios de aceite
+* Spec validada
+* Cada operação dos perfis acessível pela tela
+* Ações proibidas não aparecem no menu e retornam 403 se forçadas
+
+h3. Rastreabilidade
+* Requisitos: RF-02, RF-07, RF-08, RF-09, RF-10, RF-12, RF-13
+* Arquivos: src/main/resources/templates/responsavel/, .../administrador/
+* Processo: docs/processo/ai-workflow.md",semana-44,sprint-4,area-frontend,spec,qualidade-senac
+[T-47] S44 · Testes · Testes end-to-end dos fluxos principais,Task,High,Samuel,"*Área:* Testes  |  *Semana:* 44 (Aula 12 · Autorização, RTM e interface)  |  *Sprint:* 4
+*Dono:* Samuel  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-45, T-46
+
+h3. O que fazer
+Testes E2E com navegador real (Playwright for Java ou Selenium) sobre a aplicação subindo com Testcontainers: login, pesquisa, criação de reserva, aprovação pelo Responsável e cancelamento. Rodar no CI.
+
+h3. Por que (explicação)
+A especificação exige testes end-to-end e nenhuma aula mostra como; fica a critério do time.
+
+h3. Critérios de aceite
+* Pelo menos 3 fluxos E2E
+* Rodando no CI sem intervenção manual
+
+h3. Rastreabilidade
+* Requisitos: RF-13
+* Arquivos: src/test/java/.../e2e/
+* Processo: docs/processo/ai-workflow.md",semana-44,sprint-4,area-testes,sem-spec,qualidade-senac
+[T-48] S44 · Documentação · Matriz de autorização,Task,Highest,Samuel,"*Área:* Documentação  |  *Semana:* 44 (Aula 12 · Autorização, RTM e interface)  |  *Sprint:* 4
+*Dono:* Samuel  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-41, T-42, T-43
+
+h3. O que fazer
+Escrever docs/seguranca/matriz-autorizacao.md: uma linha por operação da API e colunas anônimo, Solicitante, Responsável e Administrador, com o status esperado (200, 201, 204, 401, 403). Regras de posse: o Solicitante só altera e cancela as próprias reservas; só o Responsável aprova recurso restrito. Marcar divergências com o código sem corrigir e listar rotas fora de qualquer regra de segurança.
+
+h3. Por que (explicação)
+Prompt 1 da Aula 12. Falha de autorização é limitador de nota. Toda rota precisa estar na matriz.
+
+h3. Critérios de aceite
+* Toda rota da API está na matriz
+* Regras de posse explícitas
+* Divergências listadas
+
+h3. Rastreabilidade
+* Requisitos: RF-01
+* Arquivos: docs/seguranca/matriz-autorizacao.md
+* Processo: docs/processo/ai-workflow.md",semana-44,sprint-4,area-documentacao,sem-spec,qualidade-senac
+[T-49] S44 · Testes · Matriz de autorização como teste parametrizado,Task,Highest,Samuel,"*Área:* Testes  |  *Semana:* 44 (Aula 12 · Autorização, RTM e interface)  |  *Sprint:* 4
+*Dono:* Samuel  |  *Fluxo:* Regra crítica: spec + revisão + validação + grill-with-docs  |  *Depende de:* T-48
+
+h3. O que fazer
+@ParameterizedTest + @MethodSource percorrendo cada célula da matriz (operação, perfil, status) via MockMvc com tokens reais. Casos de posse (Solicitante altera ou cancela a reserva de outro pelo id). Validação de entrada (término antes do início, capacidade negativa, campos ausentes) → 400 com mensagem compreensível. Nenhuma resposta de erro com stack trace, SQL ou nome de classe. Cada célula vermelha vira defeito em docs/defeitos/ antes da correção, que vai em commit próprio referenciando o defeito.
+
+h3. Por que (explicação)
+Prompt 2 da Aula 12. Na mesa, o professor faz uma requisição de Solicitante na reserva de outro. Nenhuma célula pode ser apagada para passar.
+
+h3. Critérios de aceite
+* Spec liberada
+* Todas as células da matriz testadas
+* Defeitos registrados antes das correções
+
+h3. Rastreabilidade
+* Requisitos: RF-01, RF-13
+* Arquivos: src/test/java/.../seguranca/, docs/defeitos/
+* Processo: docs/processo/ai-workflow.md",semana-44,sprint-4,area-testes,regra-critica,qualidade-senac
+[T-50] S44 · Testes · Mutação manual nas regras críticas e fechamento da RTM,Task,Highest,Renata,"*Área:* Testes  |  *Semana:* 44 (Aula 12 · Autorização, RTM e interface)  |  *Sprint:* 4
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-37, T-40, T-49
+
+h3. O que fazer
+Para cada regra crítica (sobreposição, dupla reserva, aprovação de restrito, manutenção, autorização, auditoria): quebrar a regra no código, rodar o teste ligado, registrar e desfazer com git restore. Registrar em docs/testes/mutacao-manual.md a regra, a quebra, o teste e o resultado. Teste que continuou verde é lacuna: escrever o teste que falta. Percorrer docs/rtm.md e garantir que cada requisito crítico tem risco, teste e evidência do CI no commit atual. Informar a % de requisitos críticos com evidência.
+
+h3. Por que (explicação)
+Prompt 3 da Aula 12. Meta da especificação: 100% dos requisitos críticos na RTM. Na mesa, o professor pede para repetir uma mutação.
+
+h3. Critérios de aceite
+* Uma mutação por regra crítica
+* Nenhuma mutação sobreviveu sem ação
+* RTM com 100% dos críticos com evidência
+
+h3. Rastreabilidade
+* Requisitos: Regras críticas
+* Arquivos: docs/testes/mutacao-manual.md, docs/rtm.md
+* Processo: docs/processo/ai-workflow.md",semana-44,sprint-4,area-testes,sem-spec,qualidade-senac
+[T-51] S44 · Documentação · Documentação da API com OpenAPI,Task,Medium,Caio,"*Área:* Documentação  |  *Semana:* 44 (Aula 12 · Autorização, RTM e interface)  |  *Sprint:* 4
+*Dono:* Caio  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-41
+
+h3. O que fazer
+Adicionar springdoc-openapi, descrever todos os endpoints (parâmetros, respostas, erros e perfis permitidos) e linkar o Swagger UI no README, junto com os fluxos públicos.
+
+h3. Por que (explicação)
+RF14 e entregável 'README e documentação da API'. O relatório de utilização (Aula 11) também pede documentação no README ou OpenAPI.
+
+h3. Critérios de aceite
+* Swagger UI acessível com a aplicação rodando
+* Todos os endpoints descritos
+* Link no README
+
+h3. Rastreabilidade
+* Requisitos: RF-14
+* Arquivos: pom.xml, README.md
+* Processo: docs/processo/ai-workflow.md",semana-44,sprint-4,area-documentacao,sem-spec,qualidade-senac
+[T-52] S45 · Documentação · Relatório de qualidade,Task,High,Renata,"*Área:* Documentação  |  *Semana:* 45 (Aula 13 · Preparação para a prova oral)  |  *Sprint:* 4
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-50
+
+h3. O que fazer
+Escrever docs/relatorio-qualidade.md: identificação (repositório, commit, data, integrantes, ambiente), escopo e fora de escopo, estratégia por nível, resultados comparados às metas (80% linhas, 70% branches, 100% críticos na RTM, 0 bugs ou vulnerabilidades críticas), defeitos por severidade e situação, riscos residuais e recomendação. Para cada afirmação: evidência, interpretação e limite; o que não foi medido fica 'não medido' com o motivo.
+
+h3. Por que (explicação)
+Entregável 'relatório final de qualidade'. Na mesa, o professor escolhe um número do relatório e pede a fonte.
+
+h3. Critérios de aceite
+* Toda métrica aponta a fonte
+* Comparação explícita com as 4 metas
+* Riscos residuais listados
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: docs/relatorio-qualidade.md
+* Processo: docs/processo/ai-workflow.md",semana-45,sprint-4,area-documentacao,sem-spec,qualidade-senac
+[T-53] S45 · Documentação · Banco de perguntas da prova oral,Task,High,Caio,"*Área:* Documentação  |  *Semana:* 45 (Aula 13 · Preparação para a prova oral)  |  *Sprint:* 4
+*Dono:* Caio  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-52
+
+h3. O que fazer
+Escrever docs/prova-oral/perguntas.md com 15 perguntas específicas do projeto, cada uma com o arquivo onde está a resposta e a descrição de uma resposta fraca. Distribuir para que cada integrante responda sobre partes que NÃO escreveu. Sem as respostas.
+
+h3. Por que (explicação)
+Prompt 2 da Aula 13. Na prova oral qualquer integrante pode ser perguntado sobre qualquer parte.
+
+h3. Critérios de aceite
+* 15 perguntas com arquivo de referência
+* Distribuição cruzada entre os 3
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: docs/prova-oral/perguntas.md
+* Processo: docs/processo/ai-workflow.md",semana-45,sprint-4,area-documentacao,sem-spec,qualidade-senac
+[T-54] S45 · Documentação · Ensaio da prova oral e apresentação,Task,High,,"*Área:* Documentação  |  *Semana:* 45 (Aula 13 · Preparação para a prova oral)  |  *Sprint:* 4
+*Dono:* Todos  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-53
+
+h3. O que fazer
+Ensaio com o agente: uma pergunta por vez, notas de 0 a 2 em correção técnica, evidência citada e domínio de autoria, trocando de integrante a cada 5 perguntas. Gerar docs/prova-oral/ensaio.md com a pontuação por pessoa, as 3 lacunas mais frequentes (cada uma vira task com responsável) e um plano de estudo até a semana 47. Montar a apresentação e simular o roteiro de 8 minutos: problema e risco, arquitetura, demonstração, testes e CI, RTM e relatório, limitações.
+
+h3. Por que (explicação)
+Prompt 3 da Aula 13 e entregável 'apresentação e demonstração'. O professor confere se as lacunas do ensaio têm responsável.
+
+h3. Critérios de aceite
+* ensaio.md com pontuação por pessoa
+* Lacunas viraram tasks com responsável
+* Roteiro de 8 minutos cronometrado
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: docs/prova-oral/ensaio.md, docs/prova-oral/apresentacao/
+* Processo: docs/processo/ai-workflow.md",semana-45,sprint-4,area-documentacao,sem-spec,qualidade-senac
+[T-55] S46 · Infra · Clone limpo e checklist de entrega,Task,Highest,Caio,"*Área:* Infra  |  *Semana:* 46 (Aula 14 · Entrega do trabalho final)  |  *Sprint:* 4
+*Dono:* Caio  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-52
+
+h3. O que fazer
+Clonar o repositório num diretório temporário e seguir APENAS o README até ./mvnw -B verify passar e a aplicação subir. Conferir os 12 entregáveis da especificação e escrever docs/entrega/checklist.md com item → existe → atualizado → caminho, e os bloqueadores em ordem. Não corrigir nesta etapa: cada bloqueador vira task.
+
+h3. Por que (explicação)
+Prompt 1 da Aula 14. O professor clona o repositório e segue o README; aplicação que não executa é limitador de nota.
+
+h3. Critérios de aceite
+* Clone limpo executado só com o README
+* 12 entregáveis conferidos
+* Bloqueadores com responsável
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: docs/entrega/checklist.md
+* Processo: docs/processo/ai-workflow.md",semana-46,sprint-4,area-infra,sem-spec,qualidade-senac
+[T-56] S46 · Infra · Release candidate v1.0.0-rc1 e pacote de evidências,Task,Highest,Samuel,"*Área:* Infra  |  *Semana:* 46 (Aula 14 · Entrega do trabalho final)  |  *Sprint:* 4
+*Dono:* Samuel  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-55
+
+h3. O que fazer
+Com o CI verde na main, criar a tag anotada v1.0.0-rc1 e enviá-la. Escrever CHANGELOG.md. Montar docs/evidencias/README.md como índice: run do CI no commit da tag, artifact do JaCoCo, Quality Gate do SonarCloud, docs/performance/resultado-01.md, docs/rtm.md, docs/defeitos/ e docs/relatorio-qualidade.md. Toda evidência aponta para o commit da tag; correção depois vira v1.0.0-rc2 (nunca mover tag).
+
+h3. Por que (explicação)
+Prompt 2 da Aula 14. O professor abre o run do CI ligado à tag.
+
+h3. Critérios de aceite
+* Tag anotada com CI verde
+* CHANGELOG.md
+* Índice de evidências apontando para o commit da tag
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: CHANGELOG.md, docs/evidencias/README.md
+* Processo: docs/processo/ai-workflow.md",semana-46,sprint-4,area-infra,sem-spec,qualidade-senac
+[T-57] S46 · Documentação · Decisão de qualidade e envio do formulário,Task,Highest,Renata,"*Área:* Documentação  |  *Semana:* 46 (Aula 14 · Entrega do trabalho final)  |  *Sprint:* 4
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-56
+
+h3. O que fazer
+Escrever docs/decisao-qualidade.md: decisão (liberar, liberar com ressalvas ou bloquear), critérios com a evidência de cada um, riscos aceitos com impacto, justificativa e responsável, e o nome de cada integrante declarando o que fez. Não escrever 'pronto para produção' a partir de testes locais. Enviar o formulário de entrega do Hub (turma, nomes completos dos 3, link do repositório público) e guardar o comprovante.
+
+h3. Por que (explicação)
+Prompt 3 da Aula 14 e a entrega oficial. Sem o formulário, não há entrega.
+
+h3. Critérios de aceite
+* decisao-qualidade.md com a declaração dos 3
+* Formulário enviado e comprovante guardado
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: docs/decisao-qualidade.md
+* Processo: docs/processo/ai-workflow.md",semana-46,sprint-4,area-documentacao,sem-spec,qualidade-senac
+[T-58] S47 · Documentação · Prova oral,Task,High,,"*Área:* Documentação  |  *Semana:* 47 (Prova oral)  |  *Sprint:* 4
+*Dono:* Todos  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-54, T-57
+
+h3. O que fazer
+Apresentar o roteiro de 8 minutos com demonstração ao vivo e responder às perguntas do professor. Cada integrante defende as próprias decisões e responde sobre as partes dos colegas.
+
+h3. Por que (explicação)
+Arguição do trabalho final: 'você defende as decisões de qualidade que tomou'.
+
+h3. Critérios de aceite
+* Os 3 presentes
+* Demonstração funcionando a partir da tag
+
+h3. Rastreabilidade
+* Requisitos: —
+* Arquivos: —
+* Processo: docs/processo/ai-workflow.md",semana-47,sprint-4,area-documentacao,sem-spec,qualidade-senac
