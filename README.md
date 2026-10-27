@@ -8,7 +8,7 @@ O sistema organiza a reserva de **salas, professores e materiais** de uma instit
 
 ## Como trabalhamos
 
-Toda task nasce no Jira e segue o fluxo **Spec-Driven Development**: spec → revisão por pares → spec validation → grill-with-docs (regras críticas) → TDD → pull request. Leia antes de começar:
+Toda task nasce no [backlog](docs/planejamento/backlog.md), com um ID `T-NN`, e segue o fluxo **Spec-Driven Development**: spec → revisão por pares → spec validation → grill-with-docs (regras críticas) → TDD → pull request. Leia antes de começar:
 
 - [AI Workflow](docs/processo/ai-workflow.md): o passo a passo de cada task;
 - [CONTRIBUTING](CONTRIBUTING.md): branches, commits e pull requests;

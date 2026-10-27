@@ -1,6 +1,6 @@
-# AI Workflow: do Jira ao merge
+# AI Workflow: da task ao merge
 
-Este documento descreve **o caminho de toda task**, do momento em que alguém a pega no Jira até o merge na `main`. Ele vale para as três pessoas do time e para o Claude, que lê as mesmas regras pelo [`CLAUDE.md`](../../CLAUDE.md).
+Este documento descreve **o caminho de toda task**, do momento em que alguém a pega no [backlog](../planejamento/backlog.md) até o merge na `main`. O time não usa Jira ([ADR-0003](../adr/0003-retirar-o-jira-do-fluxo.md)). Ele vale para as três pessoas do time e para o Claude, que lê as mesmas regras pelo [`CLAUDE.md`](../../CLAUDE.md).
 
 A ideia central é o **Spec-Driven Development**: nenhuma linha de código de produção é escrita antes de existir uma especificação revisada por outra pessoa, validada e confrontada com a documentação.
 
@@ -8,7 +8,7 @@ A ideia central é o **Spec-Driven Development**: nenhuma linha de código de pr
 
 ```mermaid
 flowchart LR
-    A[Pegar task no Jira] --> B[Criar branch]
+    A[Pegar task no backlog] --> B[Criar branch]
     B --> C{Muda comportamento<br/>do sistema?}
     C -- não --> H
     C -- sim --> D[1. Escrever spec]
@@ -24,7 +24,7 @@ flowchart LR
     H --> I[6. Abrir PR]
     I --> J[7. Code review + CI]
     J -- ajustes --> H
-    J -- aprovado --> K[Merge + Jira Concluída]
+    J -- aprovado --> K[Merge = task concluída]
 ```
 
 ## Quem revisa quem
@@ -37,46 +37,47 @@ A revisão é sempre feita por **outra pessoa**, em rodízio fixo, para que todo
 | Samuel | Caio |
 | Caio | Renata |
 
-Se o revisor estiver indisponível por mais de 24 horas, a terceira pessoa assume e isso é anotado no Jira.
+Se o revisor estiver indisponível por mais de 24 horas, a terceira pessoa assume e isso é anotado no PR (campo **Revisor** do template). O rodízio temporário durante a ausência da Renata está no [CONTRIBUTING](../../CONTRIBUTING.md#time).
 
-## Colunas do board no Jira
+## Estados da task
 
-| Coluna | A task está aqui quando... |
-|---|---|
-| **A fazer** | Ainda ninguém começou. |
-| **Spec** | O dono está escrevendo a spec. |
-| **Revisão da spec** | A spec aguarda o parecer do revisor. |
-| **Pronta para dev** | A spec passou na validação (e no grill, se for crítica). |
-| **Em desenvolvimento** | Ciclos de TDD em andamento. Tasks sem spec começam aqui. |
-| **Em revisão** | O PR foi aberto. |
-| **Concluída** | O PR foi mergeado com CI verde. |
+Não há board. O estado de cada task aparece no próprio repositório:
 
-Tasks com o rótulo `sem-spec` (documentação e infraestrutura) pulam direto de **A fazer** para **Em desenvolvimento**.
+| Estado | A task está aqui quando... | Onde se vê |
+|---|---|---|
+| **A fazer** | Ainda ninguém começou. | Não existe branch com o ID da task |
+| **Spec** | O dono está escrevendo a spec. | Branch criada e spec em `docs/specs/` |
+| **Revisão da spec** | A spec aguarda o parecer do revisor. | Status da spec `Em revisão` |
+| **Pronta para dev** | A spec passou na validação (e no grill, se for crítica). | Status da spec `Liberada` |
+| **Em desenvolvimento** | Ciclos de TDD em andamento. Tasks sem spec começam aqui. | Commits `test(red)`/`feat(green)` na branch |
+| **Em revisão** | O PR foi aberto. | PR aberto no GitHub |
+| **Concluída** | O PR foi mergeado com CI verde. | PR mergeado na `main` |
+
+Tasks sem spec (fluxo `—` no backlog: documentação e infraestrutura) pulam direto de **A fazer** para **Em desenvolvimento**. Pendências e defeitos que surgirem no caminho viram issues no GitHub.
 
 ---
 
 ## Passo 0: pegar a task
 
-1. No Jira, pegue uma task **atribuída a você** cuja dependência (campo "Depende de") já esteja concluída.
-2. Mova-a para **Spec** (ou **Em desenvolvimento**, se for `sem-spec`).
-3. Leia a task completa em [`backlog.md`](../planejamento/backlog.md).
+1. No [`backlog.md`](../planejamento/backlog.md), pegue uma task da qual **você é o dono** e cuja dependência (coluna "Depende de") já esteja concluída, ou seja, com o PR mergeado.
+2. Leia a task completa no mesmo arquivo.
 
 ## Passo 0.1: criar a branch
 
 ```bash
 git checkout main
 git pull
-git checkout -b feature/KAN-23-criar-reserva
+git checkout -b feature/T-23-criar-reserva
 ```
 
-O padrão é `<tipo>/<CHAVE-JIRA>-<descricao-curta>`. Os tipos e as regras completas estão no [CONTRIBUTING](../../CONTRIBUTING.md#nomes-de-branch). A chave do Jira no nome faz a branch, os commits e o PR aparecerem automaticamente dentro da task no Jira.
+O padrão é `<tipo>/<ID-DA-TASK>-<descricao-curta>`. Os tipos e as regras completas estão no [CONTRIBUTING](../../CONTRIBUTING.md#nomes-de-branch). O ID da task no nome liga a branch, os commits e o PR à task do backlog.
 
 **Na branch você pode commitar e dar push quantas vezes quiser.** O PR só é aberto no passo 6, quando a task estiver terminada.
 
 ## Passo 1: escrever a spec
 
 - **Quem faz:** o dono da task.
-- **Arquivo:** `docs/specs/KAN-23-criar-reserva.md`, copiado de [`_TEMPLATE.md`](../specs/_TEMPLATE.md).
+- **Arquivo:** `docs/specs/T-23-criar-reserva.md`, copiado de [`_TEMPLATE.md`](../specs/_TEMPLATE.md).
 - **Com o Claude:** rode `/iniciar-task`. Ele cria o arquivo a partir do template, puxa os requisitos do PRD e **faz perguntas**, mas quem decide as regras e escreve os critérios de aceite é você.
 
 O que não pode faltar:
@@ -87,12 +88,12 @@ O que não pode faltar:
 - casos de teste ligados a cada critério (classes de equivalência e valor limite);
 - mini-plano com os ciclos de TDD.
 
-Ao terminar: mude o status da spec para `Em revisão`, faça commit e push, mova a task no Jira para **Revisão da spec** e avise o revisor.
+Ao terminar: mude o status da spec para `Em revisão`, faça commit e push e avise o revisor.
 
 ```bash
-git add docs/specs/KAN-23-criar-reserva.md
-git commit -m "docs(spec): cria spec de criação de reserva (KAN-23)"
-git push -u origin feature/KAN-23-criar-reserva
+git add docs/specs/T-23-criar-reserva.md
+git commit -m "docs(spec): cria spec de criação de reserva (T-23)"
+git push -u origin feature/T-23-criar-reserva
 ```
 
 ## Passo 2: revisão por pares
@@ -103,9 +104,9 @@ git push -u origin feature/KAN-23-criar-reserva
 
 ```bash
 git fetch
-git checkout feature/KAN-23-criar-reserva
+git checkout feature/T-23-criar-reserva
 # preenche a seção 9
-git commit -am "docs(spec): revisa spec de criação de reserva (KAN-23)"
+git commit -am "docs(spec): revisa spec de criação de reserva (T-23)"
 git push
 ```
 
@@ -119,7 +120,7 @@ O commit de revisão fica com o nome do revisor no histórico. Essa é a **evid�
 Validação automática da estrutura da spec. Quem roda é o autor:
 
 ```bash
-./scripts/validar-spec.sh docs/specs/KAN-23-criar-reserva.md
+./scripts/validar-spec.sh docs/specs/T-23-criar-reserva.md
 ```
 
 O script confere, entre outros pontos: as seções obrigatórias, autor diferente do revisor, parecer `Aprovada`, critérios no formato Dado/Quando/Então, todo critério de aceite com pelo menos um caso de teste, mini-plano preenchido e ausência de trechos `_preencher_`.
@@ -134,7 +135,7 @@ Para tasks com fluxo `spec` (não críticas), a task vai agora para **Pronta par
 Uma "sabatina" de 10 a 15 minutos em que o Claude **cruza a spec com toda a documentação** e faz perguntas difíceis, **uma de cada vez**:
 
 ```
-/grill-with-docs docs/specs/KAN-23-criar-reserva.md
+/grill-with-docs docs/specs/T-23-criar-reserva.md
 ```
 
 O Claude confere a spec contra:
@@ -159,9 +160,9 @@ Siga o mini-plano da seção 8 da spec, **um ciclo por vez**:
 3. **Refactor:** melhore o código sem mudar o comportamento, com os testes verdes. Faça commit se houver mudança.
 
 ```bash
-git commit -m "test(red): término anterior ao início é recusado (KAN-23)"
-git commit -m "feat(green): término anterior ao início é recusado (KAN-23)"
-git commit -m "refactor: extrai validação de intervalo (KAN-23)"
+git commit -m "test(red): término anterior ao início é recusado (T-23)"
+git commit -m "feat(green): término anterior ao início é recusado (T-23)"
+git commit -m "refactor: extrai validação de intervalo (T-23)"
 ```
 
 Os commits `test(red)` separados são a **evidência de TDD** que o professor procura no histórico (Aula 09). Formato completo no [CONTRIBUTING](../../CONTRIBUTING.md#commits-de-tdd). O CI roda só no PR e na `main`, então um commit vermelho na sua branch não quebra nada.
@@ -182,17 +183,17 @@ Antes de abrir, confira a **Definition of Done**:
 Rode `/preparar-pr`: o Claude preenche o [template de PR](../../.github/pull_request_template.md) com base na spec e nos commits. Você revisa o texto e abre o PR:
 
 ```bash
-gh pr create --title "KAN-23: criar reserva com validação de intervalo" --body-file /caminho/do/texto.md
+gh pr create --title "T-23: criar reserva com validação de intervalo" --body-file /caminho/do/texto.md
 ```
 
-Mova a task no Jira para **Em revisão**. Não abra PR em rascunho (*draft*) nem PR de task pela metade.
+Avise o revisor. Não abra PR em rascunho (*draft*) nem PR de task pela metade.
 
 ## Passo 7: code review e merge
 
 - O revisor do rodízio revisa o código **no GitHub**, comentando nas linhas.
-- O merge só é liberado com **1 aprovação** e **CI verde**, regras garantidas pela proteção da `main`.
+- O merge só é liberado com **1 aprovação** e **CI verde**. Essas regras devem ser garantidas pela proteção da `main`, que ainda está pendente ([CONTRIBUTING](../../CONTRIBUTING.md#a-branch-main)).
 - Use **"Create a merge commit"**, e não *squash*: assim os commits red/green continuam visíveis como evidência de TDD.
-- Quem faz o merge é o **autor**, depois da aprovação. Apague a branch e mova a task para **Concluída**.
+- Quem faz o merge é o **autor**, depois da aprovação. Apague a branch: o merge é o que marca a task como **Concluída**. Se o PR resolve uma issue, o `Closes #N` do corpo a fecha automaticamente.
 
 ---
 
