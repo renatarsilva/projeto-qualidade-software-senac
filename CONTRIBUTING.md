@@ -10,6 +10,8 @@ Este guia define **as convenções** do time. O passo a passo de cada task (spec
 | Samuel | [@Samwel-Merces](https://github.com/Samwel-Merces) | Renata |
 | Caio | [@CaiosAguiar](https://github.com/CaiosAguiar) | Samuel |
 
+**Rodízio temporário:** enquanto a Renata estiver ausente, o Samuel revisa as tasks do Caio (regra da terceira pessoa do [AI Workflow](docs/processo/ai-workflow.md#quem-revisa-quem)), e o Caio continua revisando as do Samuel. A substituição é anotada no PR. Quando a Renata voltar, o rodízio da tabela volta a valer.
+
 ## Primeira configuração
 
 ```bash
@@ -26,35 +28,36 @@ Ferramentas: Java 21, Docker e GitHub CLI (`gh`). O Maven não precisa ser insta
 ## Nomes de branch
 
 ```
-<tipo>/<CHAVE-JIRA>-<descricao-curta>
+<tipo>/<ID-DA-TASK>-<descricao-curta>
 ```
 
 | Tipo | Quando usar | Exemplo |
 |---|---|---|
-| `feature` | Nova funcionalidade | `feature/KAN-23-criar-reserva` |
-| `fix` | Correção de defeito | `fix/KAN-41-sobreposicao-meia-noite` |
-| `test` | Só testes (sem código de produção) | `test/KAN-38-matriz-autorizacao` |
-| `docs` | Só documentação | `docs/KAN-7-prd` |
-| `chore` | Configuração, build, CI, dependências | `chore/KAN-5-pipeline-ci` |
-| `refactor` | Melhoria sem mudar comportamento | `refactor/KAN-44-extrai-validador-intervalo` |
+| `feature` | Nova funcionalidade | `feature/T-23-criar-reserva` |
+| `fix` | Correção de defeito | `fix/T-23-sobreposicao-meia-noite` |
+| `test` | Só testes (sem código de produção) | `test/T-49-matriz-autorizacao` |
+| `docs` | Só documentação | `docs/T-09-prd` |
+| `chore` | Configuração, build, CI, dependências | `chore/T-25-pipeline-ci` |
+| `refactor` | Melhoria sem mudar comportamento | `refactor/T-23-extrai-validador-intervalo` |
 
 Regras:
 - a descrição vai em **minúsculas, sem acento, com hífens** e em até 5 palavras;
 - **uma branch por task**, sempre criada a partir da `main` atualizada;
-- a chave do Jira é obrigatória: é ela que liga a branch, os commits e o PR à task no Jira.
+- o ID da task (`T-NN`, do [backlog](docs/planejamento/backlog.md)) é obrigatório: é ele que liga a branch, os commits e o PR à task. Trabalho que não é task do backlog usa o número da issue (ex.: `docs/issue-5-retirar-jira`). O Jira não é usado ([ADR-0003](docs/adr/0003-retirar-o-jira-do-fluxo.md)).
 
 ## Commits
 
-Padrão [Conventional Commits](https://www.conventionalcommits.org/pt-br/), em português, com a chave do Jira no final:
+Padrão [Conventional Commits](https://www.conventionalcommits.org/pt-br/), em português, com o ID da task no final (ou `#N`, o número da issue, quando não houver task):
 
 ```
-<tipo>(<escopo>): <o que mudou, no imperativo> (<CHAVE-JIRA>)
+<tipo>(<escopo>): <o que mudou, no imperativo> (<ID-DA-TASK>)
 ```
 
 ```
-docs(spec): cria spec de criação de reserva (KAN-23)
-feat(sala): adiciona cadastro de salas (KAN-16)
-fix(sobreposicao): considera reservas que cruzam a meia-noite (KAN-41)
+docs(spec): cria spec de criação de reserva (T-23)
+feat(sala): adiciona cadastro de salas (T-16)
+fix(sobreposicao): considera reservas que cruzam a meia-noite (T-23)
+docs(adr): registra a retirada do Jira do fluxo (#5)
 ```
 
 - Tipos: `feat`, `fix`, `test`, `docs`, `refactor`, `chore`, `ci`, `build`.
@@ -67,9 +70,9 @@ fix(sobreposicao): considera reservas que cruzam a meia-noite (KAN-41)
 Nas tasks de TDD, use o formato que o professor procura no histórico (Aula 09), um ciclo por cenário:
 
 ```
-test(red): término anterior ao início é recusado (KAN-23)
-feat(green): término anterior ao início é recusado (KAN-23)
-refactor: extrai validação de intervalo (KAN-23)
+test(red): término anterior ao início é recusado (T-23)
+feat(green): término anterior ao início é recusado (T-23)
+refactor: extrai validação de intervalo (T-23)
 ```
 
 - O `test(red)` só é commitado depois de rodar `./mvnw -B test` e ver o teste **falhar por asserção** (não por erro de compilação).
@@ -79,19 +82,19 @@ refactor: extrai validação de intervalo (KAN-23)
 ## Pull requests
 
 - **Só abra o PR quando a task estiver terminada**, com a Definition of Done do [AI Workflow](docs/processo/ai-workflow.md#passo-6-abrir-o-pr-só-com-a-task-terminada) cumprida. Nada de PR em rascunho ou pela metade.
-- Título: `<CHAVE-JIRA>: <descrição>`. Exemplo: `KAN-23: criar reserva com validação de intervalo`.
-- O corpo segue o [template](.github/pull_request_template.md), que o GitHub preenche automaticamente.
-- **Revisor:** a pessoa do rodízio (tabela acima).
+- Título: `<ID-DA-TASK>: <descrição>`. Exemplo: `T-23: criar reserva com validação de intervalo`.
+- O corpo segue o [template](.github/pull_request_template.md), que o GitHub preenche automaticamente. Se o PR resolve uma issue, escreva `Closes #N` no corpo.
+- **Revisor:** a pessoa do rodízio (tabela acima, incluindo o rodízio temporário).
 - **Merge:** feito pelo autor, depois de 1 aprovação e com o CI verde, usando **"Create a merge commit"** (não use *squash*, para preservar os commits red/green). Apague a branch depois do merge.
 
 ## A branch `main`
 
-- Ninguém faz push direto na `main`: tudo entra por PR. A regra é garantida pela proteção de branch no GitHub.
+- Ninguém faz push direto na `main`: tudo entra por PR. A regra deve ser garantida pela proteção de branch no GitHub. **Pendente:** a proteção ainda não está ativa e só a administradora do repositório (Renata) pode ativá-la. Até lá, a regra vale pelo combinado do time.
 - A `main` deve estar sempre executável e com o CI verde.
 
 ## Defeitos
 
-Defeitos encontrados durante o trabalho são registrados como **Bug** no Jira e documentados em `docs/defeitos/` (o processo é criado na task T-14). A correção segue o mesmo fluxo de qualquer task, com branch `fix/...`.
+Defeitos encontrados durante o trabalho são registrados como **issue no GitHub com o rótulo `bug`** e documentados em `docs/defeitos/` (o processo é criado na task T-14). A correção segue o mesmo fluxo de qualquer task, com branch `fix/...`.
 
 ## Uso de IA
 

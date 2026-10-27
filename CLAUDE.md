@@ -7,7 +7,7 @@ Instruções para o Claude Code neste repositório. Valem para **todas as pessoa
 - Projeto semestral de Qualidade de Software (TADS Senac 2026.2, Prof. Afonso Lelis): sistema de **Organização de Recursos** (reserva de salas, professores e materiais sem conflito).
 - Time de 3 pessoas: Renata (@renatarsilva), Samuel (@Samwel-Merces) e Caio (@CaiosAguiar).
 - Stack: Java 21, Spring Boot 3.5 (a especificação exige 3.x: não atualize para o 4), PostgreSQL com Flyway, telas Thymeleaf + Bootstrap, Maven (`./mvnw`), JUnit 5, Testcontainers, WireMock, Cucumber, JaCoCo, SonarCloud, GitHub Actions, JMeter.
-- Jira: projeto `KAN` (https://renatarsilva.atlassian.net/jira/software/projects/KAN/boards/1). Branches e commits levam a chave `KAN-NN`.
+- Sem Jira ([ADR-0003](docs/adr/0003-retirar-o-jira-do-fluxo.md)): branches, commits e títulos de PR levam o ID da task (`T-NN`, do backlog) ou, se não houver task, o número da issue (`#N`). Pendências e defeitos ficam em issues do GitHub. Nunca sugira chaves `KAN-NN`.
 - Fale sempre em **português**.
 
 ## Leia antes de agir
@@ -23,7 +23,7 @@ Instruções para o Claude Code neste repositório. Valem para **todas as pessoa
 ## Regras de git (obrigatórias)
 
 - **Nunca** execute `git commit`, `git commit --amend`, `git push`, `git tag`, `git merge` ou `git rebase`, nem abra pull requests (`gh pr create`), mesmo que pareça o próximo passo natural.
-- Quando algo estiver pronto para commit, avise e entregue a lista de arquivos alterados e uma mensagem no padrão do `CONTRIBUTING.md` (Conventional Commits em português, com a chave do Jira no final).
+- Quando algo estiver pronto para commit, avise e entregue a lista de arquivos alterados e uma mensagem no padrão do `CONTRIBUTING.md` (Conventional Commits em português, com o ID da task no final).
 - A pessoa faz o commit, o push e abre o PR manualmente.
 - Permitidos: `git status`, `git diff`, `git log`, `git fetch`, `git add`, `git checkout`/`git switch` para criar ou trocar de branch.
 
