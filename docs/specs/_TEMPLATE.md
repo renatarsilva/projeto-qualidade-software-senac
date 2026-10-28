@@ -1,7 +1,7 @@
-# Spec KAN-00: _preencher_ título curto
+# Spec T-00: _preencher_ título curto
 
 <!--
-Como usar: copie este arquivo para docs/specs/<CHAVE-JIRA>-<descricao-curta>.md
+Como usar: copie este arquivo para docs/specs/<ID-DA-TASK>-<descricao-curta>.md
 e substitua todo trecho _preencher_. O fluxo completo está em docs/processo/ai-workflow.md.
 
 Status possíveis, nesta ordem:
@@ -11,7 +11,7 @@ Rascunho → Em revisão → Aprovada → Validada → Liberada
 
 | Campo | Valor |
 |---|---|
-| Task (Jira) | KAN-00 · T-00 |
+| Task | T-00 |
 | Autor(a) | @_preencher_ |
 | Revisor(a) | @_preencher_ |
 | Status | Rascunho |

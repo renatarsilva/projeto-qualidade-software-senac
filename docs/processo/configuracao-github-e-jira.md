@@ -1,5 +1,7 @@
 # Configuração do GitHub e do Jira (task T-02)
 
+> **Aviso (26/10/2026):** o Jira saiu do fluxo do projeto ([ADR-0003](../adr/0003-retirar-o-jira-do-fluxo.md)). A **Parte B (Jira)** está obsoleta e foi mantida só como histórico, até o retorno da Renata. A **Parte A (GitHub)**, com a proteção da `main`, continua valendo e ainda está pendente.
+
 Passo a passo para deixar o repositório e o Jira prontos para o [AI Workflow](ai-workflow.md). Quem faz é a dona do repositório (@renatarsilva), porque essas telas exigem permissão de administrador.
 
 > As telas do GitHub e do Jira mudam com o tempo. Se um nome de botão estiver um pouco diferente, procure a opção equivalente.

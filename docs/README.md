@@ -5,7 +5,7 @@
 ## Comece por aqui
 
 1. [Contexto da disciplina](projeto/contexto-da-disciplina.md): o que o professor pede e como avalia.
-2. [AI Workflow](processo/ai-workflow.md): o caminho de toda task, do Jira ao merge.
+2. [AI Workflow](processo/ai-workflow.md): o caminho de toda task, do backlog ao merge.
 3. [CONTRIBUTING](../CONTRIBUTING.md): branches, commits, PRs e o rodízio de revisão.
 4. [Backlog](planejamento/backlog.md) e [sprints](planejamento/sprints.md): quem faz o quê e quando.
 
@@ -17,11 +17,12 @@ Os caminhos seguem os que o professor usa nas aulas. ✅ = existe; T-NN = task q
 |---|---|---|
 | `projeto/contexto-da-disciplina.md` | Especificação resumida, cronograma das aulas, avaliação e entrega | ✅ |
 | `processo/ai-workflow.md` | Fluxo SDD: spec → revisão → validação → grill → TDD → PR | ✅ |
-| `processo/configuracao-github-e-jira.md` | Proteção da `main`, Jira e integração | ✅ (executar na T-02) |
-| `planejamento/backlog.md` e `backlog-jira.csv` | 58 tasks, semana 32 a 47 | ✅ |
+| `processo/configuracao-github-e-jira.md` | Proteção da `main` (Parte A). A parte do Jira está obsoleta ([ADR-0003](adr/0003-retirar-o-jira-do-fluxo.md)) | ✅ (Parte A pendente, T-02) |
+| `planejamento/backlog.md` | 58 tasks, semana 32 a 47: a fonte das tasks | ✅ |
+| `planejamento/backlog-jira.csv` | Importação para o Jira, que não é mais usado | obsoleto · mantido até o retorno da Renata |
 | `planejamento/sprints.md` | Mini-plano e resultado de cada sprint | ✅ |
 | `specs/` | Uma spec por task ([template](specs/_TEMPLATE.md)) | ✅ template |
-| `adr/` | Decisões de arquitetura e processo ([template](adr/_TEMPLATE.md)) | ✅ 0001, 0002 · T-13, T-37 |
+| `adr/` | Decisões de arquitetura e processo ([template](adr/_TEMPLATE.md)) | ✅ 0001, 0002, 0003 · T-13, T-37 |
 | `prd.md` | Visão, personas, RF, RNF e RN numerados, escopo | esqueleto · T-04, T-09 |
 | `plano-de-teste.md` | Plano de teste (ISO/IEC/IEEE 29119-3) | esqueleto · T-06 |
 | `arquitetura.md` | Descoberta, C4, modelo de dados, sequências, ATAM e matriz | esqueleto · T-10 a T-13 |

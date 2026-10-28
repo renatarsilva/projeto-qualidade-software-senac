@@ -3,7 +3,7 @@
 # Etapa 3 do fluxo descrito em docs/processo/ai-workflow.md.
 #
 # Uso:
-#   ./scripts/validar-spec.sh docs/specs/KAN-23-criar-reserva.md
+#   ./scripts/validar-spec.sh docs/specs/T-23-criar-reserva.md
 #   ./scripts/validar-spec.sh docs/specs/*.md        (o _TEMPLATE.md é ignorado)
 #
 # Sai com código 0 se todas as specs passarem e 1 se alguma falhar,
@@ -50,9 +50,9 @@ validar() {
 
   # 1. Campos do cabeçalho
   local c valor
-  for c in "Task \(Jira\)" "Autor\(a\)" "Revisor\(a\)" "Status" "Regra crítica" "Requisitos" "Característica ISO 25010" "Criada em"; do
+  for c in "Task" "Autor\(a\)" "Revisor\(a\)" "Status" "Regra crítica" "Requisitos" "Característica ISO 25010" "Criada em"; do
     valor="$(campo "$tmp" "$c")"
-    if [ -z "$valor" ] || echo "$valor" | grep -qE "_preencher_|KAN-00|T-00|AAAA-MM-DD|RF00"; then
+    if [ -z "$valor" ] || echo "$valor" | grep -qE "_preencher_|T-00|AAAA-MM-DD|RF00"; then
       falha "campo '${c//\\/}' vazio ou com valor do template"
     fi
   done

@@ -3,7 +3,7 @@
 - **Status:** Proposta | Aceita | Substituída por ADR-NNNN | Descontinuada
 - **Data:** AAAA-MM-DD
 - **Autor(a):** @usuario
-- **Task:** KAN-
+- **Task:** T-NN (ou issue #N, se não houver task no backlog)
 
 ## Contexto
 

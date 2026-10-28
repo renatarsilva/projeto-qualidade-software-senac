@@ -2,7 +2,8 @@
 
 <!-- O que este PR resolve ou implementa. Uma ou duas frases. -->
 
-- **Task (Jira):** KAN-
+- **Task:** T- <!-- ID do backlog, ou "issue #N" se não houver task. Se resolver uma issue: Closes #N -->
+- **Revisor:** @... <!-- pessoa do rodízio; se for substituição, diga quem substitui quem e por quê -->
 - **Spec:** `docs/specs/...` <!-- ou "Não se aplica (task sem spec)" -->
 
 ## Tipo de alteração

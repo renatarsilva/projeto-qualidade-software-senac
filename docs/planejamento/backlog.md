@@ -1,10 +1,10 @@
 # Backlog do projeto
 
-> Gerado por `scripts/gerar-backlog.py`, a mesma fonte do `backlog-jira.csv`. Para mudar uma task, edite o script e rode-o de novo.
+> Gerado por `scripts/gerar-backlog.py`. Para mudar uma task, edite o script e rode-o de novo. O script também gera o `backlog-jira.csv`, obsoleto desde que o Jira saiu do fluxo ([ADR-0003](../adr/0003-retirar-o-jira-do-fluxo.md)).
 
 As tasks seguem as **semanas do cronograma da disciplina** (32 a 47) e cobrem tudo o que o professor pede em cada aula, aplicado ao projeto, mais os requisitos que nenhuma aula cobre (interface, retirada e devolução, pesquisa e OpenAPI). A semana 40 é a prova escrita, que não tem entrega no projeto.
 
-Cada task tem um **ID estável** (`T-NN`), que vai no título do Jira. A chave do Jira (`KAN-NN`) é gerada na importação, e é ela que aparece no nome da branch.
+Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commits e no título do PR. Este arquivo é a fonte das tasks: não há board.
 
 **Áreas:** Backend, Frontend, Testes, Infra e Documentação.
 
