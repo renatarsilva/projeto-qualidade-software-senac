@@ -8,7 +8,7 @@
 |---|---|
 | Responsável pela task | Caio (@CaiosAguiar) |
 | Autoria do conteúdo avaliado | Caio (@CaiosAguiar), que escreve o conteúdo avaliado e o defende na prova oral |
-| Revisão cruzada | Samuel (@Samwel-Merces), por decisão da equipe, em substituição a Renata. **Revisão em andamento**: o REV-04 aguarda confirmação do revisor (seção 11) |
+| Revisão cruzada | Samuel (@Samwel-Merces), por decisão da equipe, em substituição a Renata. **Revisão concluída** |
 | Formato da atividade | O material pede "Em dupla"; esta entrega foi feita individualmente. O planejamento inicial previa execução com outro integrante, mas Caio permaneceu como responsável pela T-05 e autor do conteúdo avaliado, com revisão cruzada por outro integrante. Não há confirmação de que o professor autorizou a execução individual. |
 
 ### Divisão de trabalho da equipe
@@ -16,7 +16,7 @@
 | Pessoa | Papel nesta entrega |
 |---|---|
 | Caio | Responsável pela T-05 e autor do conteúdo avaliado |
-| Samuel | Criou o esqueleto inicial deste documento (commit `18061e5`, 24/10/2026) e realiza a revisão cruzada do conteúdo produzido por Caio. Não é autor do conteúdo avaliado. **Revisão em andamento** |
+| Samuel | Criou o esqueleto inicial deste documento (commit `18061e5`, 24/10/2026) e realiza a revisão cruzada do conteúdo produzido por Caio. Não é autor do conteúdo avaliado. **Revisão concluída** |
 
 ## 2. Fontes
 
@@ -309,4 +309,4 @@ Nenhum destes casos foi executado ainda. Cada caso monta os próprios dados e n�
 
 | Achado | Origem | Revisor | Autor do conteúdo avaliado | Resolução | Situação |
 |---|---|---|---|---|---|
-| REV-04 | Revisão do PR #3 · issue #4 | Samuel (@Samwel-Merces) | Caio (@CaiosAguiar) | REV-04: resolvido pela adoção de 20 usuários distintos, todos com agenda livre, com solicitações diferentes para a mesma SALA-102 e intervalo (CEN-02 e CT-02) | Ajuste aplicado, aguardando confirmação do revisor |
+| REV-04 | Revisão do PR #3 · issue #4 | Samuel (@Samwel-Merces) | Caio (@CaiosAguiar) | REV-04: resolvido pela adoção de 20 usuários distintos, todos com agenda livre, com solicitações diferentes para a mesma SALA-102 e intervalo (CEN-02 e CT-02) | Resolvido e confirmado pelo revisor em 29/10/2026|
