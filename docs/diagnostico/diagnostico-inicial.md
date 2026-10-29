@@ -26,6 +26,15 @@ Windows 11 Pro, OpenJDK 21.0.6 (o projeto declara Java 17 ou superior), Maven Wr
 |---|---|---|---|---|---|
 | 2 | 1 | 0 | 1 | 0 | `BUILD FAILURE` |
 
+Trecho preservado da saída observada na execução original (tentativa 2 da seção 3):
+
+```text
+Tests run: 2, Failures: 0, Errors: 1
+BUILD FAILURE
+```
+
+É só um trecho preservado da execução original, não uma nova execução. O log completo não foi arquivado no repositório. O trecho registra 2 testes, 0 falhas de asserção, 1 erro de execução e o encerramento do build com falha.
+
 O aprovado é `contextLoads()`, sem asserções. O erro é do `HomeControllerTest.shouldReturnHomeView`: `No qualifying bean of type 'MockMvc' available`. A cobertura não foi medida.
 
 ## 5. Achados
@@ -37,11 +46,12 @@ O aprovado é `contextLoads()`, sem asserções. O erro é do `HomeControllerTes
 - **Localização:** `src/main/resources/application.properties`, `README.md`, `.gitignore:51`.
 - **Tipo:** defeito, confirmado por inspeção.
 - **Evidência:** uma credencial foi encontrada em arquivos rastreados; `git log -S` a encontra também em commits anteriores; `git ls-files -ci --exclude-standard` mostra o arquivo rastreado apesar de listado no `.gitignore`.
-- **Impacto:** quem acessa o repositório obtém acesso aos dados. Apagar apenas o arquivo atual não elimina a exposição histórica.
+- **Impacto:** quem acessa o repositório pode obter acesso aos dados, caso a credencial ainda esteja válida. Apagar apenas o arquivo atual não elimina a exposição histórica.
+- **Limites da verificação:** a exposição da credencial foi observada; a validade da credencial não foi testada e nenhum acesso aos dados foi realizado. A equipe evitou testar a credencial para não produzir acesso indevido ou não autorizado.
 - **ISO/IEC 25010:** Segurança (confidencialidade e integridade).
 - **Severidade:** Crítica. **Prioridade:** P1.
-- **Recomendação:** primeiro revogar ou rotacionar a credencial; depois remover o segredo dos arquivos atuais e avaliar a limpeza do histórico.
-- **Status:** confirmado. A credencial não foi testada.
+- **Recomendação:** primeiro revogar ou rotacionar a credencial, ação que deve ser realizada pelo responsável pelo recurso; depois remover o segredo dos arquivos atuais e avaliar a limpeza do histórico.
+- **Status:** exposição confirmada por inspeção; validade não testada. Aviso ao professor por canal privado: pendente.
 
 ### ACH-02
 
@@ -115,3 +125,10 @@ O aprovado é `contextLoads()`, sem asserções. O erro é do `HomeControllerTes
 ## 8. Conclusão
 
 A suíte oficial não sustenta a qualidade do projeto: dos 2 testes, 1 termina em erro de preparação e o outro não tem asserções, e o build termina em `BUILD FAILURE`. O problema mais grave não aparece na execução: uma credencial de banco está em arquivos rastreados e no histórico. A ordem recomendada é rotacionar a credencial, corrigir o `HomeControllerTest` e criar testes de negócio com banco isolado.
+
+## 9. Autoria e rastreabilidade
+
+- **Responsável original no planejamento:** Renata (`docs/planejamento/backlog.md`, T-03; `docs/planejamento/sprints.md`, Sprint 1).
+- **Execução do diagnóstico e autoria do conteúdo:** Caio (@CaiosAguiar), commit `aa3717e`.
+- **Revisão:** Samuel (@Samwel-Merces), aprovação no PR #1 em 23/10/2026, conforme evidência do PR.
+- **Rastreabilidade:** task T-03, commit `aa3717e`, PR #1 e issue #2 (ajustes pós-revisão). O Jira saiu do fluxo ([ADR-0003](../adr/0003-retirar-o-jira-do-fluxo.md)), por isso a T-03 não tem chave Jira.
