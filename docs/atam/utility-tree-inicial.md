@@ -8,7 +8,7 @@
 |---|---|
 | Responsável pela task | Caio (@CaiosAguiar) |
 | Autoria do conteúdo avaliado | Caio (@CaiosAguiar), que escreve o conteúdo avaliado e o defende na prova oral |
-| Revisão cruzada | Renata (@renatarsilva), pelo rodízio do [`CONTRIBUTING.md`](../../CONTRIBUTING.md) |
+| Revisão cruzada | Samuel (@Samwel-Merces), por decisão da equipe, em substituição a Renata. **Revisão em andamento**: o REV-04 aguarda confirmação do revisor (seção 11) |
 | Formato da atividade | O material pede "Em dupla"; esta entrega foi feita individualmente. O planejamento inicial previa execução com outro integrante, mas Caio permaneceu como responsável pela T-05 e autor do conteúdo avaliado, com revisão cruzada por outro integrante. Não há confirmação de que o professor autorizou a execução individual. |
 
 ### Divisão de trabalho da equipe
@@ -16,8 +16,7 @@
 | Pessoa | Papel nesta entrega |
 |---|---|
 | Caio | Responsável pela T-05 e autor do conteúdo avaliado |
-| Samuel | Criou o esqueleto inicial deste documento (commit `18061e5`, 24/10/2026). Não é autor do conteúdo avaliado |
-| Renata | Revisora cruzada, pelo rodízio do [`CONTRIBUTING.md`](../../CONTRIBUTING.md). **Revisão pendente** |
+| Samuel | Criou o esqueleto inicial deste documento (commit `18061e5`, 24/10/2026) e realiza a revisão cruzada do conteúdo produzido por Caio. Não é autor do conteúdo avaliado. **Revisão em andamento** |
 
 ## 2. Fontes
 
@@ -140,9 +139,9 @@ Usar quando a medida da resposta não tiver número oficial.
 
 | # | Parte | Conteúdo |
 |---|---|---|
-| 1 | Fonte do estímulo | 20 clientes autenticados enviando solicitações concorrentes |
+| 1 | Fonte do estímulo | 20 clientes concorrentes, cada um autenticado como um usuário distinto (SOLICITANTE-001 a SOLICITANTE-020), todos com perfil Solicitante |
 | 2 | Estímulo | 20 solicitações enviadas de forma sincronizada para o mesmo recurso, na mesma data e no mesmo intervalo |
-| 3 | Ambiente | Operação normal, banco de dados disponível e recurso inicialmente livre no intervalo |
+| 3 | Ambiente | Operação normal e banco de dados disponível. SALA-102 está inicialmente livre no intervalo, e os 20 Solicitantes têm agenda livre no mesmo intervalo. Todos solicitam a mesma sala (SALA-102), na mesma data e no mesmo intervalo: a única disputa comum entre as solicitações é SALA-102 nesse intervalo. Assim, uma rejeição não pode ser explicada por conflito na agenda do Solicitante (RF-05) nem por deduplicação de pedidos do mesmo usuário |
 | 4 | Artefato | Mecanismo de validação e persistência das reservas |
 | 5 | Resposta | Uma solicitação é aceita e as demais são rejeitadas. A forma da rejeição não está definida (lacuna L3). Eventuais registros das solicitações rejeitadas não contam como reservas ativas e não podem ocupar o horário (lacuna L2) |
 | 6 | Medida da resposta | Exatamente 1 solicitação aceita, 19 rejeitadas, exatamente 1 reserva ativa que ocupa o recurso e o intervalo, e 0 duplicidades ativas para o mesmo recurso e intervalo. A quantidade de 20 solicitações (e, portanto, as 19 rejeitadas) é **Métrica candidata, validação pendente**. "Uma única reserva aceita" vem da especificação. Não há meta de tempo de resposta: o cenário verifica correção funcional sob concorrência, não desempenho |
@@ -260,11 +259,17 @@ Nenhum destes casos foi executado ainda. Cada caso monta os próprios dados e n�
 |---|---|
 | ID | CT-02 |
 | Título | 20 solicitações simultâneas para a mesma sala e o mesmo intervalo resultam em exatamente 1 reserva aceita e ativa |
-| Pré-condições | 1. Datas e horários são interpretados no fuso configurado para o ambiente de teste. Nesta atividade, o deslocamento usado é UTC-03:00. <br> 2. Existe o recurso SALA-102 (sala), fora de manutenção. <br> 3. SALA-102 não tem nenhuma reserva em 11/11/2026 (recurso inicialmente livre). <br> 4. Existe um usuário com perfil Solicitante, identificado como SOLICITANTE-001. <br> 5. Existem 20 clientes concorrentes, todos autenticados como SOLICITANTE-001. <br> 6. O banco de dados está disponível. <br> 7. **Premissa de teste, validação pendente:** "Uma solicitação aceita cria uma reserva no estado SOLICITADA, e esse estado ocupa provisoriamente o recurso e o intervalo. Registros em REJEITADA não ocupam o horário. A relação completa entre estados e ocupação permanece na lacuna L2." Neste caso, reserva ativa = reserva em estado que ocupa o horário. O caso não assume que o sistema grava registros rejeitados. |
-| Dados de entrada (valores concretos) | 20 solicitações, identificadas como REQ-001 a REQ-020 (uma por cliente), todas de SOLICITANTE-001 para SALA-102 em 11/11/2026, das 10:00 às 12:00. Os identificadores servem para o teste acompanhar cada solicitação. A quantidade de 20 solicitações é **Métrica candidata, validação pendente** |
-| Passos | 1. Confirme que SALA-102 tem 0 reservas em 11/11/2026. <br> 2. Prepare as 20 solicitações REQ-001 a REQ-020 de forma que nenhuma seja enviada antes de todas estarem prontas. <br> 3. Libere as 20 solicitações ao mesmo tempo (disparo sincronizado; a ferramenta de sincronização ainda não está definida). <br> 4. Aguarde a resposta de todas as 20 solicitações. <br> 5. Conte quantas respostas foram de aceite e quantas de rejeição. <br> 6. Conte quantas reservas ativas ocupam SALA-102 em 11/11/2026, das 10:00 às 12:00. Registros das solicitações rejeitadas, se existirem, não entram na contagem. A contagem de respostas sozinha não basta: as respostas não provam que não houve gravação duplicada por condição de corrida (por exemplo, duas reservas ativas com uma única resposta de aceite) |
-| Resultado esperado (mensurável) | Exatamente 1 resposta de aceite. Exatamente 19 respostas de rejeição (a forma da rejeição não está definida: lacuna L3). Exatamente 1 reserva ativa que ocupa SALA-102 em 11/11/2026, das 10:00 às 12:00, e 0 duplicidades ativas para esse recurso e intervalo. Eventuais registros das solicitações rejeitadas não contam como reservas ativas e não podem ocupar o horário. Não há meta de tempo de resposta: o caso verifica correção funcional sob concorrência |
+| Pré-condições | 1. Existe o recurso SALA-102 (sala), fora de manutenção. <br> 2. SALA-102 não possui reserva ativa em 11/11/2026, das 10:00 às 12:00. <br> 3. Existem 20 usuários distintos, identificados como SOLICITANTE-001 a SOLICITANTE-020. <br> 4. Todos possuem perfil Solicitante. <br> 5. Todos possuem agenda livre em 11/11/2026, das 10:00 às 12:00. <br> 6. Todos estão autorizados a criar a solicitação avaliada. <br> 7. O banco de dados está disponível. <br> 8. Imediatamente antes do disparo, não existe reserva ativa para SALA-102 no intervalo. <br> 9. Registros em REJEITADA, caso existam, não ocupam o horário, conforme a **Premissa de teste, validação pendente** associada à lacuna L2: "Uma solicitação aceita cria uma reserva no estado SOLICITADA, e esse estado ocupa provisoriamente o recurso e o intervalo. Registros em REJEITADA não ocupam o horário. A relação completa entre estados e ocupação permanece na lacuna L2." Neste caso, reserva ativa = reserva em estado que ocupa o horário. O caso não assume que o sistema grava registros rejeitados. <br> 10. Datas e horários são interpretados no fuso configurado para o ambiente de teste. Nesta atividade, o deslocamento usado é UTC-03:00. |
+| Dados de entrada (valores concretos) | 20 solicitações, uma por usuário: SOLICITANTE-001 envia REQ-001, SOLICITANTE-002 envia REQ-002, e assim sucessivamente, até SOLICITANTE-020, que envia REQ-020. Todas usam os mesmos dados: recurso SALA-102; data 11/11/2026; início 10:00; término 12:00. Os identificadores servem para o teste acompanhar cada solicitação. O caso não determina antecipadamente qual usuário vence a concorrência. A quantidade de 20 solicitações é **Métrica candidata, validação pendente** |
+| Passos | 1. Restaure o ambiente para o estado inicial descrito nas pré-condições. <br> 2. Verifique que as agendas de SOLICITANTE-001 a SOLICITANTE-020 estão livres em 11/11/2026, das 10:00 às 12:00. <br> 3. Prepare as 20 solicitações REQ-001 a REQ-020, cada uma no cliente do seu usuário. <br> 4. Faça os 20 clientes aguardarem um ponto comum de sincronização, de forma que nenhuma solicitação seja enviada antes de todas estarem prontas. <br> 5. Libere as 20 solicitações simultaneamente. <br> 6. Colete as respostas de todas as 20 solicitações. <br> 7. Conte quantas respostas foram de aceite e quantas de rejeição. <br> 8. Consulte as reservas ativas que ocupam SALA-102 em 11/11/2026, das 10:00 às 12:00. Registros das solicitações rejeitadas, se existirem, não entram na contagem. <br> 9. Verifique a ausência de duplicidade ativa para esse recurso e intervalo. A contagem de respostas sozinha não basta: as respostas não provam que não houve gravação duplicada por condição de corrida (por exemplo, duas reservas ativas com uma única resposta de aceite) |
+| Resultado esperado (mensurável) | Exatamente 1 solicitação aceita. Exatamente 19 solicitações rejeitadas (a forma técnica da rejeição não está definida: lacuna L3). Exatamente 1 reserva ativa que ocupa SALA-102 em 11/11/2026, das 10:00 às 12:00, e 0 duplicidades ativas para esse recurso e intervalo. Todas as agendas dos 20 Solicitantes estavam livres antes do disparo, portanto nenhuma rejeição pode ser atribuída a conflito prévio na agenda dos Solicitantes. Eventuais registros das solicitações rejeitadas não contam como reservas ativas e não podem ocupar o horário. Nenhuma meta de tempo de resposta é avaliada: o caso verifica correção funcional sob concorrência |
 | Rastreabilidade | CT-02 → CEN-02 → F2 → RF-06 · RN pendente (T-09) · lacunas L2 e L3 |
+
+**Repetições e sincronização (proposta para a automação futura, ainda não implementada):**
+
+- **Repetições:** 5 execuções independentes, conforme proposta da T-37. **Métrica candidata, validação pendente**. Antes de cada repetição, o ambiente é restaurado por completo ao estado das pré-condições, e cada repetição precisa atingir o resultado esperado.
+- **Sincronização:** a estratégia proposta para a futura automação é ExecutorService + CountDownLatch (T-37). A estratégia ainda não foi implementada.
+- **Limite de espera pelas respostas:** serve apenas como proteção técnica do teste (para ele não ficar preso indefinidamente) e não é requisito de desempenho. O valor numérico será definido na T-37, conforme o ambiente de execução e o CI.
 
 #### CT-03 · Falha da notificação não desfaz a aprovação nem expõe detalhes internos
 
@@ -299,3 +304,9 @@ Nenhum destes casos foi executado ainda. Cada caso monta os próprios dados e n�
 | F1 | CEN-01 | CT-01 | Adequação funcional / Correção funcional | (A, A) | RF-05 · RN pendente (T-09) · lacunas L1 e L2 | Planejado, não executado |
 | F2 | CEN-02 | CT-02 | Adequação funcional / Correção funcional | (A, A) | RF-06 · RN pendente (T-09) · lacunas L2 e L3 | Planejado, não executado |
 | F7 | CEN-03 | CT-03 | Confiabilidade / Tolerância a falhas | (A, A) | RF-11 · RF-07 (evento de disparo da notificação) · RN pendente (T-09) · lacunas L5 e L8 | Planejado, não executado |
+
+## 11. Registro da revisão
+
+| Achado | Origem | Revisor | Autor do conteúdo avaliado | Resolução | Situação |
+|---|---|---|---|---|---|
+| REV-04 | Revisão do PR #3 · issue #4 | Samuel (@Samwel-Merces) | Caio (@CaiosAguiar) | REV-04: resolvido pela adoção de 20 usuários distintos, todos com agenda livre, com solicitações diferentes para a mesma SALA-102 e intervalo (CEN-02 e CT-02) | Ajuste aplicado, aguardando confirmação do revisor |
