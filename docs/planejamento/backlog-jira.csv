@@ -107,11 +107,11 @@ h3. Rastreabilidade
 * Requisitos: —
 * Arquivos: docs/plano-de-teste.md
 * Processo: docs/processo/ai-workflow.md",semana-33,sprint-1,area-documentacao,sem-spec,qualidade-senac
-[T-07] S34 · Infra · Criar o projeto Spring Boot 3 e o esqueleto de documentação,Task,Highest,Renata,"*Área:* Infra  |  *Semana:* 34 (Aula 03 · Caixa branca × caixa preta (nasce o projeto))  |  *Sprint:* 1
-*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* —
+[T-07] S34 · Infra · Criar o projeto Spring Boot 3 e o esqueleto de documentação,Task,Highest,Caio,"*Área:* Infra  |  *Semana:* 34 (Aula 03 · Caixa branca × caixa preta (nasce o projeto))  |  *Sprint:* 1
+*Dono:* Caio  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* —
 
 h3. O que fazer
-Projeto Maven com Java 21, Spring Boot 3.5 (última linha 3.x estável), group br.senac e as dependências da Aula 03 (Web, Security, Data JPA, Validation, PostgreSQL, Testcontainers), mais Thymeleaf e Flyway. compose.yaml com PostgreSQL local. Esqueletos de docs/prd.md, docs/arquitetura.md e docs/plano-de-teste.md com as seções da aula. README com 'como subir' e 'como rodar os testes'. (Gerado pelo Claude em 15/10; falta o commit.)
+Projeto Maven com Java 21, Spring Boot 3.5 (última linha 3.x estável), group br.senac e as dependências da Aula 03 (Web, Security, Data JPA, Validation, PostgreSQL, Testcontainers), mais Thymeleaf e Flyway. compose.yaml com PostgreSQL local. Esqueletos de docs/prd.md, docs/arquitetura.md e docs/plano-de-teste.md com as seções da aula. README com 'como subir' e 'como rodar os testes'. Bootstrap criado no commit `1d5ca68`, em 15/10/2026. A T-07 permanece aberta para validar os critérios de aceite e completar a documentação operacional.
 
 h3. Por que (explicação)
 É o 'marco zero': a suíte roda verde sem nenhum teste escrito por vocês. A aplicação que não executa é limitador de nota.
@@ -126,8 +126,8 @@ h3. Rastreabilidade
 * Requisitos: —
 * Arquivos: pom.xml, compose.yaml, src/, docs/
 * Processo: docs/processo/ai-workflow.md",semana-34,sprint-1,area-infra,sem-spec,qualidade-senac
-[T-08] S34 · Infra · Instalar o AIOX no repositório,Task,Medium,Samuel,"*Área:* Infra  |  *Semana:* 34 (Aula 03 · Caixa branca × caixa preta (nasce o projeto))  |  *Sprint:* 1
-*Dono:* Samuel  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-07
+[T-08] S34 · Infra · Instalar o AIOX no repositório,Task,Medium,Caio,"*Área:* Infra  |  *Semana:* 34 (Aula 03 · Caixa branca × caixa preta (nasce o projeto))  |  *Sprint:* 1
+*Dono:* Caio  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-07
 
 h3. O que fazer
 Rodar npx aiox-core@latest install (squad development) na raiz do repositório e versionar a pasta .aiox-core/. Ler como o fluxo de histórias do AIOX se encaixa no nosso ai-workflow e registrar a conclusão no PR.
@@ -143,8 +143,8 @@ h3. Rastreabilidade
 * Requisitos: —
 * Arquivos: .aiox-core/
 * Processo: docs/processo/ai-workflow.md",semana-34,sprint-1,area-infra,sem-spec,qualidade-senac
-"[T-09] S34 · Documentação · PRD: visão, escopos, RF e RNF numerados e regras de negócio",Task,High,Renata,"*Área:* Documentação  |  *Semana:* 34 (Aula 03 · Caixa branca × caixa preta (nasce o projeto))  |  *Sprint:* 1
-*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-04
+"[T-09] S34 · Documentação · PRD: visão, escopos, RF e RNF numerados e regras de negócio",Task,High,Caio,"*Área:* Documentação  |  *Semana:* 34 (Aula 03 · Caixa branca × caixa preta (nasce o projeto))  |  *Sprint:* 1
+*Dono:* Caio  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-04
 
 h3. O que fazer
 Preencher docs/prd.md: 1 Visão, 2 Problema, 3 Personas (T-04), 4 Escopos, 5 Fora de escopo, 6 Métricas de sucesso. Elicitar com IA, a partir das personas, os requisitos funcionais (RF-01 a RF-14 da especificação) e não funcionais (RNF-01...), todos os RNF medíveis (ex.: p95 < 2 s), cada um ligado ao escopo de origem. Numerar as regras de negócio (RN-01...) a partir das regras críticas. Registrar necessidades implícitas e o que fica fora da v1 (ex.: reserva recorrente).

@@ -14,9 +14,9 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 | Pessoa | Tasks | Backend | Frontend | Testes | Infra | Documentação | Regras críticas |
 |---|---|---|---|---|---|---|---|
-| Renata (@renatarsilva) | 18 | 2 | 1 | 6 | 2 | 7 | T-20, T-40 |
-| Samuel (@Samwel-Merces) | 18 | 7 | 1 | 2 | 4 | 4 | T-15, T-35, T-37, T-49 |
-| Caio (@CaiosAguiar) | 19 | 6 | 1 | 2 | 2 | 8 | T-21, T-34 |
+| Renata (@renatarsilva) | 16 | 2 | 1 | 6 | 1 | 6 | T-20, T-40 |
+| Samuel (@Samwel-Merces) | 17 | 7 | 1 | 2 | 3 | 4 | T-15, T-35, T-37, T-49 |
+| Caio (@CaiosAguiar) | 22 | 6 | 1 | 2 | 4 | 9 | T-21, T-34 |
 | Todos (time) | 3 | 0 | 0 | 0 | 1 | 2 | — |
 
 ## Sprint 1 · 15/10 a 21/10 · semanas 32 a 35
@@ -41,9 +41,9 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 | ID | Área | Task | Dono | Fluxo | Prioridade | Depende de |
 |---|---|---|---|---|---|---|
-| [T-07](#t-07) | Infra | Criar o projeto Spring Boot 3 e o esqueleto de documentação | Renata | — | Highest | — |
-| [T-08](#t-08) | Infra | Instalar o AIOX no repositório | Samuel | — | Medium | T-07 |
-| [T-09](#t-09) | Documentação | PRD: visão, escopos, RF e RNF numerados e regras de negócio | Renata | — | High | T-04 |
+| [T-07](#t-07) | Infra | Criar o projeto Spring Boot 3 e o esqueleto de documentação | Caio | — | Highest | — |
+| [T-08](#t-08) | Infra | Instalar o AIOX no repositório | Caio | — | Medium | T-07 |
+| [T-09](#t-09) | Documentação | PRD: visão, escopos, RF e RNF numerados e regras de negócio | Caio | — | High | T-04 |
 
 ### Semana 35 · Aula 04 · Arquitetura e ATAM com IA agêntica
 
@@ -250,9 +250,9 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 **Criar o projeto Spring Boot 3 e o esqueleto de documentação**
 
-- **Semana:** 34 (Aula 03 · Caixa branca × caixa preta (nasce o projeto)) · **Sprint:** 1 · **Área:** Infra · **Dono:** Renata
+- **Semana:** 34 (Aula 03 · Caixa branca × caixa preta (nasce o projeto)) · **Sprint:** 1 · **Área:** Infra · **Dono:** Caio
 - **Fluxo:** Sem spec (PR direto) · **Prioridade:** Highest · **Requisitos:** — · **Depende de:** —
-- **O que fazer:** Projeto Maven com Java 21, Spring Boot 3.5 (última linha 3.x estável), group br.senac e as dependências da Aula 03 (Web, Security, Data JPA, Validation, PostgreSQL, Testcontainers), mais Thymeleaf e Flyway. compose.yaml com PostgreSQL local. Esqueletos de docs/prd.md, docs/arquitetura.md e docs/plano-de-teste.md com as seções da aula. README com 'como subir' e 'como rodar os testes'. (Gerado pelo Claude em 15/10; falta o commit.)
+- **O que fazer:** Projeto Maven com Java 21, Spring Boot 3.5 (última linha 3.x estável), group br.senac e as dependências da Aula 03 (Web, Security, Data JPA, Validation, PostgreSQL, Testcontainers), mais Thymeleaf e Flyway. compose.yaml com PostgreSQL local. Esqueletos de docs/prd.md, docs/arquitetura.md e docs/plano-de-teste.md com as seções da aula. README com 'como subir' e 'como rodar os testes'. Bootstrap criado no commit `1d5ca68`, em 15/10/2026. A T-07 permanece aberta para validar os critérios de aceite e completar a documentação operacional.
 - **Por quê:** É o 'marco zero': a suíte roda verde sem nenhum teste escrito por vocês. A aplicação que não executa é limitador de nota.
 - **Critérios de aceite:**
   - ./mvnw verify verde com Java 21
@@ -265,7 +265,7 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 **Instalar o AIOX no repositório**
 
-- **Semana:** 34 (Aula 03 · Caixa branca × caixa preta (nasce o projeto)) · **Sprint:** 1 · **Área:** Infra · **Dono:** Samuel
+- **Semana:** 34 (Aula 03 · Caixa branca × caixa preta (nasce o projeto)) · **Sprint:** 1 · **Área:** Infra · **Dono:** Caio
 - **Fluxo:** Sem spec (PR direto) · **Prioridade:** Medium · **Requisitos:** — · **Depende de:** T-07
 - **O que fazer:** Rodar npx aiox-core@latest install (squad development) na raiz do repositório e versionar a pasta .aiox-core/. Ler como o fluxo de histórias do AIOX se encaixa no nosso ai-workflow e registrar a conclusão no PR.
 - **Por quê:** A Aula 03 lista .aiox-core/ no checklist 'precisa existir'. É a ferramenta de agentes que o professor usa nas práticas.
@@ -278,7 +278,7 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 **PRD: visão, escopos, RF e RNF numerados e regras de negócio**
 
-- **Semana:** 34 (Aula 03 · Caixa branca × caixa preta (nasce o projeto)) · **Sprint:** 1 · **Área:** Documentação · **Dono:** Renata
+- **Semana:** 34 (Aula 03 · Caixa branca × caixa preta (nasce o projeto)) · **Sprint:** 1 · **Área:** Documentação · **Dono:** Caio
 - **Fluxo:** Sem spec (PR direto) · **Prioridade:** High · **Requisitos:** RF-01 a RF-14 · **Depende de:** T-04
 - **O que fazer:** Preencher docs/prd.md: 1 Visão, 2 Problema, 3 Personas (T-04), 4 Escopos, 5 Fora de escopo, 6 Métricas de sucesso. Elicitar com IA, a partir das personas, os requisitos funcionais (RF-01 a RF-14 da especificação) e não funcionais (RNF-01...), todos os RNF medíveis (ex.: p95 < 2 s), cada um ligado ao escopo de origem. Numerar as regras de negócio (RN-01...) a partir das regras críticas. Registrar necessidades implícitas e o que fica fora da v1 (ex.: reserva recorrente).
 - **Por quê:** Requisitos e regras de negócio valem 15%. As specs, os testes e a RTM citam esses IDs: sem PRD numerado não há rastreabilidade.
