@@ -105,24 +105,59 @@ Cobertura alta, sozinha, não garante qualidade. Cada teste precisa ter asserç�
 ### Pré-requisitos
 
 - **Java 21.** Confira com `java -version`. Outra versão não serve.
+- **`JAVA_HOME` apontando para um JDK 21.** O wrapper usa o Java do `JAVA_HOME`, que pode ser diferente do `java` do terminal.
 - **Docker** rodando. Ele é usado pelo banco local e pelos testes.
-- Não precisa instalar o Maven: o projeto usa o wrapper `./mvnw`.
+- Não precisa instalar o Maven: o projeto usa o Maven Wrapper (`mvnw` e `mvnw.cmd`), que baixa a versão certa na primeira execução.
 
 ### Rodar os testes
 
+Linux/macOS:
+
 ```bash
 ./mvnw verify
+```
+
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd verify
+```
+
+Windows CMD:
+
+```bat
+mvnw.cmd verify
 ```
 
 Os testes sobem um PostgreSQL real em container (Testcontainers). Não há H2 nem banco em memória.
 
 ### Subir a aplicação
 
+Linux/macOS:
+
 ```bash
 ./mvnw spring-boot:run
 ```
 
-O banco local do `compose.yaml` sobe sozinho. A aplicação fica em http://localhost:8080.
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+
+Windows CMD:
+
+```bat
+mvnw.cmd spring-boot:run
+```
+
+**Banco local.** O Spring Boot usa o `compose.yaml` e sobe o serviço PostgreSQL automaticamente, se ele ainda não estiver rodando. A porta 5432 do container é publicada em uma porta livre do host, e o Spring Boot descobre essa porta sozinho para configurar o DataSource. Para inspecionar o serviço e ver a porta real (útil para conectar um cliente de banco):
+
+```bash
+docker compose ps
+```
+
+**Segurança no bootstrap.** A aplicação inicia em http://localhost:8080 com a segurança padrão do Spring Boot ativa. Por isso, acessar sem autenticação redireciona para `/login` (no navegador) ou devolve `401` (em clientes como o `curl`). Esse comportamento é esperado nesta fase: a autenticação e a autorização definitivas pertencem à task T-15.
 
 ### Abrir no IntelliJ
 
@@ -130,6 +165,8 @@ O banco local do `compose.yaml` sobe sozinho. A aplicação fica em http://local
 2. Em **File → Project Structure → Project → SDK**, selecione um **JDK 21**.
 3. Para rodar: abra `OrganizacaoRecursosApplication` e clique em ▶ ao lado do `main`.
    Para rodar sem o `compose.yaml`, use `TestOrganizacaoRecursosApplication` (em `src/test`), que sobe o banco com Testcontainers.
+
+> **Validação do ambiente:** em 29/10/2026, Caio validou no Windows, com Java 21: `verify` verde, PostgreSQL 16 subindo pelo Compose e aplicação iniciada na porta 8080.
 
 ## Documentação
 
