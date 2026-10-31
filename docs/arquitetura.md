@@ -267,7 +267,55 @@ flowchart TB
 
 Como toda mudança de estado passa pelo Ciclo de vida, é ele que aciona a Auditoria e a Notificação, e a RN-09 não depende de cada chamador.
 
-TODO (T-10): sequências críticas.
+### 2.4 Sequências críticas
+
+#### 2.4.1 Criar reserva
+
+```mermaid
+sequenceDiagram
+    actor U as Solicitante
+    participant C as Controladores
+    participant R as Reservas
+    participant RC as Recursos
+    participant CV as Ciclo de vida
+    participant A as Auditoria
+    participant DB as PostgreSQL
+    participant N as Notificação
+    participant X as API de notificações
+
+    U->>C: pede reserva (recursos, início, fim)
+    C->>R: criar(pedido, usuário)
+    R->>R: término posterior ao início? (RN-01)
+    R->>RC: algum recurso em manutenção no intervalo? (RN-04)
+
+    alt intervalo inválido ou recurso em manutenção
+        R-->>C: recusa com motivo
+        C-->>U: mensagem de erro compreensível
+    else pedido válido
+        R->>DB: grava reserva SOLICITADA e seus recursos
+        alt restrição anti-conflito violada (RN-02, RN-03)
+            DB-->>R: erro de exclusão
+            R-->>C: recusa por conflito
+            C-->>U: mensagem de conflito
+        else gravada
+            R->>CV: registra estado inicial
+            CV->>A: grava auditoria (RN-09)
+            A->>DB: insere registro
+            DB-->>R: transação confirmada
+            R-->>C: reserva criada
+            C-->>U: confirmação
+            R-)N: avisa (depois da transação)
+            N->>X: envia notificação
+            Note over N,X: Falha ou timeout não desfaz a reserva (RNF-10)
+        end
+    end
+```
+
+- O banco é quem decide o conflito. Se duas solicitações disputam o mesmo recurso e intervalo, só uma grava (S-01, S-02, D-02).
+- A reserva e a auditoria entram na mesma transação. A notificação só sai depois da confirmação.
+- Premissa, com validação pendente: a criação conta como mudança de estado e gera auditoria (RN-09). O que a recusa por conflito devolve ao usuário continua em aberto (L03).
+
+TODO (T-10): sequências de aprovar recurso restrito, solicitações simultâneas e job diário.
 
 ## 3. Modelo de dados
 
