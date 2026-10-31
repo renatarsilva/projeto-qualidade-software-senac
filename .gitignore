@@ -41,3 +41,12 @@ build/
 
 ### JMeter: o relatório HTML não é versionado (Aula 10) ###
 perf/relatorio-*/
+
+### Node.js e AIOX local ###
+node_modules/
+.aiox-core/node_modules/
+.aiox-core/local/
+.aiox/
+.env.local
+.claude/settings.local.json
+*.log
