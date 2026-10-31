@@ -578,7 +578,7 @@ ALTER TABLE reserva_recurso
 
 ## 4. Autenticação e sessão
 
-TODO (T-13, T-15)
+A decisão está na [ADR-0007](adr/0007-autenticacao-sessao-nas-telas-e-token-na-api.md): sessão e proteção contra CSRF nas telas, token assinado na API, autorização negada por padrão e senha com hash BCrypt. Os perfis estão na [ADR-0009](adr/0009-usuario-com-um-perfil.md). O detalhe da implementação (validade do token, matriz de perfil por operação) fica nas specs da T-15 e da T-48.
 
 ## 5. Decisões (ADR)
 
