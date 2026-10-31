@@ -640,3 +640,24 @@ Os cenários das folhas F1, F2 e F7 foram escritos na T-05 e continuam valendo: 
 | Justificativa do número | Mesma ordem de grandeza do teste de concorrência de reservas (CEN-02), para reaproveitar a infraestrutura de teste |
 | Impacto se o número estiver errado | Poucas execuções podem não revelar a janela de corrida, e muitas só alongam o teste |
 | Quem aprova | Time, na spec do teste (T-35) |
+
+### 6.3 Situações de falha
+
+A Aula 04 lista situações de falha a considerar. Algumas são do pipeline de treino de modelo do case de aula (Foot Fanatics) e não existem no nosso sistema. Elas aparecem abaixo com o motivo, para ficar claro que foram avaliadas e não esquecidas.
+
+| Situação | Aplica? | O que pode acontecer no nosso sistema | Folha | Como o desenho responde |
+|---|---|---|---|---|
+| Falha parcial do job | Sim | O job diário cai no meio e deixa reservas sem marcar | F12 | Cada reserva é tratada em sua própria transação (seção 2.4.4); o que já foi marcado fica salvo |
+| Reexecução | Sim | O job roda de novo depois de uma falha, ou por engano | F12 | O job só busca `APROVADA` e `EM_USO` vencidas; o que já mudou de estado não é buscado de novo |
+| Jobs sobrepostos | Sim | Duas execuções do job ao mesmo tempo tentam mudar a mesma reserva | F12, F3 | Depende de o Ciclo de vida recusar a transição quando o estado já mudou; não há bloqueio entre execuções (a avaliar) |
+| Dados duplicados | Sim | O mesmo usuário envia o mesmo pedido duas vezes (duplo clique) | F1 | A segunda reserva conflita com a primeira e é recusada (S-02) |
+| Dados atrasados | Não | Não há cache de disponibilidade nem fila de dados | — | Toda consulta lê o banco |
+| Alteração de esquema | Sim | Uma migração Flyway falha ou quebra a restrição anti-conflito | F2, F10 | Migrações versionadas, aplicadas e testadas com PostgreSQL real (Testcontainers) |
+| Degradação da qualidade dos dados | Não | Não há modelo treinado nem dados de entrada externos | — | — |
+| Candidato inferior ao modelo ativo | Não | Não há modelo | — | — |
+| Promoção incompleta | Adaptada | Uma transição de estado gravada sem o registro de auditoria | F6 | Estado e auditoria entram na mesma transação (seções 2.4.1 e 2.4.2) |
+| Condições de rollback | Sim | A auditoria falha ao gravar; a notificação falha ao enviar | F6, F7 | A falha da auditoria desfaz a transição; a falha da notificação não desfaz nada (RNF-10) |
+| Indisponibilidade do registro | Adaptada | O PostgreSQL fica indisponível | F14 | A aplicação não opera sem o banco; o erro devolvido não expõe detalhes internos (RNF-08) |
+| Vazamento ou uso indevido de dados | Sim | Usuários, e-mails e histórico de reservas expostos a quem não deve ver | F4, F5 | Autorização por perfil em toda entrada; senha guardada só como hash (`senha_hash`); quem consulta a auditoria ainda é decisão pendente (DP-02) |
+| Custo ou tempo acima da janela | Sim | O job diário demora mais do que o intervalo até a próxima execução | F13 | Sem medida ainda: o tamanho da janela e o volume esperado são lacunas |
+| Impacto do batch no online | Sim | O job disputa o banco com consultas e reservas | F13 | O job roda no fim do dia e trata uma reserva por vez; a medida depende do teste de carga (T-38) |
