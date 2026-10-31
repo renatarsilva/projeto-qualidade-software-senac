@@ -14,9 +14,9 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 | Pessoa | Tasks | Backend | Frontend | Testes | Infra | Documentação | Regras críticas |
 |---|---|---|---|---|---|---|---|
-| Renata (@renatarsilva) | 16 | 2 | 1 | 6 | 1 | 6 | T-20, T-40 |
-| Samuel (@Samwel-Merces) | 17 | 7 | 1 | 2 | 3 | 4 | T-15, T-35, T-37, T-49 |
-| Caio (@CaiosAguiar) | 22 | 6 | 1 | 2 | 4 | 9 | T-21, T-34 |
+| Renata (@renatarsilva) | 20 | 2 | 1 | 6 | 1 | 10 | T-20, T-40 |
+| Samuel (@Samwel-Merces) | 15 | 7 | 1 | 2 | 3 | 2 | T-15, T-35, T-37, T-49 |
+| Caio (@CaiosAguiar) | 20 | 6 | 1 | 2 | 4 | 7 | T-21, T-34 |
 | Todos (time) | 3 | 0 | 0 | 0 | 1 | 2 | — |
 
 ## Sprint 1 · 15/10 a 21/10 · semanas 32 a 35
@@ -49,10 +49,10 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 | ID | Área | Task | Dono | Fluxo | Prioridade | Depende de |
 |---|---|---|---|---|---|---|
-| [T-10](#t-10) | Documentação | Arquitetura: descoberta, C4 e diagramas de sequência | Samuel | — | High | T-09 |
-| [T-11](#t-11) | Documentação | Modelo de dados | Caio | — | High | T-09 |
-| [T-12](#t-12) | Documentação | ATAM: utility tree, cenários, táticas e riscos | Caio | — | High | T-05, T-10 |
-| [T-13](#t-13) | Documentação | ADRs e matriz requisito → decisão → componente → evidência | Samuel | — | High | T-10 |
+| [T-10](#t-10) | Documentação | Arquitetura: descoberta, C4 e diagramas de sequência | Renata | — | High | T-09 |
+| [T-11](#t-11) | Documentação | Modelo de dados | Renata | — | High | T-09 |
+| [T-12](#t-12) | Documentação | ATAM: utility tree, cenários, táticas e riscos | Renata | — | High | T-05, T-10 |
+| [T-13](#t-13) | Documentação | ADRs e matriz requisito → decisão → componente → evidência | Renata | — | High | T-10 |
 
 ## Sprint 2 · 22/10 a 28/10 · semanas 36 a 39
 
@@ -293,7 +293,7 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 **Arquitetura: descoberta, C4 e diagramas de sequência**
 
-- **Semana:** 35 (Aula 04 · Arquitetura e ATAM com IA agêntica) · **Sprint:** 1 · **Área:** Documentação · **Dono:** Samuel
+- **Semana:** 35 (Aula 04 · Arquitetura e ATAM com IA agêntica) · **Sprint:** 1 · **Área:** Documentação · **Dono:** Renata
 - **Fluxo:** Sem spec (PR direto) · **Prioridade:** High · **Requisitos:** — · **Depende de:** T-09
 - **O que fazer:** Em docs/arquitetura.md: (1) descoberta: contexto, stakeholders, fonte de verdade, requisitos significativos, drivers priorizados, glossário, fatos, lacunas, suposições (S-01...) e decisões (D-01...), preservando os IDs do PRD. (2) Diagramas Mermaid C4 de contexto, contêineres e componentes. (3) Sequências críticas: criar reserva, aprovar recurso restrito, duas solicitações simultâneas e o fluxo batch diário (adaptação proposta: job no fim do dia que marca NAO_COMPARECEU e conclui reservas vencidas). (4) Comparar pelo menos 2 alternativas quando faltar dado.
 - **Por quê:** A especificação pede 'diagramas de contexto, componentes e sequências críticas'. O DoD da Aula 04: outra equipe entende, rastreia e contesta a arquitetura sem explicação oral.
@@ -308,7 +308,7 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 **Modelo de dados**
 
-- **Semana:** 35 (Aula 04 · Arquitetura e ATAM com IA agêntica) · **Sprint:** 1 · **Área:** Documentação · **Dono:** Caio
+- **Semana:** 35 (Aula 04 · Arquitetura e ATAM com IA agêntica) · **Sprint:** 1 · **Área:** Documentação · **Dono:** Renata
 - **Fluxo:** Sem spec (PR direto) · **Prioridade:** High · **Requisitos:** — · **Depende de:** T-09
 - **O que fazer:** Diagrama ER em Mermaid na seção 3 de docs/arquitetura.md: usuário (com perfil), sala, professor e competências, material, reserva (com intervalo e estado), período de manutenção, retirada/devolução e auditoria. Descrever as restrições do banco que impedem conflito (FKs, unicidade, e a opção de EXCLUDE USING gist sobre tstzrange).
 - **Por quê:** O modelo é a base das migrações Flyway e das regras de sobreposição. Decidir as restrições cedo evita retrabalho na semana 42 (dupla reserva).
@@ -321,7 +321,7 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 **ATAM: utility tree, cenários, táticas e riscos**
 
-- **Semana:** 35 (Aula 04 · Arquitetura e ATAM com IA agêntica) · **Sprint:** 1 · **Área:** Documentação · **Dono:** Caio
+- **Semana:** 35 (Aula 04 · Arquitetura e ATAM com IA agêntica) · **Sprint:** 1 · **Área:** Documentação · **Dono:** Renata
 - **Fluxo:** Sem spec (PR direto) · **Prioridade:** High · **Requisitos:** — · **Depende de:** T-05, T-10
 - **O que fazer:** Em docs/arquitetura.md: utility tree completa com (I, D) justificados; cenários em 6 partes (faixa marcada 'validação pendente' quando faltar meta); situações de falha aplicáveis (falha parcial, reexecução, jobs sobrepostos, dados duplicados, impacto do batch no online etc.); tática de Len Bass e métrica para cada abordagem; sensibilidades, trade-offs, riscos, não-riscos e temas de risco. Baixar o catálogo de táticas do site e guardá-lo em docs/.
 - **Por quê:** O ATAM é método de identificação de riscos. 'Arquitetura sem trade-off é sinal de análise superficial'. Cai na prova e alimenta o ciclo-01 da semana 37.
@@ -335,7 +335,7 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 **ADRs e matriz requisito → decisão → componente → evidência**
 
-- **Semana:** 35 (Aula 04 · Arquitetura e ATAM com IA agêntica) · **Sprint:** 1 · **Área:** Documentação · **Dono:** Samuel
+- **Semana:** 35 (Aula 04 · Arquitetura e ATAM com IA agêntica) · **Sprint:** 1 · **Área:** Documentação · **Dono:** Renata
 - **Fluxo:** Sem spec (PR direto) · **Prioridade:** High · **Requisitos:** — · **Depende de:** T-10
 - **O que fazer:** Revisão cruzada com 6 papéis (Analista, Arquiteto, Dados, Segurança/LGPD, Ops, Custos) registrando objeções. ADRs em docs/adr/ (status, contexto, alternativas, decisão, consequências, riscos, evidência necessária, condição de revisão) para: PostgreSQL, Flyway, Thymeleaf no mesmo projeto, autenticação (sessão nas telas e token na API), Clock injetado, entidade Usuario com perfil. Matriz requisito → decisão → componente → evidência e listas de requisitos sem cobertura, decisões sem requisito, suposições, perguntas e riscos aceitos.
 - **Por quê:** ADR é a memória das decisões e assunto certo da prova oral ('por que PostgreSQL?'). A matriz é o começo da rastreabilidade.
