@@ -583,3 +583,33 @@ TODO (T-13, T-15)
 ## 5. Decisões (ADR)
 
 As decisões ficam em [`docs/adr/`](adr/). TODO (T-13): ADRs de arquitetura e matriz requisito → decisão → componente → evidência.
+
+
+## 6. Análise ATAM
+
+Avalia a arquitetura contra os atributos de qualidade que importam para a nota. Parte da [utility tree inicial](atam/utility-tree-inicial.md) (T-05, folhas F1 a F8, cenários CEN-01 a CEN-03) e a completa com o que as seções 2 e 3 revelaram. O catálogo usado nas táticas está em [`taticas-arquiteturais-len-bass.md`](taticas-arquiteturais-len-bass.md).
+
+### 6.1 Utility tree
+
+Escala (I, D): **A**lta, **M**édia, **B**aixa. I = importância para o negócio; D = dificuldade de alcançar. A análise começa pelas folhas (A, A).
+
+Os IDs F1 a F8 são os da T-05. As origens agora usam os IDs do PRD, que não existiam na T-05. F9 a F14 são novas.
+
+| ID | Atributo → refinamento | Folha (estímulo → resposta) | Origem | (I, D) | Justificativa |
+|---|---|---|---|---|---|
+| F1 | Adequação funcional → correção | Pedido que se sobrepõe a outra reserva do mesmo recurso é recusado e nada é gravado | RN-02, RF-05 | (A, A) | I: regra central do produto. D: três tipos de recurso, inclusive a agenda do professor, e a fronteira entre intervalos (S-01) |
+| F2 | Adequação funcional → correção | Solicitações simultâneas do mesmo recurso e intervalo: só uma é aceita | RN-03, RNF-05 | (A, A) | I: dupla reserva é limitador de nota. D: condição de corrida, que só o banco resolve e só teste de concorrência prova |
+| F3 | Adequação funcional → correção | Transição de estado inválida (por exemplo, `SOLICITADA` direto para `EM_USO`) é recusada | RN-05, RN-06 | (A, M) | I: pular a aprovação corrompe o ciclo de vida. D: transições são finitas e verificáveis por tabela |
+| F4 | Segurança → integridade | Quem não é Responsável tenta aprovar recurso restrito: recusado, estado não muda | RN-07, RF-07 | (A, M) | I: falha de autorização é limitador de nota. D: a checagem precisa valer em todo ponto de aprovação |
+| F5 | Segurança → integridade | Solicitante tenta operação do Administrador: negada, nada é alterado | RF-01, RNF-06 | (A, M) | I: limitador de nota. D: cobrir toda operação administrativa sem esquecer nenhuma (L06) |
+| F6 | Segurança → responsabilização | Toda mudança de estado grava um registro de auditoria | RN-09, RF-10 | (A, M) | I: rastreabilidade. D: vale para todas as transições, inclusive as do job diário |
+| F7 | Confiabilidade → tolerância a falhas | A API de notificações falha ou demora: a reserva se mantém e o erro não vaza | RNF-10, RF-11 | (A, A) | I: falha externa não pode derrubar a reserva. D: timeout e HTTP 500 só se reproduzem com simulação |
+| F8 | Confiabilidade → recuperabilidade | Notificações falhas são reenviadas sem duplicar | FE-05 (fora de escopo) | (M, A) | Mantida só como registro: o reenvio está fora do escopo, e não vira cenário |
+| F9 | Adequação funcional → correção | Reserva em recurso em manutenção é recusada, inclusive quando a manutenção e a reserva são criadas ao mesmo tempo | RN-04, RF-08 | (A, A) | I: regra crítica. D: envolve duas tabelas, então não cabe em restrição declarativa (seção 3.2) |
+| F10 | Adequação funcional → integridade de dados | O indicador `ocupa` acompanha o estado da reserva em toda mudança | D-02, RN-02 | (A, M) | I: se divergir, a restrição anti-conflito deixa de proteger. D: é uma cópia mantida pelo Ciclo de vida |
+| F11 | Eficiência de desempenho → comportamento temporal | Consulta de disponibilidade e criação de reserva sob 50 usuários simultâneos | RNF-09 (candidata) | (M, M) | I: meta ainda não aprovada (DP-07). D: depende de índices e do banco sob carga |
+| F12 | Confiabilidade → recuperabilidade | O job diário falha no meio: uma nova execução termina o trabalho sem duplicar | S-06 | (M, M) | I: o job não é regra crítica oficial. D: falha parcial e reexecução precisam de tratamento por reserva |
+| F13 | Eficiência de desempenho → capacidade | O job diário roda sem degradar as consultas online | S-06, RNF-09 | (M, M) | I: o job roda fora do horário de pico. D: disputa de banco entre batch e online |
+| F14 | Segurança → confidencialidade | Um erro interno não devolve stack trace, SQL, nome de classe nem caminho | RNF-08 | (M, B) | I: exigido pela especificação. D: tratamento central de erros, simples de aplicar |
+
+**Folhas (A, A), analisadas primeiro:** F1, F2, F7 e F9. F1, F2 e F7 já têm cenários na T-05 (CEN-01 a CEN-03). O F9 ganha o CEN-04 na seção 6.2.
