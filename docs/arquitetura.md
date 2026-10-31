@@ -614,7 +614,32 @@ Cobre os 14 requisitos funcionais. A evidência é a task que vai escrever o tes
 | RF-13 interface responsiva | ADR-0006 | Controladores | T-44, T-45, T-46 |
 | RF-14 documentação da API | nenhuma | Controladores | T-51 |
 
-TODO (T-13): listas de lacunas, suposições, perguntas e riscos aceitos.
+### 5.2 Lacunas, suposições, perguntas e riscos aceitos
+
+**Requisitos sem decisão de arquitetura própria:** RF-03, RF-09, RF-11, RF-12 e RF-14. Cada um é atendido por um componente (seção 2.3), mas nenhuma decisão foi registrada sobre ele. O RF-03 pede atenção por causa do índice de pesquisa (R-04).
+
+**Decisões sem requisito de origem direto:**
+
+- ADR-0005 (Flyway): é infraestrutura. Sustenta as restrições do banco, mas nenhum requisito pede um versionador de esquema.
+- ADR-0008 (`Clock`): atende o job diário (S-06) e a auditoria (RF-10) de forma indireta.
+
+**Suposições, todas com validação pendente:** S-01 a S-06 (seção 1.6), mais as decisões D-01 e D-02 (seção 1.7).
+
+**Perguntas abertas:**
+
+| Para quem | Pergunta |
+|---|---|
+| Professor | "Solicitação especial" e "recurso restrito" são a mesma coisa? (DP-06) |
+| Professor | O que significa "validar a alocação de docentes"? (L12) |
+| Professor | Uma pessoa pode ter mais de um perfil? (L10, ADR-0009) |
+| Time | Quem consulta a auditoria (DP-02), quais eventos notificam (DP-03), quem registra retirada e devolução (DP-04) e se o Administrador cria reservas (DP-05) |
+| Time | Valores de desempenho (DP-07) e timeouts da notificação (DP-08) |
+| Time | Onde a aplicação roda na entrega, e qual a regra de retenção dos dados pessoais |
+
+**Riscos aceitos:**
+
+- R-07: a notificação perdida não é reenviada, porque o reenvio está fora de escopo (FE-05).
+- Uma pessoa que precise de dois perfis usa duas contas (ADR-0009), enquanto a pergunta L10 não for respondida.
 
 
 ## 6. Análise ATAM
