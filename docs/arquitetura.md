@@ -613,3 +613,30 @@ Os IDs F1 a F8 são os da T-05. As origens agora usam os IDs do PRD, que não ex
 | F14 | Segurança → confidencialidade | Um erro interno não devolve stack trace, SQL, nome de classe nem caminho | RNF-08 | (M, B) | I: exigido pela especificação. D: tratamento central de erros, simples de aplicar |
 
 **Folhas (A, A), analisadas primeiro:** F1, F2, F7 e F9. F1, F2 e F7 já têm cenários na T-05 (CEN-01 a CEN-03). O F9 ganha o CEN-04 na seção 6.2.
+
+### 6.2 Cenários (A, A) em seis partes
+
+Os cenários das folhas F1, F2 e F7 foram escritos na T-05 e continuam valendo: [CEN-01](atam/utility-tree-inicial.md) (sobreposição), CEN-02 (solicitações simultâneas) e CEN-03 (falha da notificação). Aqui entra só o cenário que faltava, o da folha F9.
+
+#### CEN-04 · Reserva e manutenção ao mesmo tempo (F9)
+
+| # | Parte | Conteúdo |
+|---|---|---|
+| 1 | Fonte do estímulo | Um Administrador e um Solicitante, autenticados, agindo ao mesmo tempo |
+| 2 | Estímulo | O Administrador cadastra uma manutenção da SALA-102 das 10h às 12h, e o Solicitante pede reserva da SALA-102 das 10h às 11h, no mesmo instante |
+| 3 | Ambiente | Operação normal. A SALA-102 não tem reserva ativa nem manutenção nesse intervalo |
+| 4 | Artefato | Componentes Reservas e Recursos (manutenção) e as tabelas `reserva_recurso` e `periodo_manutencao` no PostgreSQL |
+| 5 | Resposta | O resultado é consistente em qualquer ordem. Se a manutenção confirma primeiro, a reserva é recusada (RN-04). Se a reserva confirma primeiro, ela fica gravada e aparece na lista de reservas afetadas pela manutenção, sem ser cancelada (S-05). Nenhuma reserva é gravada depois da manutenção confirmada |
+| 6 | Medida da resposta | Em 20 execuções concorrentes, 0 reservas gravadas depois da confirmação da manutenção, e 100% das reservas confirmadas antes aparecem na lista de afetadas. Sem concorrência, uma reserva pedida depois da manutenção confirmada é recusada e nada é gravado. **Métrica candidata, validação pendente** |
+
+- **Origem:** RN-04: "Recursos em manutenção não podem ser reservados." · RF-08 · suposições S-04 e S-05
+- **Atributo / refinamento:** Adequação funcional → correção
+- **(I, D):** (A, A) · **Justificativa:** I: regra crítica. D: a regra envolve duas tabelas e não cabe em restrição declarativa (seção 3.2)
+
+| Campo | Conteúdo |
+|---|---|
+| Valor proposto | 20 execuções concorrentes |
+| Status | Métrica candidata, validação pendente |
+| Justificativa do número | Mesma ordem de grandeza do teste de concorrência de reservas (CEN-02), para reaproveitar a infraestrutura de teste |
+| Impacto se o número estiver errado | Poucas execuções podem não revelar a janela de corrida, e muitas só alongam o teste |
+| Quem aprova | Time, na spec do teste (T-35) |
