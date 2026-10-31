@@ -128,11 +128,39 @@ Termos usados neste documento, com o sentido que têm no sistema. Quando o termo
 | Administrador | Perfil que gerencia cadastros, usuários, bloqueios e manutenção |
 | Conflito evitado | Tentativa de reserva recusada por sobreposição ou manutenção. Entra no relatório de utilização (RF-12) |
 
-TODO (T-10): diagramas C4 e sequências.
+## 2. Diagramas C4 e camadas
 
-## 2. Camadas
+Os diagramas seguem o modelo C4 em três níveis (contexto, contêineres e componentes), em Mermaid, para renderizar direto no GitHub. As sequências críticas vêm depois dos três níveis.
 
-TODO (T-10)
+### 2.1 Nível 1: contexto
+
+Mostra o sistema como uma caixa só, as pessoas que o usam e os sistemas externos com que conversa.
+
+```mermaid
+C4Context
+    title Contexto: Organização de Recursos
+
+    Person(solicitante, "Solicitante", "Professor ou coordenador. Consulta disponibilidade e cria, altera e cancela as próprias reservas")
+    Person(responsavel, "Responsável", "Aprova recursos restritos e acompanha retiradas e devoluções")
+    Person(admin, "Administrador", "Gerencia salas, professores, materiais, usuários, bloqueios e manutenção")
+
+    System(sistema, "Organização de Recursos", "Aloca salas, professores e materiais sem conflito de horário")
+
+    System_Ext(notificacao, "API de notificações", "Recebe os avisos de mudança de reserva. Simulada ou externa (RF-11)")
+
+    Rel(solicitante, sistema, "Reserva e consulta", "HTTPS")
+    Rel(responsavel, sistema, "Aprova e acompanha", "HTTPS")
+    Rel(admin, sistema, "Administra", "HTTPS")
+    Rel(sistema, notificacao, "Envia notificações", "HTTP/JSON")
+```
+
+**Leitura do diagrama:**
+
+- Os três perfis falam com o sistema pelo navegador (telas Thymeleaf) ou diretamente pela API. A autenticação por perfil vale nos dois caminhos (RF-01).
+- A única dependência externa é a API de notificações. Ela é isolada do fluxo da reserva (RNF-10) e, nos testes, é simulada com WireMock.
+- O banco de dados e o job diário não aparecem aqui porque estão dentro do sistema. Eles entram no nível de contêineres (2.2).
+
+TODO (T-10): contêineres, componentes e sequências críticas.
 
 ## 3. Modelo de dados
 
