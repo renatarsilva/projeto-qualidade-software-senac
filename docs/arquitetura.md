@@ -315,7 +315,52 @@ sequenceDiagram
 - A reserva e a auditoria entram na mesma transação. A notificação só sai depois da confirmação.
 - Premissa, com validação pendente: a criação conta como mudança de estado e gera auditoria (RN-09). O que a recusa por conflito devolve ao usuário continua em aberto (L03).
 
-TODO (T-10): sequências de aprovar recurso restrito, solicitações simultâneas e job diário.
+#### 2.4.2 Aprovar recurso restrito
+
+```mermaid
+sequenceDiagram
+    actor U as Usuário
+    participant S as Segurança
+    participant C as Controladores
+    participant CV as Ciclo de vida
+    participant A as Auditoria
+    participant DB as PostgreSQL
+    participant N as Notificação
+    participant X as API de notificações
+
+    U->>S: pede aprovação da reserva
+    S->>S: perfil é Responsável? (RN-07)
+
+    alt perfil não autorizado
+        S-->>U: acesso negado, reserva continua SOLICITADA
+    else perfil Responsável
+        S->>C: repassa o pedido
+        C->>CV: aprovar(reserva, usuário)
+        CV->>DB: lê a reserva
+        CV->>CV: estado é SOLICITADA? (RN-05)
+
+        alt transição inválida
+            CV-->>C: recusa, estado não muda
+            C-->>U: mensagem de erro compreensível
+        else SOLICITADA
+            CV->>DB: grava estado APROVADA
+            CV->>A: grava auditoria (RN-09)
+            A->>DB: insere registro
+            DB-->>CV: transação confirmada
+            CV-->>C: reserva aprovada
+            C-->>U: confirmação
+            CV-)N: avisa (depois da transação)
+            N->>X: envia notificação
+            Note over N,X: Falha ou timeout não desfaz a aprovação (RNF-10)
+        end
+    end
+```
+
+- A autorização é checada antes de chegar à regra. Um perfil diferente de Responsável nunca altera o estado (RN-07, RNF-06).
+- A rejeição segue o mesmo caminho, com destino `REJEITADA` (RN-06). Quem rejeita ainda é uma necessidade candidata (NC-04).
+- Premissa, com validação pendente: a notificação de aprovação (DP-03). Se uma reserva de recurso não restrito também passa por `APROVADA` continua em aberto (L04).
+
+TODO (T-10): sequências de solicitações simultâneas e job diário.
 
 ## 3. Modelo de dados
 
