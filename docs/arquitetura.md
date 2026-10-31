@@ -202,7 +202,117 @@ flowchart LR
 - **O job diário não é um contêiner à parte.** Ele roda como tarefa agendada dentro do mesmo processo da aplicação (S-06) e aparece como componente no nível 3.
 - **Notificação isolada.** A chamada à API externa acontece depois da reserva gravada, com timeouts configuráveis (RNF-10, DP-08). Nos testes, ela é simulada com WireMock.
 
-TODO (T-10): componentes e sequências críticas.
+### 2.3 Nível 3: componentes
+
+Abre a aplicação Spring Boot e mostra seus blocos internos. Ainda não existe código: os nomes abaixo são a **proposta de organização**, por área de negócio, e podem mudar nas specs.
+
+```mermaid
+flowchart TB
+    usuarios["<b>Usuários</b><br/>[Pessoa]"]
+
+    subgraph app["Aplicação Spring Boot [Contêiner]"]
+        direction TB
+
+        subgraph borda["Borda"]
+            seguranca["<b>Segurança</b><br/>autenticação e autorização por perfil"]
+            telas["<b>Controladores de telas</b><br/>Thymeleaf"]
+            api["<b>Controladores da API</b><br/>REST em JSON"]
+            erros["<b>Tratamento de erros</b><br/>sem expor detalhes internos"]
+        end
+
+        subgraph dominio["Domínio"]
+            reservas["<b>Reservas</b><br/>criar, alterar, cancelar; intervalo e conflito"]
+            ciclo["<b>Ciclo de vida</b><br/>estados e transições"]
+            aprovacao["<b>Aprovação</b><br/>recursos restritos"]
+            recursos["<b>Recursos</b><br/>salas, professores, materiais e pesquisa"]
+            manutencao["<b>Manutenção</b><br/>períodos de indisponibilidade"]
+            retirada["<b>Retirada e devolução</b><br/>materiais e equipamentos"]
+            relatorios["<b>Relatórios</b><br/>utilização e conflitos evitados"]
+            auditoria["<b>Auditoria</b><br/>histórico de mudanças de estado"]
+            notificacao["<b>Notificação</b><br/>cliente da API externa"]
+            job["<b>Job diário</b><br/>NAO_COMPARECEU e conclusão"]
+            relogio["<b>Relógio</b><br/>Clock injetado"]
+        end
+
+        repos["<b>Repositórios</b><br/>Spring Data JPA"]
+    end
+
+    db[("<b>PostgreSQL 16</b><br/>[Contêiner]")]
+    ext["<b>API de notificações</b><br/>[Sistema externo]"]
+
+    usuarios --> seguranca
+    seguranca --> telas
+    seguranca --> api
+    telas --> reservas
+    api --> reservas
+    telas --> recursos
+    api --> recursos
+    telas --> aprovacao
+    api --> aprovacao
+    api --> manutencao
+    api --> retirada
+    api --> relatorios
+    erros -.-> telas
+    erros -.-> api
+
+    reservas --> ciclo
+    reservas --> recursos
+    reservas --> manutencao
+    reservas --> relogio
+    aprovacao --> ciclo
+    job --> ciclo
+    job --> relogio
+    ciclo --> auditoria
+    ciclo --> notificacao
+
+    reservas --> repos
+    recursos --> repos
+    manutencao --> repos
+    retirada --> repos
+    relatorios --> repos
+    auditoria --> repos
+    repos --> db
+    notificacao --> ext
+
+    classDef pessoa fill:#1c3d6e,stroke:#8b949e,color:#ffffff
+    classDef componente fill:#2f6fc4,stroke:#8b949e,color:#ffffff
+    classDef conteiner fill:#1f5a9e,stroke:#8b949e,color:#ffffff
+    classDef externo fill:#6e7781,stroke:#8b949e,color:#ffffff
+    class usuarios pessoa
+    class seguranca,telas,api,erros,reservas,ciclo,aprovacao,recursos,manutencao,retirada,relatorios,auditoria,notificacao,job,relogio,repos componente
+    class db conteiner
+    class ext externo
+```
+
+**Responsabilidades e requisitos de cada componente:**
+
+| Componente | Responsabilidade | Requisitos |
+|---|---|---|
+| Segurança | Autentica e autoriza por perfil em toda entrada, telas e API | RF-01, RN-07, RNF-06 |
+| Controladores de telas e da API | Recebem os pedidos, validam a entrada e chamam o domínio | RF-13, RF-14, RNF-07 |
+| Tratamento de erros | Converte falhas em mensagens compreensíveis, sem stack trace, SQL ou caminho interno | RF-13, RNF-08 |
+| Reservas | Cria, altera e cancela reservas; valida o intervalo (término após o início) e detecta sobreposição, inclusive na agenda do professor | RF-04, RF-05, RF-06, RN-01, RN-02, RN-03 |
+| Ciclo de vida | Concentra as transições de estado permitidas; toda mudança passa por aqui | RN-05, RN-06, RN-08 |
+| Aprovação | Aprova ou rejeita reservas de recurso restrito, só pelo Responsável | RF-07, RN-07 |
+| Recursos | Cadastro, consulta e pesquisa de salas, professores e materiais | RF-02, RF-03 |
+| Manutenção | Registra períodos de indisponibilidade e lista as reservas afetadas | RF-08, RN-04, S-04, S-05 |
+| Retirada e devolução | Registra a saída e a volta de materiais e equipamentos | RF-09 |
+| Relatórios | Utilização por recurso, carga horária alocada e conflitos evitados | RF-12 |
+| Auditoria | Grava um registro a cada mudança de estado | RF-10, RN-09 |
+| Notificação | Envia avisos à API externa, com timeouts configuráveis, sem desfazer a reserva | RF-11, RNF-10 |
+| Job diário | Marca `NAO_COMPARECEU` e conclui reservas vencidas | S-06, RN-06 |
+| Relógio | Fornece a hora atual injetada, para que regras com horário sejam testáveis | RN-01, S-06 |
+| Repositórios | Acesso ao PostgreSQL via Spring Data JPA; a restrição anti-conflito vive no banco | RNF-05, D-02 |
+
+**Leitura do diagrama:**
+
+- **O Ciclo de vida é o ponto único de mudança de estado.** Reservas, Aprovação e o Job diário passam por ele, e é ele que aciona a Auditoria e a Notificação. Assim, a RN-09 (toda mudança gera auditoria) não depende de cada chamador lembrar de auditar.
+- **A Segurança fica na frente de tudo.** Nenhuma tela nem endpoint chega ao domínio sem passar por ela (driver 2).
+- **A detecção de conflito tem duas camadas.** O componente Reservas verifica antes de gravar, para dar uma mensagem clara. O banco é quem garante, de fato, uma única reserva aceita sob concorrência (driver 1).
+- **O Relógio é injetado.** Sem ele, as regras que dependem de "agora" (job diário, reserva iniciada) não seriam testáveis.
+- **Auditoria e Notificação ficam depois do Ciclo de vida**, e a falha da Notificação não pode voltar atrás na reserva (RNF-10). O desenho exato dessa garantia, dentro ou depois da transação, fica para a sequência de criação da reserva.
+
+TODO (T-10): sequências críticas.
 
 ## 3. Modelo de dados
 
