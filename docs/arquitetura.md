@@ -680,3 +680,25 @@ Cada abordagem da arquitetura, com a tática do [catálogo](taticas-arquiteturai
 | **Nenhuma definida** | F11 | — | p95 ≤ 300 ms com 50 usuários (candidata, MC-01) | — | Carga (T-38) |
 
 A última linha é um **risco**: o cenário de desempenho (F11) não tem tática nomeada. Ele volta na seção 6.5.
+
+### 6.5 Descobertas
+
+#### Pontos de sensibilidade
+
+Um parâmetro que decide sozinho a resposta de **um** atributo.
+
+| ID | Parâmetro | Atributo afetado | Efeito |
+|---|---|---|---|
+| PS-01 | Limites do intervalo, `[)` (S-01) | Adequação funcional | Decide se reservas adjacentes conflitam |
+| PS-02 | Timeouts de conexão e leitura da notificação (MC-04, MC-05) | Confiabilidade | Decidem quanto tempo uma chamada externa presa consome recursos antes de falhar |
+| PS-03 | Tamanho da janela e volume do job diário (sem medida) | Desempenho | Decidem se o job termina antes da próxima execução |
+
+#### Pontos de trade-off
+
+O mesmo parâmetro melhora um atributo e piora outro.
+
+| ID | Decisão | Melhora | Piora |
+|---|---|---|---|
+| TO-01 | `SOLICITADA` ocupa o horário (D-01) | Integridade: duas solicitações não são aprovadas para o mesmo horário (RNF-05) | Usabilidade: um pedido pendente "segura" o recurso e outros ficam recusados |
+| TO-02 | Restrição de exclusão no banco (3.2) | Integridade: dupla reserva impossível mesmo com erro no código | Desempenho: a segunda transação espera a primeira, e a vazão cai em pico |
+| TO-03 | `reserva_recurso` com `ocupa` copiado do estado (D-02) | Adequação funcional: uma reserva ocupa sala e professor ao mesmo tempo | Modificabilidade: dado duplicado que precisa ser mantido em sincronia |
