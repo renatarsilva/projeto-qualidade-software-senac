@@ -102,7 +102,33 @@ Lacunas e decisões pendentes do [PRD](prd.md#48-lacunas) que as suposições S-
 | DP-07 | Valores finais de desempenho | Define a meta que a arquitetura precisa atender (RNF-09) | T-38 |
 | DP-08 | Timeouts da integração externa | Parâmetros configuráveis da integração, nunca fixos no código | T-31 |
 
-TODO (T-10): glossário, diagramas C4 e sequências.
+### 1.9 Glossário
+
+Termos usados neste documento, com o sentido que têm no sistema. Quando o termo vem de uma suposição, o ID aparece na definição.
+
+| Termo | Significado |
+|---|---|
+| Recurso | Sala, professor ou material que pode ser reservado |
+| Recurso restrito | Recurso cuja reserva exige aprovação do Responsável (RN-07). É marcado por um indicador booleano `restrito` (S-03) |
+| Reserva | Pedido de uso de um ou mais recursos em um intervalo de tempo, feito por um Solicitante. Tem um estado |
+| Intervalo | Período de uma reserva, de início a término. O término é posterior ao início (RN-01) e o intervalo é fechado no início e aberto no término (S-01) |
+| Sobreposição | Dois intervalos que compartilham algum instante no mesmo recurso. Reservas adjacentes, uma terminando quando a outra começa, não se sobrepõem (S-01) |
+| Estado que ocupa o horário | Estado em que a reserva impede outras no mesmo recurso e intervalo: `SOLICITADA`, `APROVADA` e `EM_USO` (S-02, D-01) |
+| Fluxo principal | `SOLICITADA → APROVADA → EM_USO → CONCLUIDA` (RN-05) |
+| Estados alternativos | `REJEITADA`, `CANCELADA` e `NAO_COMPARECEU` (RN-06) |
+| Dupla reserva | Duas reservas ativas para o mesmo recurso e intervalo. É um limitador de nota e o que a restrição anti-conflito do banco impede (RNF-05) |
+| Período de manutenção | Intervalo em que um recurso está indisponível, com motivo. Equivale ao bloqueio (S-04) e impede novas reservas (RN-04), sem cancelar as existentes (S-05) |
+| Reserva afetada | Reserva já existente cujo intervalo cruza um período de manutenção. É listada para o Administrador (S-05) |
+| Retirada e devolução | Registro de que um material ou equipamento saiu e voltou (RF-09) |
+| Auditoria | Registro gravado a cada mudança de estado de uma reserva (RN-09) |
+| Job diário | Processo agendado que marca `NAO_COMPARECEU` e conclui reservas vencidas (S-06) |
+| Perfil | Papel de acesso de um usuário: Solicitante, Responsável ou Administrador (RF-01) |
+| Solicitante | Perfil de quem cria, altera e cancela as próprias reservas. Professores e coordenadores são do mesmo perfil (FE-02) |
+| Responsável | Único perfil que aprova recursos restritos (RN-07) |
+| Administrador | Perfil que gerencia cadastros, usuários, bloqueios e manutenção |
+| Conflito evitado | Tentativa de reserva recusada por sobreposição ou manutenção. Entra no relatório de utilização (RF-12) |
+
+TODO (T-10): diagramas C4 e sequências.
 
 ## 2. Camadas
 
