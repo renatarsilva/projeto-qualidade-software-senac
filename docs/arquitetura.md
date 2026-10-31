@@ -436,7 +436,111 @@ sequenceDiagram
 
 ## 3. Modelo de dados
 
-TODO (T-11)
+### 3.1 Diagrama de entidades
+
+Sala, professor e material são tipos de **recurso**. Uma tabela `recurso` guarda o que é comum (tipo, nome, `restrito`), e cada tipo tem uma tabela com seus próprios dados. Assim, a reserva, a manutenção e a restrição anti-conflito apontam sempre para um só `recurso_id`.
+
+```mermaid
+erDiagram
+    USUARIO ||--o{ RESERVA : solicita
+    USUARIO ||--o{ AUDITORIA : "faz a mudança"
+    RESERVA ||--|{ RESERVA_RECURSO : ocupa
+    RECURSO ||--o{ RESERVA_RECURSO : "é reservado em"
+    RECURSO ||--o{ PERIODO_MANUTENCAO : "fica indisponível em"
+    RECURSO ||--o| SALA : "é uma"
+    RECURSO ||--o| PROFESSOR : "é um"
+    RECURSO ||--o| MATERIAL : "é um"
+    PROFESSOR ||--o{ COMPETENCIA : possui
+    RESERVA_RECURSO ||--o| RETIRADA : "tem"
+    RESERVA ||--o{ AUDITORIA : "tem histórico"
+    USUARIO ||--o{ RETIRADA : registra
+
+    USUARIO {
+        bigint id PK
+        varchar nome
+        varchar email UK
+        varchar senha_hash
+        varchar perfil "SOLICITANTE, RESPONSAVEL ou ADMINISTRADOR"
+        boolean ativo
+    }
+    RECURSO {
+        bigint id PK
+        varchar tipo "SALA, PROFESSOR ou MATERIAL"
+        varchar nome
+        boolean restrito
+    }
+    SALA {
+        bigint recurso_id PK, FK
+        int capacidade
+        varchar localizacao
+        varchar tipo_sala
+    }
+    PROFESSOR {
+        bigint recurso_id PK, FK
+    }
+    COMPETENCIA {
+        bigint id PK
+        bigint professor_id FK
+        varchar descricao
+    }
+    MATERIAL {
+        bigint recurso_id PK, FK
+        varchar tipo_material
+    }
+    RESERVA {
+        bigint id PK
+        bigint solicitante_id FK
+        timestamptz inicio
+        timestamptz fim
+        varchar estado "SOLICITADA, APROVADA, EM_USO, CONCLUIDA, REJEITADA, CANCELADA ou NAO_COMPARECEU"
+        timestamptz criada_em
+    }
+    RESERVA_RECURSO {
+        bigint id PK
+        bigint reserva_id FK
+        bigint recurso_id FK
+        tstzrange periodo "copia de inicio e fim"
+        boolean ocupa "copia do estado: ocupa o horario?"
+    }
+    PERIODO_MANUTENCAO {
+        bigint id PK
+        bigint recurso_id FK
+        tstzrange periodo
+        varchar motivo
+    }
+    RETIRADA {
+        bigint id PK
+        bigint reserva_recurso_id FK
+        bigint registrada_por FK
+        timestamptz retirada_em
+        timestamptz devolvida_em "nulo ate a devolucao"
+    }
+    AUDITORIA {
+        bigint id PK
+        bigint reserva_id FK
+        bigint usuario_id FK
+        varchar estado_anterior "nulo na criacao"
+        varchar estado_novo
+        timestamptz ocorrida_em
+    }
+```
+
+**Onde cada requisito está no modelo:**
+
+| Requisito | Entidades |
+|---|---|
+| RF-01 autenticação e perfil | `USUARIO` |
+| RF-02, RF-03 cadastro e pesquisa | `RECURSO`, `SALA`, `PROFESSOR`, `COMPETENCIA`, `MATERIAL` (a disponibilidade vem de `RESERVA_RECURSO` e `PERIODO_MANUTENCAO`) |
+| RF-04, RF-07 reservas e aprovação | `RESERVA`, `RECURSO.restrito` |
+| RF-05, RF-06 sobreposição e simultaneidade | `RESERVA_RECURSO` (restrição na seção 3.2) |
+| RF-08 manutenção | `PERIODO_MANUTENCAO` |
+| RF-09 retirada e devolução | `RETIRADA` |
+| RF-10 auditoria | `AUDITORIA` |
+| RF-11 notificação | sem tabela: o aviso é enviado e não guardado (reenvio fora de escopo, FE-05) |
+| RF-12 relatórios | consultas sobre `RESERVA`, `RESERVA_RECURSO` e `AUDITORIA` |
+| RF-13, RF-14 interface e documentação | sem tabela |
+
+TODO (T-11): restrições anti-conflito (seção 3.2).
 
 ## 4. Autenticação e sessão
 
