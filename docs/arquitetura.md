@@ -393,7 +393,46 @@ sequenceDiagram
 - Sem a restrição no banco, uma checagem "existe conflito?" antes do INSERT deixaria as duas passarem. Por isso o teste de concorrência (T-37) é obrigatório.
 - A forma da resposta recusada (código e mensagem) continua em aberto (L03).
 
-TODO (T-10): sequência do job diário.
+#### 2.4.4 Job diário
+
+Fluxo batch da S-06, disparado pelo agendador no fim do dia, dentro da própria aplicação.
+
+```mermaid
+sequenceDiagram
+    participant AG as Agendador
+    participant J as Job diário
+    participant CV as Ciclo de vida
+    participant A as Auditoria
+    participant DB as PostgreSQL
+
+    AG->>J: dispara no fim do dia
+    J->>J: lê a hora atual (Clock injetado)
+    J->>DB: busca reservas APROVADA com início já passado
+    DB-->>J: lista
+
+    loop cada reserva APROVADA vencida
+        J->>CV: marcar NAO_COMPARECEU
+        CV->>DB: grava estado
+        CV->>A: grava auditoria (RN-09)
+        A->>DB: insere registro
+    end
+
+    J->>DB: busca reservas EM_USO com término já passado
+    DB-->>J: lista
+
+    loop cada reserva EM_USO vencida
+        J->>CV: concluir
+        CV->>DB: grava estado CONCLUIDA
+        CV->>A: grava auditoria (RN-09)
+        A->>DB: insere registro
+    end
+```
+
+- O job passa pelo Ciclo de vida, como qualquer outra mudança de estado, e por isso também gera auditoria (RN-09).
+- Cada reserva é tratada em sua própria transação. O que já foi marcado não é buscado de novo, então uma nova execução não duplica o trabalho.
+- A hora vem do `Clock` injetado, para o teste poder simular o fim do dia sem esperar.
+- Quem marca `NAO_COMPARECEU` é uma suposição, com validação pendente (S-06, DP-01).
+- O job não envia notificações: os eventos que notificam ainda são uma decisão pendente (DP-03).
 
 ## 3. Modelo de dados
 
