@@ -773,6 +773,7 @@ Decisões que podem impedir um cenário de ser atendido.
 | R-05 | A auditoria só de inserção depende da aplicação, sem reforço no banco | 3.2, restrição 6 | F6 |
 | R-06 | O job diário não tem janela nem volume medidos | S-06, PS-03 | F13 |
 | R-07 | Notificação perdida não é reenviada. **Risco aceito**: o reenvio está fora de escopo (FE-05) | RNF-10 | F7 |
+| R-08 | O mesmo intervalo é guardado duas vezes: `inicio` e `fim` em `reserva`, `periodo` em `reserva_recurso`. Se um mudar sem o outro, a restrição anti-conflito protege um horário que não é o da reserva. Mitigação: gravar os dois na mesma transação, a partir dos mesmos valores | D-02 | F1, F2, F10 |
 
 #### Não-riscos
 
@@ -791,7 +792,7 @@ Padrões que se repetem em vários riscos.
 
 | ID | Tema | Riscos |
 |---|---|---|
-| TR-01 | Regras que atravessam duas tabelas ou dois componentes dependem da disciplina do código, sem garantia do banco | R-01, R-02, R-05 |
+| TR-01 | Regras que atravessam duas tabelas ou dois componentes dependem da disciplina do código, sem garantia do banco | R-01, R-02, R-05, R-08 |
 | TR-02 | O job diário não tem medida nem proteção contra execução dupla | R-03, R-06 |
 | TR-03 | Há cenário de desempenho e de job sem tática nem meta aprovada | R-04, R-06 |
 
