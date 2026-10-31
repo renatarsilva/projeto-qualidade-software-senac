@@ -661,3 +661,22 @@ A Aula 04 lista situações de falha a considerar. Algumas são do pipeline de t
 | Vazamento ou uso indevido de dados | Sim | Usuários, e-mails e histórico de reservas expostos a quem não deve ver | F4, F5 | Autorização por perfil em toda entrada; senha guardada só como hash (`senha_hash`); quem consulta a auditoria ainda é decisão pendente (DP-02) |
 | Custo ou tempo acima da janela | Sim | O job diário demora mais do que o intervalo até a próxima execução | F13 | Sem medida ainda: o tamanho da janela e o volume esperado são lacunas |
 | Impacto do batch no online | Sim | O job disputa o banco com consultas e reservas | F13 | O job roda no fim do dia e trata uma reserva por vez; a medida depende do teste de carga (T-38) |
+
+### 6.4 Táticas e métricas
+
+Cada abordagem da arquitetura, com a tática do [catálogo](taticas-arquiteturais-len-bass.md) que ela realiza, a métrica que a comprova, o custo e o teste planejado. Os testes ainda não existem: os IDs são das tasks que vão escrevê-los.
+
+| Abordagem | Folha | Tática (Bass) | Métrica | Custo | Teste planejado |
+|---|---|---|---|---|---|
+| Restrição de exclusão no banco, na mesma transação que grava a reserva (2.4.3, 3.2) | F1, F2 | Transactions · Schedule Resources | 1 reserva ativa em 20 pedidos simultâneos (CEN-02); 21 de 21 verificações de sobreposição (CEN-01) | Contenção: a segunda transação espera a primeira, o que limita a vazão em pico | Concorrência (T-37) e sobreposição (T-23) |
+| Ciclo de vida como ponto único de mudança de estado, com tabela de transições (2.3) | F3, F6 | Sanity Checking · Audit · Timestamp | 100% das transições inválidas recusadas; 1 registro de auditoria por mudança de estado | Um componente obrigatório no caminho; volume da tabela de auditoria | Ciclo de vida (T-21) e auditoria (T-40) |
+| Segurança na frente de todas as entradas, com matriz de perfil por operação (2.3) | F4, F5 | Authenticate Actors · Authorize Actors | 0 operações por perfil não autorizado; 100% das células da matriz com o resultado esperado (RNF-06) | Complexidade do modelo de permissões | Matriz parametrizada (T-49) |
+| Notificação depois da transação, com timeouts configuráveis (2.4.1) | F7 | Bound Execution Times · Exception Handling | 0 reversões de reserva com HTTP 500 ou timeout; timeouts de 500 ms e 1500 ms (candidatas, DP-08) | Notificação perdida, sem reenvio (FE-05) | WireMock (T-31) |
+| Verificação de manutenção na aplicação, antes de gravar (2.4.1) | F9 | Sanity Checking | 0 reservas gravadas depois da manutenção confirmada, em 20 execuções (CEN-04, candidata) | A verificação e a gravação não são atômicas: a corrida não está fechada | Concorrência de manutenção (T-35) |
+| Indicador `ocupa` atualizado pelo Ciclo de vida na mesma transação (3.2) | F10 | Transactions · Executable Assertions | 0 divergências entre `ocupa` e o estado da reserva após qualquer transição | Dado duplicado, que precisa ser mantido | Integração parametrizada por transição (T-21) |
+| Job diário com uma transação por reserva e busca só de estados vencidos (2.4.4) | F12 | Transactions · Retry | 0 reservas marcadas duas vezes e 0 auditorias duplicadas após reexecução | Mais transações curtas | Job com `Clock` injetado e falha forçada no meio |
+| Job rodando no fim do dia, uma reserva por vez (2.4.4) | F13 | Schedule Resources | p95 das consultas online com o job rodando dentro da meta de desempenho (candidata, MC-01) | Tempo total do job, ainda sem medida | Carga com o job em execução (T-38) |
+| Tratamento central de erros nos controladores (2.3) | F14 | Exception Handling · Limit Exposure | 0 respostas de erro com stack trace, SQL, nome de classe ou caminho (RNF-08) | Mensagens menos detalhadas: o diagnóstico fica nos logs internos | Erros e entrada inválida (T-22, T-49) |
+| **Nenhuma definida** | F11 | — | p95 ≤ 300 ms com 50 usuários (candidata, MC-01) | — | Carga (T-38) |
+
+A última linha é um **risco**: o cenário de desempenho (F11) não tem tática nomeada. Ele volta na seção 6.5.
