@@ -797,6 +797,25 @@ Padrões que se repetem em vários riscos.
 | TR-03 | Há cenário de desempenho e de job sem tática nem meta aprovada | R-04, R-06 |
 
 
+#### Matriz de descobertas
+
+O material da Aula 04 pede a matriz de descobertas do ATAM sem fixar o formato. Esta tabela cruza, por folha da utility tree, os IDs das tabelas acima. Não traz nenhuma descoberta nova. Folhas sem descoberta ficam de fora (F3 e F14).
+
+| Folha | Sensibilidade | Trade-off | Risco | Não-risco |
+|---|---|---|---|---|
+| F1 sobreposição | PS-01 | TO-01, TO-02 | R-08 | NR-01 |
+| F2 simultâneas | — | TO-01, TO-02 | R-08 | NR-01 |
+| F4, F5 autorização | — | — | — | NR-03 |
+| F6 auditoria | — | — | R-05 | NR-04 |
+| F7 notificação | PS-02 | — | R-07 | NR-02 |
+| F9 manutenção | — | — | R-01 | — |
+| F10 `ocupa` | — | TO-03 | R-02, R-08 | — |
+| F11 desempenho | — | — | R-04 | — |
+| F12 job: falha e reexecução | — | — | R-03 | — |
+| F13 job: impacto no online | PS-03 | — | R-06 | — |
+
+Entre as folhas (A, A), só a F9 não tem não-risco: a corrida entre manutenção e reserva (R-01) é a descoberta mais séria sem resposta. F10 a F13 também têm risco e nenhum não-risco.
+
 ## 7. Revisão cruzada
 
 Cada papel questiona a arquitetura das seções 1 a 6. As objeções não são decisões: cada uma aponta onde será tratada (ADR, risco, pergunta aberta ou ação). A revisão é uma leitura crítica e deve ser contestada pelo time.
