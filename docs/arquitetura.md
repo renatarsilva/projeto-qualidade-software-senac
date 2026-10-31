@@ -702,3 +702,38 @@ O mesmo parâmetro melhora um atributo e piora outro.
 | TO-01 | `SOLICITADA` ocupa o horário (D-01) | Integridade: duas solicitações não são aprovadas para o mesmo horário (RNF-05) | Usabilidade: um pedido pendente "segura" o recurso e outros ficam recusados |
 | TO-02 | Restrição de exclusão no banco (3.2) | Integridade: dupla reserva impossível mesmo com erro no código | Desempenho: a segunda transação espera a primeira, e a vazão cai em pico |
 | TO-03 | `reserva_recurso` com `ocupa` copiado do estado (D-02) | Adequação funcional: uma reserva ocupa sala e professor ao mesmo tempo | Modificabilidade: dado duplicado que precisa ser mantido em sincronia |
+
+#### Riscos
+
+Decisões que podem impedir um cenário de ser atendido.
+
+| ID | Risco | Decisão de origem | Folha |
+|---|---|---|---|
+| R-01 | A verificação de manutenção e a gravação da reserva não são atômicas: uma reserva pode ser gravada depois de a manutenção ser confirmada | Verificação na aplicação (2.4.1, 3.2) | F9 |
+| R-02 | `ocupa` diverge do estado da reserva se o Ciclo de vida esquecer de atualizá-lo, e a restrição anti-conflito deixa de proteger | D-02 | F10 |
+| R-03 | Duas execuções do job ao mesmo tempo podem tentar mudar a mesma reserva, sem bloqueio entre elas | S-06, 2.4.4 | F12 |
+| R-04 | Nenhuma tática de desempenho definida, e a meta ainda não foi aprovada | DP-07, RNF-09 | F11 |
+| R-05 | A auditoria só de inserção depende da aplicação, sem reforço no banco | 3.2, restrição 6 | F6 |
+| R-06 | O job diário não tem janela nem volume medidos | S-06, PS-03 | F13 |
+| R-07 | Notificação perdida não é reenviada. **Risco aceito**: o reenvio está fora de escopo (FE-05) | RNF-10 | F7 |
+
+#### Não-riscos
+
+Decisões que atendem o cenário, com métrica verificável.
+
+| ID | Não-risco | Por quê | Folha |
+|---|---|---|---|
+| NR-01 | A restrição de exclusão decide a corrida entre solicitações simultâneas | A decisão é do banco, e o CEN-02 mede 1 reserva em 20 pedidos (a comprovar no T-37) | F1, F2 |
+| NR-02 | A falha da notificação não desfaz a reserva | A notificação sai depois da transação (2.4.1), e o CEN-03 mede 0 reversões | F7 |
+| NR-03 | Perfil não autorizado não chega à regra de negócio | A Segurança fica na frente de toda entrada (2.3, 2.4.2) | F4, F5 |
+| NR-04 | Nenhuma mudança de estado fica sem auditoria | Estado e auditoria entram na mesma transação (2.4.1, 2.4.2) | F6 |
+
+#### Temas de risco
+
+Padrões que se repetem em vários riscos.
+
+| ID | Tema | Riscos |
+|---|---|---|
+| TR-01 | Regras que atravessam duas tabelas ou dois componentes dependem da disciplina do código, sem garantia do banco | R-01, R-02, R-05 |
+| TR-02 | O job diário não tem medida nem proteção contra execução dupla | R-03, R-06 |
+| TR-03 | Há cenário de desempenho e de job sem tática nem meta aprovada | R-04, R-06 |
