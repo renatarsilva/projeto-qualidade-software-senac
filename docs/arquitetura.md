@@ -360,7 +360,40 @@ sequenceDiagram
 - A rejeição segue o mesmo caminho, com destino `REJEITADA` (RN-06). Quem rejeita ainda é uma necessidade candidata (NC-04).
 - Premissa, com validação pendente: a notificação de aprovação (DP-03). Se uma reserva de recurso não restrito também passa por `APROVADA` continua em aberto (L04).
 
-TODO (T-10): sequências de solicitações simultâneas e job diário.
+#### 2.4.3 Duas solicitações simultâneas
+
+Dois Solicitantes pedem o mesmo recurso no mesmo intervalo ao mesmo tempo (CEN-02 da utility tree). Cada pedido roda em sua própria transação, depois de passar pelas validações da sequência 2.4.1.
+
+```mermaid
+sequenceDiagram
+    actor A as Solicitante A
+    actor B as Solicitante B
+    participant R as Reservas
+    participant DB as PostgreSQL
+
+    par pedido de A
+        A->>R: reserva sala 102, 10h às 11h
+        R->>DB: INSERT reserva (transação 1)
+    and pedido de B
+        B->>R: reserva sala 102, 10h às 11h
+        R->>DB: INSERT reserva (transação 2)
+    end
+
+    Note over DB: A restrição anti-conflito faz a transação 2 esperar a transação 1 terminar
+    DB-->>R: transação 1 confirmada, reserva de A gravada
+    DB-->>R: transação 2 falha por violação da restrição
+
+    R-->>A: reserva criada
+    R-->>B: recusa por conflito
+    Note over DB: Resultado: uma reserva ativa no recurso e intervalo, a de A
+```
+
+- Quem vence é quem confirma primeiro. A ordem de chegada não importa, e a decisão é do banco, não do código da aplicação (S-01, S-02, D-02).
+- A solicitação recusada não grava reserva ativa e não ocupa o horário (S-02).
+- Sem a restrição no banco, uma checagem "existe conflito?" antes do INSERT deixaria as duas passarem. Por isso o teste de concorrência (T-37) é obrigatório.
+- A forma da resposta recusada (código e mensagem) continua em aberto (L03).
+
+TODO (T-10): sequência do job diário.
 
 ## 3. Modelo de dados
 
