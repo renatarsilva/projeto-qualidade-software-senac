@@ -162,8 +162,8 @@ h3. Rastreabilidade
 * Requisitos: RF-01 a RF-14
 * Arquivos: docs/prd.md
 * Processo: docs/processo/ai-workflow.md",semana-34,sprint-1,area-documentacao,sem-spec,qualidade-senac
-"[T-10] S35 · Documentação · Arquitetura: descoberta, C4 e diagramas de sequência",Task,High,Samuel,"*Área:* Documentação  |  *Semana:* 35 (Aula 04 · Arquitetura e ATAM com IA agêntica)  |  *Sprint:* 1
-*Dono:* Samuel  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-09
+"[T-10] S35 · Documentação · Arquitetura: descoberta, C4 e diagramas de sequência",Task,High,Renata,"*Área:* Documentação  |  *Semana:* 35 (Aula 04 · Arquitetura e ATAM com IA agêntica)  |  *Sprint:* 1
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-09
 
 h3. O que fazer
 Em docs/arquitetura.md: (1) descoberta: contexto, stakeholders, fonte de verdade, requisitos significativos, drivers priorizados, glossário, fatos, lacunas, suposições (S-01...) e decisões (D-01...), preservando os IDs do PRD. (2) Diagramas Mermaid C4 de contexto, contêineres e componentes. (3) Sequências críticas: criar reserva, aprovar recurso restrito, duas solicitações simultâneas e o fluxo batch diário (adaptação proposta: job no fim do dia que marca NAO_COMPARECEU e conclui reservas vencidas). (4) Comparar pelo menos 2 alternativas quando faltar dado.
@@ -181,8 +181,8 @@ h3. Rastreabilidade
 * Requisitos: —
 * Arquivos: docs/arquitetura.md
 * Processo: docs/processo/ai-workflow.md",semana-35,sprint-1,area-documentacao,sem-spec,qualidade-senac
-[T-11] S35 · Documentação · Modelo de dados,Task,High,Caio,"*Área:* Documentação  |  *Semana:* 35 (Aula 04 · Arquitetura e ATAM com IA agêntica)  |  *Sprint:* 1
-*Dono:* Caio  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-09
+[T-11] S35 · Documentação · Modelo de dados,Task,High,Renata,"*Área:* Documentação  |  *Semana:* 35 (Aula 04 · Arquitetura e ATAM com IA agêntica)  |  *Sprint:* 1
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-09
 
 h3. O que fazer
 Diagrama ER em Mermaid na seção 3 de docs/arquitetura.md: usuário (com perfil), sala, professor e competências, material, reserva (com intervalo e estado), período de manutenção, retirada/devolução e auditoria. Descrever as restrições do banco que impedem conflito (FKs, unicidade, e a opção de EXCLUDE USING gist sobre tstzrange).
@@ -198,8 +198,8 @@ h3. Rastreabilidade
 * Requisitos: —
 * Arquivos: docs/arquitetura.md (seção 3)
 * Processo: docs/processo/ai-workflow.md",semana-35,sprint-1,area-documentacao,sem-spec,qualidade-senac
-"[T-12] S35 · Documentação · ATAM: utility tree, cenários, táticas e riscos",Task,High,Caio,"*Área:* Documentação  |  *Semana:* 35 (Aula 04 · Arquitetura e ATAM com IA agêntica)  |  *Sprint:* 1
-*Dono:* Caio  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-05, T-10
+"[T-12] S35 · Documentação · ATAM: utility tree, cenários, táticas e riscos",Task,High,Renata,"*Área:* Documentação  |  *Semana:* 35 (Aula 04 · Arquitetura e ATAM com IA agêntica)  |  *Sprint:* 1
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-05, T-10
 
 h3. O que fazer
 Em docs/arquitetura.md: utility tree completa com (I, D) justificados; cenários em 6 partes (faixa marcada 'validação pendente' quando faltar meta); situações de falha aplicáveis (falha parcial, reexecução, jobs sobrepostos, dados duplicados, impacto do batch no online etc.); tática de Len Bass e métrica para cada abordagem; sensibilidades, trade-offs, riscos, não-riscos e temas de risco. Baixar o catálogo de táticas do site e guardá-lo em docs/.
@@ -216,8 +216,8 @@ h3. Rastreabilidade
 * Requisitos: —
 * Arquivos: docs/arquitetura.md, docs/taticas-arquiteturais-len-bass.md
 * Processo: docs/processo/ai-workflow.md",semana-35,sprint-1,area-documentacao,sem-spec,qualidade-senac
-[T-13] S35 · Documentação · ADRs e matriz requisito → decisão → componente → evidência,Task,High,Samuel,"*Área:* Documentação  |  *Semana:* 35 (Aula 04 · Arquitetura e ATAM com IA agêntica)  |  *Sprint:* 1
-*Dono:* Samuel  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-10
+[T-13] S35 · Documentação · ADRs e matriz requisito → decisão → componente → evidência,Task,High,Renata,"*Área:* Documentação  |  *Semana:* 35 (Aula 04 · Arquitetura e ATAM com IA agêntica)  |  *Sprint:* 1
+*Dono:* Renata  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-10
 
 h3. O que fazer
 Revisão cruzada com 6 papéis (Analista, Arquiteto, Dados, Segurança/LGPD, Ops, Custos) registrando objeções. ADRs em docs/adr/ (status, contexto, alternativas, decisão, consequências, riscos, evidência necessária, condição de revisão) para: PostgreSQL, Flyway, Thymeleaf no mesmo projeto, autenticação (sessão nas telas e token na API), Clock injetado, entidade Usuario com perfil. Matriz requisito → decisão → componente → evidência e listas de requisitos sem cobertura, decisões sem requisito, suposições, perguntas e riscos aceitos.

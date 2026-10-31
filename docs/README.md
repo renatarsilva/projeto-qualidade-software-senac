@@ -22,10 +22,11 @@ Os caminhos seguem os que o professor usa nas aulas. ✅ = existe; T-NN = task q
 | `planejamento/backlog-jira.csv` | Importação para o Jira, que não é mais usado | obsoleto · mantido até o retorno da Renata |
 | `planejamento/sprints.md` | Mini-plano e resultado de cada sprint | ✅ |
 | `specs/` | Uma spec por task ([template](specs/_TEMPLATE.md)) | ✅ template |
-| `adr/` | Decisões de arquitetura e processo ([template](adr/_TEMPLATE.md)) | ✅ 0001, 0002, 0003 · T-13, T-37 |
+| `adr/` | Decisões de arquitetura e processo ([template](adr/_TEMPLATE.md)) | ✅ 0001 a 0009 · T-37 |
 | `prd.md` | Visão, personas, RF, RNF e RN numerados, escopo | esqueleto · T-04, T-09 |
 | `plano-de-teste.md` | Plano de teste (ISO/IEC/IEEE 29119-3) | esqueleto · T-06 |
-| `arquitetura.md` | Descoberta, C4, modelo de dados, sequências, ATAM e matriz | esqueleto · T-10 a T-13 |
+| `arquitetura.md` | Descoberta, C4, modelo de dados, sequências, ATAM e matriz | ✅ T-10 a T-13 |
+| `taticas-arquiteturais-len-bass.md` | Catálogo de táticas da Aula 04, usado no ATAM (material do professor, sem edição) | ✅ T-12 |
 | `diagnostico/diagnostico-inicial.md` | Diagnóstico de qualidade (Atividade #1) | T-03 |
 | `atam/utility-tree-inicial.md` | Utility tree e casos de teste (Atividade #2) | T-05 |
 | `defeitos/` | Processo e registro de defeitos | T-14 |

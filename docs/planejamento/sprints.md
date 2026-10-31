@@ -42,9 +42,9 @@ gantt
 
 | Pessoa | Tasks |
 |---|---|
-| Renata | T-02 Jira e proteção da main · T-03 diagnóstico |
-| Samuel | T-06 plano de teste · T-10 arquitetura e C4 · T-13 ADRs e matriz |
-| Caio | T-04 personas · T-05 utility tree (Atividade #2) · T-07 projeto Spring Boot · T-08 AIOX · T-09 PRD · T-11 modelo de dados · T-12 ATAM |
+| Renata | T-02 Jira e proteção da main · T-03 diagnóstico · T-10 arquitetura e C4 · T-11 modelo de dados · T-12 ATAM · T-13 ADRs e matriz |
+| Samuel | T-06 plano de teste |
+| Caio | T-04 personas · T-05 utility tree (Atividade #2) · T-07 projeto Spring Boot · T-08 AIOX · T-09 PRD |
 | Todos | T-01 ambiente de cada integrante |
 
 **Ordem que importa:** T-07 (projeto) e T-02 (Jira e proteção) primeiro. Depois T-01 (cada um roda o projeto). T-04 (personas) antes de T-09 (PRD), e o PRD antes da arquitetura (T-10 a T-13).
