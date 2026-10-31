@@ -737,3 +737,23 @@ Padrões que se repetem em vários riscos.
 | TR-01 | Regras que atravessam duas tabelas ou dois componentes dependem da disciplina do código, sem garantia do banco | R-01, R-02, R-05 |
 | TR-02 | O job diário não tem medida nem proteção contra execução dupla | R-03, R-06 |
 | TR-03 | Há cenário de desempenho e de job sem tática nem meta aprovada | R-04, R-06 |
+
+
+## 7. Revisão cruzada
+
+Cada papel questiona a arquitetura das seções 1 a 6. As objeções não são decisões: cada uma aponta onde será tratada (ADR, risco, pergunta aberta ou ação). A revisão é uma leitura crítica e deve ser contestada pelo time.
+
+| Papel | Objeção | Onde é tratada |
+|---|---|---|
+| Analista | L12 ("validar a alocação de docentes") não tem task nem dono, e pode exigir uma aprovação que o modelo ainda não tem | Pergunta aberta |
+| Analista | DP-06 pode separar "solicitação especial" de "recurso restrito", o que quebraria o campo único `restrito` (S-03) | Pergunta ao professor; ADR da entidade Usuario e do recurso |
+| Arquiteto | O job diário roda dentro da aplicação: com duas instâncias, ele roda duas vezes (R-03) | R-03; ADR do job, se houver mais de uma instância |
+| Arquiteto | A verificação de manutenção não é atômica com a gravação da reserva (R-01) | R-01 |
+| Dados | `reserva` guarda `inicio` e `fim`, e `reserva_recurso` guarda `periodo`: são duas cópias do mesmo intervalo | Ação: definir qual é a fonte e sincronizar na mesma transação |
+| Dados | Não há índice definido para a pesquisa de disponibilidade, e o desempenho (F11) depende dele | R-04; ADR do PostgreSQL |
+| Segurança/LGPD | Nome e e-mail ficam em `usuario` e a auditoria guarda quem agiu: não há regra de retenção nem de quem consulta (DP-02) | Pergunta aberta; ADR da entidade Usuario |
+| Segurança/LGPD | Sessão nas telas exige proteção contra CSRF, e o token da API precisa de validade; nada disso está definido | ADR de autenticação |
+| Ops | Não há CI (F-08), e a extensão `btree_gist` precisa de permissão no banco para a migração rodar | ADR do Flyway; task do CI (T-25) |
+| Ops | Nada avisa se o job diário falhar ou demorar (R-06) | R-06; sem ADR por ora |
+| Custos | Não está definido onde a aplicação roda na entrega, e a API de notificações externa pode ter limite ou custo | Pergunta aberta |
+| Custos | A pilha escolhida (PostgreSQL, Spring Boot, Thymeleaf) não tem licença paga; o custo é o tempo do time | Registrado nos ADRs como consequência |
