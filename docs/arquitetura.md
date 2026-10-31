@@ -79,7 +79,30 @@ Decisões de projeto desta arquitetura. Cada uma cita o requisito de origem. Dec
 | D-01 | `SOLICITADA` ocupa o horário, como em S-02 | RN-02, RN-03 · premissa do CEN-01 na utility tree | (a) só `APROVADA` e `EM_USO` ocupam; (b) `SOLICITADA` também ocupa | Em (b), um pedido pendente de aprovação "segura" o recurso e o solicitante pode bloquear horários. Em (a), duas solicitações simultâneas podem ser ambas aprovadas depois, o que reabre a dupla reserva (RNF-05). Escolhida a (b). Trade-off levado à T-12 | Aceita; validação pendente |
 | D-02 | Uma reserva se liga aos seus recursos pela tabela `reserva_recurso`, em vez de um `recurso_id` único na reserva | RN-02, RF-05 · agenda do professor | (a) `recurso_id` único na reserva; (b) tabela `reserva_recurso` | Em (a), uma reserva só ocupa um recurso, e reservar sala e professor juntos exige várias reservas ligadas. Em (b), uma reserva ocupa sala, professor e material ao mesmo tempo, mas o `EXCLUDE` do PostgreSQL só enxerga colunas da própria tabela: o período e o indicador de ocupação são copiados para `reserva_recurso` e precisam ficar sincronizados com o estado da reserva. Escolhida a (b). Risco levado à T-12 | Aceita; validação pendente |
 
-TODO (T-10): lacunas ainda abertas, glossário, diagramas C4 e sequências.
+### 1.8 Lacunas ainda abertas
+
+Lacunas e decisões pendentes do [PRD](prd.md#48-lacunas) que as suposições S-01 a S-06 **não** respondem. Elas não bloqueiam a arquitetura, mas cada uma tem um ponto em que será resolvida. As respondidas por S-xx (L01, L02, L05, L13, L14 e DP-01) não aparecem aqui.
+
+| ID | Lacuna ou decisão pendente | Efeito na arquitetura | Onde será resolvida |
+|---|---|---|---|
+| L03 | O que é "simultâneo" e que resposta recebe a solicitação recusada | Quem decide o vencedor é o banco, pela restrição anti-conflito. A forma da resposta (código e mensagem) fica em aberto | T-37 |
+| L04 | A reserva de um recurso não restrito passa por `APROVADA`? | Define as transições permitidas e se `SOLICITADA` vai direto a `APROVADA` | T-21 (spec do ciclo de vida) |
+| L06 | Não existe matriz oficial de perfil × operação | A autorização por operação não pode ser detalhada ainda | T-48, T-49 |
+| L07 | Conteúdo mínimo do registro de auditoria | Define as colunas da tabela de auditoria (seção 3) | T-40 |
+| L08 | O que acontece com a reserva quando a notificação falha | A utility tree propõe que a reserva se mantenha; a notificação fica isolada do fluxo da reserva | T-31 |
+| L09 | Notificações pendentes precisam ser reenviadas? | Reenvio está fora de escopo (FE-05); não há fila de reprocessamento | — |
+| L10 | O coordenador tem permissões além das do professor no perfil Solicitante? | Nenhum efeito: os dois são o mesmo perfil (FE-02) | — |
+| L11 | Até quando uma reserva pode ser alterada ou cancelada; cancelar uma reserva iniciada conta como "apagar"? | Interage com RN-08: reserva iniciada nunca é removida do banco | T-21 |
+| L12 | O que significa "validar a alocação de docentes" para o Responsável | Pode exigir uma aprovação explícita da agenda do professor, com efeito no modelo | Sem task definida no PRD |
+| DP-02 | Quais perfis consultam a auditoria | Afeta a autorização do acesso ao histórico | T-40, T-48 |
+| DP-03 | Quais eventos disparam notificações | Define o contrato com a API externa | T-31 |
+| DP-04 | Quem registra retirada e devolução | Afeta a autorização e o modelo de retirada | T-42 |
+| DP-05 | Se o Administrador cria reservas | Afeta a matriz de autorização | T-48 |
+| DP-06 | Relação entre "solicitação especial" e "recurso restrito" | Pode exigir um segundo mecanismo de aprovação além do campo `restrito` (S-03) | T-33, T-34, a decidir com o professor |
+| DP-07 | Valores finais de desempenho | Define a meta que a arquitetura precisa atender (RNF-09) | T-38 |
+| DP-08 | Timeouts da integração externa | Parâmetros configuráveis da integração, nunca fixos no código | T-31 |
+
+TODO (T-10): glossário, diagramas C4 e sequências.
 
 ## 2. Camadas
 
