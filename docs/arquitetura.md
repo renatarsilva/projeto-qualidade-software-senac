@@ -152,6 +152,12 @@ C4Context
     Rel(responsavel, sistema, "Aprova e acompanha", "HTTPS")
     Rel(admin, sistema, "Administra", "HTTPS")
     Rel(sistema, notificacao, "Envia notificações", "HTTP/JSON")
+
+    UpdateRelStyle(solicitante, sistema, $textColor="#8b949e", $lineColor="#8b949e", $offsetX="-40", $offsetY="-10")
+    UpdateRelStyle(responsavel, sistema, $textColor="#8b949e", $lineColor="#8b949e", $offsetY="-10")
+    UpdateRelStyle(admin, sistema, $textColor="#8b949e", $lineColor="#8b949e", $offsetX="40", $offsetY="-10")
+    UpdateRelStyle(sistema, notificacao, $textColor="#8b949e", $lineColor="#8b949e", $offsetY="-10")
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 ```
 
 **Leitura do diagrama:**
@@ -160,7 +166,43 @@ C4Context
 - A única dependência externa é a API de notificações. Ela é isolada do fluxo da reserva (RNF-10) e, nos testes, é simulada com WireMock.
 - O banco de dados e o job diário não aparecem aqui porque estão dentro do sistema. Eles entram no nível de contêineres (2.2).
 
-TODO (T-10): contêineres, componentes e sequências críticas.
+### 2.2 Nível 2: contêineres
+
+Abre a caixa do sistema e mostra o que roda dentro dela. "Contêiner" aqui é uma unidade executável ou de armazenamento (um processo ou um banco), não um contêiner Docker.
+
+```mermaid
+flowchart LR
+    usuarios["<b>Usuários</b><br/>[Pessoa]<br/>Solicitante, Responsável e Administrador"]
+
+    subgraph sistema["Organização de Recursos [Sistema]"]
+        direction LR
+        app["<b>Aplicação Spring Boot</b><br/>[Contêiner: Java 21, Spring Boot 3.5]<br/>Telas Thymeleaf, API REST em JSON, regras de reserva, autorização por perfil e job diário"]
+        db[("<b>PostgreSQL 16</b><br/>[Contêiner: banco de dados]<br/>Recursos, reservas, manutenção, retiradas, auditoria e usuários")]
+    end
+
+    notif["<b>API de notificações</b><br/>[Sistema externo]<br/>Simulada ou externa (RF-11)"]
+
+    usuarios -->|"HTTPS: telas HTML e API JSON"| app
+    app -->|"JDBC: leitura e escrita"| db
+    app -->|"HTTP/JSON: avisos de mudança de reserva"| notif
+
+    classDef pessoa fill:#1c3d6e,stroke:#8b949e,color:#ffffff
+    classDef conteiner fill:#2f6fc4,stroke:#8b949e,color:#ffffff
+    classDef externo fill:#6e7781,stroke:#8b949e,color:#ffffff
+    class usuarios pessoa
+    class app,db conteiner
+    class notif externo
+```
+
+**Leitura do diagrama:**
+
+- **Dois contêineres próprios.** Telas e API ficam no mesmo projeto Spring Boot (ver 1.1): não há um front-end separado. A decisão de autenticação (sessão nas telas e token na API) será formalizada em ADR na T-13.
+- **O banco é a última linha de defesa.** A restrição anti-conflito (D-02, S-01 e S-02) vive no PostgreSQL, não no código da aplicação. É isso que garante uma única reserva aceita sob solicitações simultâneas (driver 1).
+- **Migrações pela aplicação.** O Flyway aplica as migrações quando a aplicação sobe (F-03). O Hibernate só valida o esquema.
+- **O job diário não é um contêiner à parte.** Ele roda como tarefa agendada dentro do mesmo processo da aplicação (S-06) e aparece como componente no nível 3.
+- **Notificação isolada.** A chamada à API externa acontece depois da reserva gravada, com timeouts configuráveis (RNF-10, DP-08). Nos testes, ela é simulada com WireMock.
+
+TODO (T-10): componentes e sequências críticas.
 
 ## 3. Modelo de dados
 
