@@ -540,7 +540,41 @@ erDiagram
 | RF-12 relatórios | consultas sobre `RESERVA`, `RESERVA_RECURSO` e `AUDITORIA` |
 | RF-13, RF-14 interface e documentação | sem tabela |
 
-TODO (T-11): restrições anti-conflito (seção 3.2).
+### 3.2 Restrições do banco
+
+O banco é a última linha de defesa: as regras que protegem os limitadores de nota valem mesmo que o código da aplicação erre ou seja contornado.
+
+| # | Restrição | Onde | Garante |
+|---|---|---|---|
+| 1 | Sem sobreposição: `EXCLUDE USING gist (recurso_id WITH =, periodo WITH &&) WHERE (ocupa)` | `RESERVA_RECURSO` | RN-02, RN-03, RNF-05 |
+| 2 | Término posterior ao início: `CHECK (fim > inicio)` | `RESERVA` | RN-01 |
+| 3 | Estado, perfil e tipo só aceitam os valores válidos: `CHECK (... IN (...))` | `RESERVA`, `USUARIO`, `RECURSO` | RN-05, RN-06 |
+| 4 | Manutenções do mesmo recurso não se sobrepõem: `EXCLUDE USING gist (recurso_id WITH =, periodo WITH &&)` | `PERIODO_MANUTENCAO` | RF-08 |
+| 5 | Nenhuma reserva é apagada: as chaves estrangeiras usam `ON DELETE RESTRICT`, e o cancelamento só muda o estado | `RESERVA` e tabelas filhas | RN-08 |
+| 6 | Auditoria só recebe inserções, sem alteração nem exclusão | `AUDITORIA` | RN-09 |
+| 7 | Uma retirada por recurso reservado, e a devolução não vem antes da retirada: `UNIQUE (reserva_recurso_id)` e `CHECK (devolvida_em IS NULL OR devolvida_em >= retirada_em)` | `RETIRADA` | RF-09 |
+| 8 | E-mail único por usuário e nome único por tipo de recurso: `UNIQUE (email)` e `UNIQUE (tipo, nome)` | `USUARIO`, `RECURSO` | RF-01, RF-02 |
+
+**A restrição 1 em SQL** (a extensão `btree_gist` permite combinar igualdade e sobreposição no mesmo índice):
+
+```sql
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+
+ALTER TABLE reserva_recurso
+    ADD CONSTRAINT sem_sobreposicao
+    EXCLUDE USING gist (recurso_id WITH =, periodo WITH &&)
+    WHERE (ocupa);
+```
+
+- O período é `tstzrange` com limites `[)` (S-01), então reservas adjacentes não conflitam.
+- A coluna `ocupa` é verdadeira nos estados `SOLICITADA`, `APROVADA` e `EM_USO` (S-02), e o Ciclo de vida a atualiza na mesma transação que muda o estado da reserva. Reservas em outros estados saem da restrição e liberam o horário.
+- Alternativa descartada: bloquear a linha ou usar o nível de isolamento `SERIALIZABLE`. As duas dependem de cada trecho do código lembrar de usá-las, e um esquecimento reabre a dupla reserva.
+
+**Limites conhecidos, levados à T-12:**
+
+- **`ocupa` é uma cópia do estado.** Se o Ciclo de vida mudar o estado e esquecer de atualizar `ocupa`, o banco passa a divergir da reserva (D-02).
+- **Reserva contra manutenção (RN-04)** não cabe em uma restrição declarativa, porque envolve duas tabelas. A verificação fica na aplicação (sequência 2.4.1). Há uma janela de corrida entre criar uma manutenção e criar uma reserva ao mesmo tempo. Um gatilho no banco seria a alternativa, a decidir.
+- **Auditoria só de inserção** é garantida pela aplicação. Reforçar por permissão do banco ou por gatilho fica em aberto (L07).
 
 ## 4. Autenticação e sessão
 
