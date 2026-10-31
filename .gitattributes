@@ -1,2 +1,7 @@
 /mvnw text eol=lf
 *.cmd text eol=crlf
+# AIOX: preservar os bytes distribuÃ­dos pelo pacote
+.aiox-core/** -text
+
+# AIOX: preservar os bytes distribuídos pelo pacote
+.aiox-core/** -text
