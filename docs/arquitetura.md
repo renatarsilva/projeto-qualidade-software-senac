@@ -582,7 +582,39 @@ TODO (T-13, T-15)
 
 ## 5. Decisões (ADR)
 
-As decisões ficam em [`docs/adr/`](adr/). TODO (T-13): ADRs de arquitetura e matriz requisito → decisão → componente → evidência.
+As decisões ficam em [`docs/adr/`](adr/). Os ADRs desta arquitetura:
+
+| ADR | Decisão |
+|---|---|
+| [0004](adr/0004-adotar-postgresql.md) | PostgreSQL como banco, com restrição de exclusão sobre `tstzrange` |
+| [0005](adr/0005-adotar-flyway.md) | Esquema versionado só por migrações Flyway |
+| [0006](adr/0006-thymeleaf-no-mesmo-projeto.md) | Telas Thymeleaf no mesmo projeto Spring Boot |
+| [0007](adr/0007-autenticacao-sessao-nas-telas-e-token-na-api.md) | Sessão nas telas e token na API |
+| [0008](adr/0008-injetar-o-clock.md) | `Clock` injetado em toda regra que depende da hora |
+| [0009](adr/0009-usuario-com-um-perfil.md) | Usuário com um único perfil |
+
+### 5.1 Matriz requisito → decisão → componente → evidência
+
+Cobre os 14 requisitos funcionais. A evidência é a task que vai escrever o teste: ainda não há código.
+
+| Requisito | Decisão | Componente | Evidência |
+|---|---|---|---|
+| RF-01 autenticação e perfil | ADR-0007, ADR-0009 | Segurança | T-15, T-49 |
+| RF-02 cadastro e consulta | ADR-0004 | Recursos | T-16, T-17, T-18 |
+| RF-03 pesquisa | nenhuma (índice em aberto, R-04) | Recursos | T-43 |
+| RF-04 reservas | D-02, S-01, S-02, ADR-0008 | Reservas, Ciclo de vida | T-23, T-24 |
+| RF-05 sobreposição | S-01, S-02, D-02 | Reservas, Repositórios | T-20, T-23 |
+| RF-06 dupla reserva | D-01, D-02, ADR-0004 | Repositórios (restrição de exclusão) | T-37 |
+| RF-07 aprovação de restrito | S-03, ADR-0007 | Ciclo de vida, Segurança | T-34 |
+| RF-08 manutenção | S-04, S-05 | Recursos (manutenção) | T-35 |
+| RF-09 retirada e devolução | nenhuma (DP-04 pendente) | Recursos (retirada) | T-42 |
+| RF-10 auditoria | ADR-0008 | Auditoria, Ciclo de vida | T-40 |
+| RF-11 notificação | nenhuma própria (seção 2.4.1; DP-03 pendente) | Notificação | T-31 |
+| RF-12 relatórios | nenhuma | Relatórios | T-41 |
+| RF-13 interface responsiva | ADR-0006 | Controladores | T-44, T-45, T-46 |
+| RF-14 documentação da API | nenhuma | Controladores | T-51 |
+
+TODO (T-13): listas de lacunas, suposições, perguntas e riscos aceitos.
 
 
 ## 6. Análise ATAM
