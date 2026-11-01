@@ -89,7 +89,8 @@ refactor: extrai validação de intervalo (T-23)
 
 ## A branch `main`
 
-- Ninguém faz push direto na `main`: tudo entra por PR. A regra deve ser garantida pela proteção de branch no GitHub. **Pendente:** a proteção ainda não está ativa e só a administradora do repositório (Renata) pode ativá-la. Até lá, a regra vale pelo combinado do time.
+- Ninguém faz push direto na `main`: tudo entra por PR, com **1 aprovação** de outra pessoa e apenas por **merge commit**. A regra é garantida pelo ruleset "Proteger main" do GitHub, sem bypass.
+- As regras de proteção da `main` e as configurações do repositório são regras explícitas do projeto. Apenas a Renata pode alterá-las.
 - A `main` deve estar sempre executável e com o CI verde.
 
 ## Defeitos
