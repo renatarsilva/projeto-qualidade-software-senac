@@ -251,8 +251,8 @@ h3. Rastreabilidade
 * Requisitos: —
 * Arquivos: docs/defeitos/, .github/ISSUE_TEMPLATE/bug.md
 * Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-documentacao,sem-spec,qualidade-senac
-[T-15] S36 · Backend · Autenticação e autorização por perfil,Task,Highest,Samuel,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
-*Dono:* Samuel  |  *Fluxo:* Regra crítica: spec + revisão + validação + grill-with-docs  |  *Depende de:* T-07, T-13
+[T-15] S36 · Backend · Autenticação e autorização por perfil,Task,Highest,Renata,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
+*Dono:* Renata  |  *Fluxo:* Regra crítica: spec + revisão + validação + grill-with-docs  |  *Depende de:* T-07, T-13
 
 h3. O que fazer
 Spring Security com os perfis SOLICITANTE, RESPONSAVEL e ADMINISTRADOR; usuários em banco (migração Flyway) com senha em hash; login por formulário (sessão) para as telas e endpoint de login que devolve token para a API (MockMvc, Cucumber e JMeter usam token); gestão de usuários pelo Administrador; 401 sem autenticação e 403 para perfil sem permissão, sem vazar detalhes.
@@ -269,8 +269,8 @@ h3. Rastreabilidade
 * Requisitos: RF-01
 * Arquivos: src/main/java/.../seguranca/, db/migration/
 * Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-backend,regra-critica,qualidade-senac
-[T-16] S36 · Backend · Cadastro e consulta de salas,Task,Medium,Caio,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
-*Dono:* Caio  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-15
+[T-16] S36 · Backend · Cadastro e consulta de salas,Task,Medium,Renata,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
+*Dono:* Renata  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-15
 
 h3. O que fazer
 Entidade, migração, repositório, serviço e API REST de salas (tipo, capacidade, localização, restrita ou não). Cadastro e alteração só pelo Administrador; consulta por usuários autenticados. Validação de entrada (capacidade > 0, campos obrigatórios).
@@ -287,8 +287,8 @@ h3. Rastreabilidade
 * Requisitos: RF-02
 * Arquivos: src/main/java/.../sala/
 * Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-backend,spec,qualidade-senac
-[T-17] S36 · Backend · Cadastro e consulta de professores e competências,Task,Medium,Samuel,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
-*Dono:* Samuel  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-15
+[T-17] S36 · Backend · Cadastro e consulta de professores e competências,Task,Medium,Renata,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
+*Dono:* Renata  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-15
 
 h3. O que fazer
 CRUD de professores com suas competências, restrito ao Administrador para escrita.
@@ -304,8 +304,8 @@ h3. Rastreabilidade
 * Requisitos: RF-02
 * Arquivos: src/main/java/.../professor/
 * Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-backend,spec,qualidade-senac
-[T-18] S36 · Backend · Cadastro e consulta de materiais e equipamentos,Task,Medium,Samuel,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
-*Dono:* Samuel  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-15
+[T-18] S36 · Backend · Cadastro e consulta de materiais e equipamentos,Task,Medium,Renata,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
+*Dono:* Renata  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-15
 
 h3. O que fazer
 CRUD de materiais (tipo, patrimônio, restrito ou não, situação), restrito ao Administrador para escrita.
@@ -358,8 +358,8 @@ h3. Rastreabilidade
 * Requisitos: RF-04, RF-05
 * Arquivos: docs/specs/, src/test/java/.../reserva/
 * Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-testes,regra-critica,qualidade-senac
-[T-21] S36 · Testes · Fase red: testes do ciclo de vida da reserva,Task,High,Caio,"*Área:* Testes  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
-*Dono:* Caio  |  *Fluxo:* Regra crítica: spec + revisão + validação + grill-with-docs  |  *Depende de:* T-19
+[T-21] S36 · Testes · Fase red: testes do ciclo de vida da reserva,Task,High,Renata,"*Área:* Testes  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
+*Dono:* Renata  |  *Fluxo:* Regra crítica: spec + revisão + validação + grill-with-docs  |  *Depende de:* T-19
 
 h3. O que fazer
 Escrever a spec do ciclo de vida: transições válidas (SOLICITADA → APROVADA → EM_USO → CONCLUIDA) e alternativas (REJEITADA, CANCELADA, NAO_COMPARECEU), transições proibidas, alteração e cancelamento pelo dono, e reserva iniciada não pode ser apagada. Depois, testes JUnit 5 parametrizados (tabela de transições) falhando por asserção. Commits test(red).
@@ -376,8 +376,8 @@ h3. Rastreabilidade
 * Requisitos: RF-04
 * Arquivos: docs/specs/, src/test/java/.../reserva/
 * Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-testes,regra-critica,qualidade-senac
-[T-22] S36 · Backend · Tratamento padronizado de erros e validação de entrada,Task,High,Caio,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
-*Dono:* Caio  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-07
+[T-22] S36 · Backend · Tratamento padronizado de erros e validação de entrada,Task,High,Renata,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
+*Dono:* Renata  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-07
 
 h3. O que fazer
 @RestControllerAdvice devolvendo ProblemDetail (RFC 9457) com mensagem compreensível em português; 400 para validação (com o campo e o motivo), 404, 409 para conflito de regra; erro inesperado vira 500 neutro, sem stack trace, SQL ou nome de classe. Nas telas, página de erro amigável.

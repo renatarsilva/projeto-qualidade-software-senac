@@ -61,9 +61,9 @@ gantt
 
 | Pessoa | Tasks |
 |---|---|
-| Renata | T-14 defeitos · T-19 plano TDD · T-20 red intervalo e sobreposição · T-23 green · T-28 cobertura de ramo · T-32 RTM |
-| Samuel | T-15 autenticação (crítica) · T-17 professores · T-18 materiais · T-25 CI · T-29 SonarCloud · T-31 notificação WireMock |
-| Caio | T-16 salas · T-21 red ciclo de vida · T-22 tratamento de erros · T-24 green · T-26 ciclo-01 · T-27 JaCoCo · T-30 Testcontainers |
+| Renata | Semana 36 inteira: T-14 defeitos · T-15 autenticação (crítica) · T-16 salas · T-17 professores · T-18 materiais · T-19 plano TDD · T-20 red intervalo e sobreposição · T-21 red ciclo de vida · T-22 tratamento de erros. Depois: T-23 green · T-28 cobertura de ramo · T-32 RTM |
+| Samuel | T-25 CI · T-29 SonarCloud · T-31 notificação WireMock |
+| Caio | T-24 green ciclo de vida · T-26 ciclo-01 · T-27 JaCoCo · T-30 Testcontainers |
 
 **Ordem que importa:** T-25 (CI) e T-15 (autenticação) no início, porque quase tudo depende deles. T-19 (plano TDD) antes das fases red. Escrevam as specs no primeiro dia: a revisão leva tempo.
 

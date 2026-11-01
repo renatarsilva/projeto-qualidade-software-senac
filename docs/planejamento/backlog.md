@@ -14,9 +14,9 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 | Pessoa | Tasks | Backend | Frontend | Testes | Infra | Documentação | Regras críticas |
 |---|---|---|---|---|---|---|---|
-| Renata (@renatarsilva) | 20 | 2 | 1 | 6 | 1 | 10 | T-20, T-40 |
-| Samuel (@Samwel-Merces) | 15 | 7 | 1 | 2 | 3 | 2 | T-15, T-35, T-37, T-49 |
-| Caio (@CaiosAguiar) | 20 | 6 | 1 | 2 | 4 | 7 | T-21, T-34 |
+| Renata (@renatarsilva) | 26 | 7 | 1 | 7 | 1 | 10 | T-15, T-20, T-21, T-40 |
+| Samuel (@Samwel-Merces) | 12 | 4 | 1 | 2 | 3 | 2 | T-35, T-37, T-49 |
+| Caio (@CaiosAguiar) | 17 | 4 | 1 | 1 | 4 | 7 | T-34 |
 | Todos (time) | 3 | 0 | 0 | 0 | 1 | 2 | — |
 
 ## Sprint 1 · 15/10 a 21/10 · semanas 32 a 35
@@ -61,14 +61,14 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 | ID | Área | Task | Dono | Fluxo | Prioridade | Depende de |
 |---|---|---|---|---|---|---|
 | [T-14](#t-14) | Documentação | Processo e registro de defeitos | Renata | — | High | — |
-| [T-15](#t-15) | Backend | Autenticação e autorização por perfil | Samuel | spec + grill | Highest | T-07, T-13 |
-| [T-16](#t-16) | Backend | Cadastro e consulta de salas | Caio | spec | Medium | T-15 |
-| [T-17](#t-17) | Backend | Cadastro e consulta de professores e competências | Samuel | spec | Medium | T-15 |
-| [T-18](#t-18) | Backend | Cadastro e consulta de materiais e equipamentos | Samuel | spec | Medium | T-15 |
+| [T-15](#t-15) | Backend | Autenticação e autorização por perfil | Renata | spec + grill | Highest | T-07, T-13 |
+| [T-16](#t-16) | Backend | Cadastro e consulta de salas | Renata | spec | Medium | T-15 |
+| [T-17](#t-17) | Backend | Cadastro e consulta de professores e competências | Renata | spec | Medium | T-15 |
+| [T-18](#t-18) | Backend | Cadastro e consulta de materiais e equipamentos | Renata | spec | Medium | T-15 |
 | [T-19](#t-19) | Testes | Plano TDD: inventário de todas as regras de negócio | Renata | — | High | T-09 |
 | [T-20](#t-20) | Testes | Fase red: testes de intervalo e sobreposição de horários | Renata | spec + grill | Highest | T-16, T-17, T-18, T-19 |
-| [T-21](#t-21) | Testes | Fase red: testes do ciclo de vida da reserva | Caio | spec + grill | High | T-19 |
-| [T-22](#t-22) | Backend | Tratamento padronizado de erros e validação de entrada | Caio | spec | High | T-07 |
+| [T-21](#t-21) | Testes | Fase red: testes do ciclo de vida da reserva | Renata | spec + grill | High | T-19 |
+| [T-22](#t-22) | Backend | Tratamento padronizado de erros e validação de entrada | Renata | spec | High | T-07 |
 
 ### Semana 37 · Aula 06 · Testes automatizados em CI (fase green)
 
@@ -362,7 +362,7 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 **Autenticação e autorização por perfil**
 
-- **Semana:** 36 (Aula 05 · Gestão de erros e bugs (TDD fase red)) · **Sprint:** 2 · **Área:** Backend · **Dono:** Samuel
+- **Semana:** 36 (Aula 05 · Gestão de erros e bugs (TDD fase red)) · **Sprint:** 2 · **Área:** Backend · **Dono:** Renata
 - **Fluxo:** Regra crítica: spec + revisão + validação + grill-with-docs · **Prioridade:** Highest · **Requisitos:** RF-01 · **Depende de:** T-07, T-13
 - **O que fazer:** Spring Security com os perfis SOLICITANTE, RESPONSAVEL e ADMINISTRADOR; usuários em banco (migração Flyway) com senha em hash; login por formulário (sessão) para as telas e endpoint de login que devolve token para a API (MockMvc, Cucumber e JMeter usam token); gestão de usuários pelo Administrador; 401 sem autenticação e 403 para perfil sem permissão, sem vazar detalhes.
 - **Por quê:** RF01. Falha de autorização é limitador de nota. As Aulas 09, 10 e 12 dependem de tokens de cada perfil.
@@ -376,7 +376,7 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 **Cadastro e consulta de salas**
 
-- **Semana:** 36 (Aula 05 · Gestão de erros e bugs (TDD fase red)) · **Sprint:** 2 · **Área:** Backend · **Dono:** Caio
+- **Semana:** 36 (Aula 05 · Gestão de erros e bugs (TDD fase red)) · **Sprint:** 2 · **Área:** Backend · **Dono:** Renata
 - **Fluxo:** Spec + revisão + validação · **Prioridade:** Medium · **Requisitos:** RF-02 · **Depende de:** T-15
 - **O que fazer:** Entidade, migração, repositório, serviço e API REST de salas (tipo, capacidade, localização, restrita ou não). Cadastro e alteração só pelo Administrador; consulta por usuários autenticados. Validação de entrada (capacidade > 0, campos obrigatórios).
 - **Por quê:** RF02. Sala é o recurso principal das reservas.
@@ -390,7 +390,7 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 **Cadastro e consulta de professores e competências**
 
-- **Semana:** 36 (Aula 05 · Gestão de erros e bugs (TDD fase red)) · **Sprint:** 2 · **Área:** Backend · **Dono:** Samuel
+- **Semana:** 36 (Aula 05 · Gestão de erros e bugs (TDD fase red)) · **Sprint:** 2 · **Área:** Backend · **Dono:** Renata
 - **Fluxo:** Spec + revisão + validação · **Prioridade:** Medium · **Requisitos:** RF-02 · **Depende de:** T-15
 - **O que fazer:** CRUD de professores com suas competências, restrito ao Administrador para escrita.
 - **Por quê:** RF02. O professor também é recurso reservável: a agenda dele não pode ter sobreposição.
@@ -403,7 +403,7 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 **Cadastro e consulta de materiais e equipamentos**
 
-- **Semana:** 36 (Aula 05 · Gestão de erros e bugs (TDD fase red)) · **Sprint:** 2 · **Área:** Backend · **Dono:** Samuel
+- **Semana:** 36 (Aula 05 · Gestão de erros e bugs (TDD fase red)) · **Sprint:** 2 · **Área:** Backend · **Dono:** Renata
 - **Fluxo:** Spec + revisão + validação · **Prioridade:** Medium · **Requisitos:** RF-02 · **Depende de:** T-15
 - **O que fazer:** CRUD de materiais (tipo, patrimônio, restrito ou não, situação), restrito ao Administrador para escrita.
 - **Por quê:** RF02. Material é o terceiro tipo de recurso e a base da retirada e devolução (RF09).
@@ -445,7 +445,7 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 **Fase red: testes do ciclo de vida da reserva**
 
-- **Semana:** 36 (Aula 05 · Gestão de erros e bugs (TDD fase red)) · **Sprint:** 2 · **Área:** Testes · **Dono:** Caio
+- **Semana:** 36 (Aula 05 · Gestão de erros e bugs (TDD fase red)) · **Sprint:** 2 · **Área:** Testes · **Dono:** Renata
 - **Fluxo:** Regra crítica: spec + revisão + validação + grill-with-docs · **Prioridade:** High · **Requisitos:** RF-04 · **Depende de:** T-19
 - **O que fazer:** Escrever a spec do ciclo de vida: transições válidas (SOLICITADA → APROVADA → EM_USO → CONCLUIDA) e alternativas (REJEITADA, CANCELADA, NAO_COMPARECEU), transições proibidas, alteração e cancelamento pelo dono, e reserva iniciada não pode ser apagada. Depois, testes JUnit 5 parametrizados (tabela de transições) falhando por asserção. Commits test(red).
 - **Por quê:** Regras críticas da especificação. A tabela de transições é ótima para @ParameterizedTest e será usada pela aprovação (semana 41) e pela auditoria (43).
@@ -459,7 +459,7 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 
 **Tratamento padronizado de erros e validação de entrada**
 
-- **Semana:** 36 (Aula 05 · Gestão de erros e bugs (TDD fase red)) · **Sprint:** 2 · **Área:** Backend · **Dono:** Caio
+- **Semana:** 36 (Aula 05 · Gestão de erros e bugs (TDD fase red)) · **Sprint:** 2 · **Área:** Backend · **Dono:** Renata
 - **Fluxo:** Spec + revisão + validação · **Prioridade:** High · **Requisitos:** RF-13 · **Depende de:** T-07
 - **O que fazer:** @RestControllerAdvice devolvendo ProblemDetail (RFC 9457) com mensagem compreensível em português; 400 para validação (com o campo e o motivo), 404, 409 para conflito de regra; erro inesperado vira 500 neutro, sem stack trace, SQL ou nome de classe. Nas telas, página de erro amigável.
 - **Por quê:** RF13 (mensagens compreensíveis) e 'tratamento seguro de erros'. Na Aula 12 o professor provoca um erro e lê o corpo da resposta. Fazer agora evita que cada endpoint trate erro de um jeito.
