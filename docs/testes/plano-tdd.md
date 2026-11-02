@@ -112,6 +112,29 @@ Base dos casos: sala 102, terça, salvo indicação.
 | RN-03-T9 | Feliz | Depois da disputa, quem foi recusado pede outro horário livre | Aceita |
 | (inválida e estado) | — | Não se aplicam: a regra é só sobre simultaneidade | — |
 
+### RN-04 · Recurso em manutenção não pode ser reservado
+
+Fonte: PRD, seção 4.4 · RF-08. Premissas: S-01 (períodos encostados convivem), S-04 (bloqueio e manutenção são o mesmo mecanismo) e S-05 (criar manutenção não cancela reservas existentes). O caso concorrente é o CEN-04 da [arquitetura](../arquitetura.md).
+
+Base dos casos: sala 102 em manutenção na terça, das 10:00 às 12:00, salvo indicação.
+
+| Caso | Tipo | Situação | Resultado esperado |
+|---|---|---|---|
+| RN-04-T1 | Conflito | Reserva da sala 102 das 10:30 às 11:30, dentro da manutenção | Recusada, e nada é gravado |
+| RN-04-T2 | Conflito | Reserva das 09:30 às 10:30, que invade o início da manutenção | Recusada, e nada é gravado |
+| RN-04-T3 | Limite | Reserva das 09:00 às 10:00 (termina quando a manutenção começa) | Aceita (encostada, S-01) |
+| RN-04-T4 | Limite | Reserva das 12:00 às 13:00 (começa quando a manutenção termina) | Aceita |
+| RN-04-T5 | Feliz | Reserva da sala 101, sem manutenção, no mesmo horário | Aceita |
+| RN-04-T6 | Feliz | Reserva da sala 102 em outro dia, sem manutenção | Aceita |
+| RN-04-T7 | Conflito | Reserva de um material em manutenção (por exemplo, o projetor) no período | Recusada, e nada é gravado |
+| RN-04-T8 | Conflito | Pedido de sala 102 livre e projetor em manutenção | Recusada por inteiro, e a sala não fica gravada |
+| RN-04-T9 | Estado | A sala 102 já tem reserva `APROVADA` das 10:30 às 11:30, e a manutenção é criada depois | A manutenção é criada; a reserva não é cancelada, continua `APROVADA` e aparece na lista de reservas afetadas (S-05) |
+| RN-04-T10 | Concorrência | Manutenção e reserva da sala 102 criadas ao mesmo tempo (CEN-04) | Nenhuma reserva é gravada depois de a manutenção ser confirmada |
+| RN-04-T11 | Feliz | A manutenção é encerrada, e depois alguém reserva a sala 102 no mesmo período | Aceita (a sala voltou a ficar livre) |
+| (inválida) | Inválida | Não se aplica: os dados malformados são da RN-01 | — |
+
+Quem pode criar manutenção (só o Administrador) é autorização e fica para a matriz da T-48.
+
 ### RN-10 · Janela de funcionamento (proposta)
 
 Segunda a sexta, de 07:00 às 22:45. Sábado, de 08:00 às 14:00. Domingo e feriados, fechado. A reserva começa não antes da abertura, termina não depois do fechamento e fica dentro de **um único dia**. Os horários são os de Brasília, e o `Clock` do teste é fixo.
