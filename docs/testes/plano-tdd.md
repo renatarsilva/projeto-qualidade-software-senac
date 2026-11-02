@@ -70,6 +70,29 @@ Fonte: PRD, seção 4.4 · RF-04. A comparação é entre **data e hora**, não 
 
 Premissas de teste: a fonte não exige duração mínima geral, então qualquer duração positiva é válida no meio do dia (RN-01-T3); e toda reserva fica dentro de um único dia, conforme a RN-10.
 
+### RN-02 · Reservas do mesmo recurso não podem se sobrepor
+
+Fonte: PRD, seção 4.4 · RF-05. As formas de sobreposição em sala, material e professor (V01 a V21) estão no [CT-01](../atam/utility-tree-inicial.md) e não se repetem aqui. Premissas: S-01 (reservas encostadas convivem) e S-02 (quais estados ocupam o horário).
+
+Base dos casos: sala 102, terça, 10:00 às 11:00, reserva `APROVADA` do usuário A, salvo indicação.
+
+| Caso | Tipo | Situação | Resultado esperado |
+|---|---|---|---|
+| RN-02-T1 | Conflito | A estende a sua reserva para 10:00 às 12:00, mas B tem a sala 102 das 11:00 às 12:00 | Recusada, e a reserva de A continua das 10:00 às 11:00 |
+| RN-02-T2 | Feliz | A estende a sua reserva para 10:00 às 12:00, com a sala livre depois | Aceita (a reserva não conflita com ela mesma) |
+| RN-02-T3 | Limite | A estende de 10:00 às 10:30 para 10:00 às 11:00, e B tem 11:00 às 12:00 | Aceita (encostada, S-01) |
+| RN-02-T4 | Conflito | A muda a reserva para 13:00 às 14:00, horário já ocupado por C | Recusada, e a reserva de A fica no horário original |
+| RN-02-T5 | Conflito | Pedido de sala 102, projetor e professor X; só o projetor está ocupado | Recusada por inteiro; a sala e o professor X continuam livres |
+| RN-02-T6 | Conflito | Pedido em que a sala e o professor conflitam ao mesmo tempo | Recusada, e nada é gravado |
+| RN-02-T7 | Estado | B pede 10:30 às 11:30, e a reserva existente está `SOLICITADA` | Recusada (ocupa o horário) |
+| RN-02-T8 | Estado | Idem, com a existente `EM_USO` | Recusada (ocupa o horário) |
+| RN-02-T9 | Estado | Idem, com a existente `CANCELADA` | Aceita (não ocupa) |
+| RN-02-T10 | Estado | Idem, com a existente `REJEITADA` | Aceita (não ocupa) |
+| RN-02-T11 | Estado | Idem, com a existente `NAO_COMPARECEU` | Aceita (não ocupa) |
+| RN-02-T12 | Feliz | B pede a sala 101, terça das 10:00 às 11:00, com a sala 102 reservada | Aceita (recursos diferentes) |
+| RN-02-T13 | Feliz | B pede a sala 102 em outro dia, das 10:00 às 11:00 | Aceita |
+| (inválida) | Inválida | Não se aplica: os dados malformados são da RN-01 | — |
+
 ### RN-10 · Janela de funcionamento (proposta)
 
 Segunda a sexta, de 07:00 às 22:45. Sábado, de 08:00 às 14:00. Domingo e feriados, fechado. A reserva começa não antes da abertura, termina não depois do fechamento e fica dentro de **um único dia**. Os horários são os de Brasília, e o `Clock` do teste é fixo.
