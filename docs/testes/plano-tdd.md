@@ -93,6 +93,25 @@ Base dos casos: sala 102, terça, 10:00 às 11:00, reserva `APROVADA` do usuári
 | RN-02-T13 | Feliz | B pede a sala 102 em outro dia, das 10:00 às 11:00 | Aceita |
 | (inválida) | Inválida | Não se aplica: os dados malformados são da RN-01 | — |
 
+### RN-03 · Duas solicitações simultâneas produzem uma única reserva aceita
+
+Fonte: PRD, seção 4.4 · RF-06. Premissas: S-02 (quais estados ocupam o horário) e L03 (a forma da recusa não está definida: o teste só verifica que a reserva recusada **não é gravada**). O caso de 20 solicitações é o [CT-02](../atam/utility-tree-inicial.md); os demais são menores e não se repetem lá.
+
+Base dos casos: sala 102, terça, salvo indicação.
+
+| Caso | Tipo | Situação | Resultado esperado |
+|---|---|---|---|
+| RN-03-T1 | Conflito | 20 solicitações simultâneas para a mesma sala e o mesmo intervalo (CT-02) | Exatamente 1 aceita, 19 recusadas e 1 reserva ativa |
+| RN-03-T2 | Limite | 2 solicitações simultâneas, mesma sala e mesmo intervalo (a menor disputa) | 1 aceita, 1 recusada e 1 reserva ativa |
+| RN-03-T3 | Conflito | 2 simultâneas com sobreposição parcial (10:00 às 11:00 e 10:30 às 11:30) | 1 aceita, 1 recusada |
+| RN-03-T4 | Feliz | 2 simultâneas na mesma sala, em intervalos encostados (10:00 às 11:00 e 11:00 às 12:00) | As duas aceitas |
+| RN-03-T5 | Feliz | 2 simultâneas, em salas diferentes e no mesmo horário | As duas aceitas |
+| RN-03-T6 | Conflito | O mesmo usuário envia o mesmo pedido 2 vezes ao mesmo tempo (duplo clique) | 1 reserva criada, e a repetição é recusada |
+| RN-03-T7 | Conflito | A pede sala 102 e projetor, e B pede sala 103 e o mesmo projetor, ao mesmo tempo | 1 aceita, e a recusada não deixa a sala 103 gravada |
+| RN-03-T8 | Estável | O caso RN-03-T2 repetido 5 vezes seguidas | O mesmo resultado nas 5 (premissa: 5 repetições é métrica candidata, MC-03) |
+| RN-03-T9 | Feliz | Depois da disputa, quem foi recusado pede outro horário livre | Aceita |
+| (inválida e estado) | — | Não se aplicam: a regra é só sobre simultaneidade | — |
+
 ### RN-10 · Janela de funcionamento (proposta)
 
 Segunda a sexta, de 07:00 às 22:45. Sábado, de 08:00 às 14:00. Domingo e feriados, fechado. A reserva começa não antes da abertura, termina não depois do fechamento e fica dentro de **um único dia**. Os horários são os de Brasília, e o `Clock` do teste é fixo.
