@@ -43,27 +43,53 @@ Hoje cada endpoint poderia devolver erros em um formato diferente, e uma falha i
 
 Liste as regras com o ID do PRD. Se a regra ainda não existe no PRD, ela entra primeiro no PRD.
 
-- **RN00:** _preencher_
+Esta task não cria regra de negócio: ela aplica requisitos do PRD.
+
+- **RF-13:** interface responsiva e **mensagens de erro compreensíveis**.
+- **RNF-07 (validação de entrada):** toda entrada inválida catalogada é recusada, e nenhuma gravação inválida acontece. A exigência é oficial; a medida (100 % do catálogo) é candidata, com validação pendente.
+- **RNF-08 (tratamento seguro de erros):** nenhuma resposta de erro contém stack trace, SQL, nome de classe nem caminho interno.
 
 ## 4. Contrato da API
 
-`MÉTODO /caminho`: _preencher_ (quem pode chamar)
+Esta task não cria um endpoint: ela define **como todos os endpoints respondem a erro**. Toda resposta de erro tem o tipo `application/problem+json` (RFC 9457), com mensagens em português, e vale para os três perfis.
 
-**Requisição:**
+**Formato:**
+
+| Campo | Conteúdo |
+|---|---|
+| `type` | Identifica o tipo do erro |
+| `title` | Título curto e compreensível |
+| `status` | O código HTTP |
+| `detail` | A explicação para a pessoa, sem detalhe interno |
+| `instance` | O caminho da requisição |
+| `erros` | Só no `400`: a lista de campos inválidos, cada um com `campo` e `motivo` |
+
+**Exemplo de entrada inválida (`400`):**
 
 ```json
-{ "_preencher_": "" }
+{
+  "type": "about:blank",
+  "title": "Dados inválidos",
+  "status": 400,
+  "detail": "Um ou mais campos estão inválidos.",
+  "instance": "/api/salas",
+  "erros": [
+    { "campo": "capacidade", "motivo": "deve ser maior que zero" }
+  ]
+}
 ```
 
 **Respostas:**
 
 | Situação | Status HTTP | Corpo |
 |---|---|---|
-| Sucesso | 201 | _preencher_ |
-| Entrada inválida | 400 | ProblemDetail com mensagem compreensível |
-| Sem autenticação | 401 | _preencher_ |
-| Perfil sem permissão | 403 | _preencher_ |
-| Conflito de regra | 409 | _preencher_ |
+| Entrada inválida | 400 | `ProblemDetail` com a lista `erros` (campo e motivo) |
+| Recurso não encontrado | 404 | `ProblemDetail`: "Recurso não encontrado" |
+| Conflito de regra | 409 | `ProblemDetail` com o motivo do conflito, em linguagem de negócio |
+| Erro inesperado | 500 | `ProblemDetail` neutro: "Ocorreu um erro inesperado. Tente novamente mais tarde." Sem stack trace, SQL, nome de classe nem caminho |
+| Sem autenticação e perfil sem permissão | 401 e 403 | Fora desta task (T-15), mas devem seguir o mesmo formato |
+
+Nas telas, os mesmos erros aparecem como uma página de erro amigável, sem detalhe técnico.
 
 ## 5. Critérios de aceite
 
