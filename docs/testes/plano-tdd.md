@@ -168,6 +168,26 @@ Fonte: PRD, seção 4.4 · RF-04, RF-07. Só o fluxo principal é oficial: os ca
 
 O cancelamento por falta de aprovação (RN-06-T9) é feito pelo sistema, e não pelo dono: é uma proposta, com validação pendente.
 
+### RN-07 · Somente o Responsável aprova recursos restritos
+
+Fonte: PRD, seção 4.4 · RF-07, RF-01. Premissas: S-03 (o recurso tem o indicador `restrito`), DP-06 (se "solicitação especial" e "recurso restrito" são a mesma coisa) e L04 (se o recurso não restrito passa por `APROVADA`). A matriz completa de perfil por operação é da T-48 e da T-49.
+
+Base dos casos: o Laboratório 1 (recurso restrito) tem uma reserva `SOLICITADA` do usuário A.
+
+| Caso | Tipo | Situação | Resultado esperado |
+|---|---|---|---|
+| RN-07-T1 | Feliz | O Responsável aprova a reserva | Estado `APROVADA` |
+| RN-07-T2 | Conflito | O dono (Solicitante) tenta aprovar a própria reserva | Recusada (acesso negado), e continua `SOLICITADA` |
+| RN-07-T3 | Conflito | O Administrador tenta aprovar (premissa: só o Responsável aprova; DP-05 em aberto) | Recusada, e continua `SOLICITADA` |
+| RN-07-T4 | Conflito | Alguém sem login tenta aprovar | Recusada (não autenticado), e o estado não muda |
+| RN-07-T5 | Conflito | O Solicitante tenta rejeitar a reserva de outro usuário | Recusada, e continua `SOLICITADA` |
+| RN-07-T6 | Estado | O Responsável tenta aprovar uma reserva já `APROVADA`, `CANCELADA` ou `REJEITADA` | Recusada, e o estado não muda |
+| RN-07-T7 | Feliz | Reserva de um recurso não restrito | Não depende do Responsável (premissa; se passa por `APROVADA` é a L04) |
+| RN-07-T8 | Conflito | O Responsável clica em aprovar 2 vezes ao mesmo tempo | 1 aprovação e 1 registro de auditoria |
+| RN-07-T9 | Concorrência | O Responsável aprova enquanto o dono cancela, ao mesmo tempo | Um só resultado final (`APROVADA` ou `CANCELADA`), nunca os dois, com 1 registro de auditoria |
+| RN-07-T10 | Inválida | Aprovar uma reserva que não existe | Recusada, sem alterar nada |
+| RN-07-T11 | Feliz | Depois da aprovação, a auditoria registra o Responsável que aprovou | O registro traz o usuário, o estado anterior e o novo (RN-09) |
+
 ### RN-10 · Janela de funcionamento (proposta)
 
 Segunda a sexta, de 07:00 às 22:45. Sábado, de 08:00 às 14:00. Domingo e feriados, fechado. A reserva começa não antes da abertura, termina não depois do fechamento e fica dentro de **um único dia**. Os horários são os de Brasília, e o `Clock` do teste é fixo.
