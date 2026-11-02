@@ -188,6 +188,22 @@ Base dos casos: o Laboratório 1 (recurso restrito) tem uma reserva `SOLICITADA`
 | RN-07-T10 | Inválida | Aprovar uma reserva que não existe | Recusada, sem alterar nada |
 | RN-07-T11 | Feliz | Depois da aprovação, a auditoria registra o Responsável que aprovou | O registro traz o usuário, o estado anterior e o novo (RN-09) |
 
+### RN-08 · Reservas iniciadas não podem ser apagadas
+
+Fonte: PRD, seção 4.4 · RF-04, RF-10. Premissas: L11 (cancelar não é apagar) e a restrição 5 da [arquitetura](../arquitetura.md) (nenhuma reserva é apagada, nem antes do início). Base: reserva do usuário A, sala 102, terça, das 10:00 às 11:00.
+
+| Caso | Tipo | Situação | Resultado esperado |
+|---|---|---|---|
+| RN-08-T1 | Estado proibido | Apagar uma reserva `EM_USO` | Recusada, e a reserva continua no sistema |
+| RN-08-T2 | Estado proibido | Apagar uma reserva `CONCLUIDA` | Recusada, e a reserva continua no sistema |
+| RN-08-T3 | Limite | Apagar às 10:00 em ponto, no instante do início | Recusada (o sistema não apaga reservas, nem antes, nem depois do início) |
+| RN-08-T4 | Limite | Apagar às 09:59, antes do início (premissa: o sistema não apaga reservas, só cancela) | Recusada; o caminho é cancelar (RN-13) |
+| RN-08-T5 | Estado proibido | Apagar uma reserva `CANCELADA`, `REJEITADA` ou `NAO_COMPARECEU` | Recusada, e a reserva continua no sistema |
+| RN-08-T6 | Feliz | A cancela a reserva antes do início | A reserva continua consultável como `CANCELADA`, com o histórico |
+| RN-08-T7 | Conflito | Alguém sem permissão tenta apagar | Recusada, e a reserva continua |
+| RN-08-T8 | Inválida | Apagar uma reserva que não existe | Recusada (não encontrada), sem alterar nada |
+| RN-08-T9 | Integração | Um `DELETE` direto no banco de uma reserva que tem auditoria | Recusado pela chave estrangeira, e a auditoria e a reserva continuam (arquitetura 3.2) |
+
 ### RN-10 · Janela de funcionamento (proposta)
 
 Segunda a sexta, de 07:00 às 22:45. Sábado, de 08:00 às 14:00. Domingo e feriados, fechado. A reserva começa não antes da abertura, termina não depois do fechamento e fica dentro de **um único dia**. Os horários são os de Brasília, e o `Clock` do teste é fixo.
@@ -237,7 +253,7 @@ A reserva vale para hoje ou para qualquer dia futuro, **nunca no passado**, desd
 
 ### RN-13 · Cancelamento libera o recurso (proposta)
 
-O **dono** da reserva pode cancelá-la. Antes do início, a reserva vira `CANCELADA` e o horário inteiro volta a ficar livre. Depois do início e antes do fim, é um **encerramento antecipado**: a reserva vira `CONCLUIDA` (o uso aconteceu) e o resto do horário volta a ficar livre. Depois do fim, não há o que cancelar. A reserva nunca é apagada (RN-08) e toda mudança gera auditoria (RN-09).
+O **dono** da reserva pode cancelá-la. Até o instante do início (inclusive), a reserva vira `CANCELADA` e o horário inteiro volta a ficar livre. Depois do início e antes do fim, é um **encerramento antecipado**: a reserva vira `CONCLUIDA` (o uso aconteceu) e o resto do horário volta a ficar livre. Depois do fim, não há o que cancelar. A reserva nunca é apagada (RN-08) e toda mudança gera auditoria (RN-09).
 
 Os casos usam o `Clock` fixo em segunda, às 08:00, e uma reserva `APROVADA` do usuário A, na sala 102, das 10:00 às 11:00, salvo indicação.
 
@@ -247,7 +263,7 @@ Os casos usam o `Clock` fixo em segunda, às 08:00, e uma reserva `APROVADA` do 
 | RN-13-T2 | Feliz | Depois do cancelamento de T1, o usuário B reserva a sala 102 das 10:00 às 11:00 | Aceita (o conflito deixou de existir) |
 | RN-13-T3 | Feliz | A cancela uma reserva ainda `SOLICITADA` (sem aprovação), antes do início | Estado `CANCELADA`; o horário fica livre |
 | RN-13-T4 | Limite | A cancela às 09:59, um minuto antes do início | Estado `CANCELADA` |
-| RN-13-T5 | Limite | A cancela às 10:00 em ponto (premissa: início igual a agora já conta como iniciada) | Encerramento antecipado: estado `CONCLUIDA` |
+| RN-13-T5 | Limite | A cancela às 10:00 em ponto, no instante do início (o uso ainda não começou) | Estado `CANCELADA`, e o horário inteiro das 10:00 às 11:00 volta a ficar livre |
 | RN-13-T6 | Feliz | Reserva das 10:00 às 12:00; A encerra às 10:40 | Estado `CONCLUIDA`; a reserva continua no histórico |
 | RN-13-T7 | Feliz | Depois de T6, B reserva a sala 102 das 11:00 às 12:00 | Aceita (o resto do horário foi liberado) |
 | RN-13-T8 | Estado proibido | A tenta cancelar às 11:30, depois do fim | Recusada, e o estado não muda |
@@ -256,6 +272,7 @@ Os casos usam o `Clock` fixo em segunda, às 08:00, e uma reserva `APROVADA` do 
 | RN-13-T11 | Conflito | B, que não é o dono, tenta cancelar a reserva de A | Recusada, e a reserva fica intacta (premissa: só o dono cancela; o caso do Administrador entra na matriz de autorização, T-48) |
 | RN-13-T12 | Inválida | Cancelar uma reserva que não existe | Recusada, sem alterar nada |
 | RN-13-T13 | Feliz | Em T1, T4 e T6, o registro de auditoria traz o estado anterior, o novo, o usuário e o instante | Um registro por mudança (RN-09) |
+| RN-13-T14 | Limite | A cancela às 10:01, um minuto depois do início | Encerramento antecipado: estado `CONCLUIDA`, e o resto do horário fica livre |
 
 ## 4. Ambiguidades, lacunas e perguntas
 
