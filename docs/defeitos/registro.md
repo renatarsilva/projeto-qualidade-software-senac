@@ -4,7 +4,7 @@ Lista dos defeitos encontrados, priorizados e corrigidos. O processo está em [`
 
 | ID | Título | Severidade | Prioridade | Estado |
 |---|---|---|---|---|
-| DEF-01 | A arquitetura cita a task de código como evidência de teste | Baixa | P2 | Em verificação |
+| DEF-01 | A arquitetura cita a task de código como evidência de teste | Baixa | P2 | Fechado |
 
 ## DEF-01 · A arquitetura cita a task de código como evidência de teste
 
@@ -15,7 +15,7 @@ Lista dos defeitos encontrados, priorizados e corrigidos. O processo está em [`
 - **Severidade: Baixa.** É um erro de documentação, sem efeito no sistema
 - **Prioridade: P2.** A matriz é o começo da rastreabilidade (10% da nota), e a correção é de poucas linhas
 - **Correção:** PR #22 (três referências trocadas e a regra escrita no cabeçalho da matriz)
-- **Verificação:** buscar `T-23` e `T-24` em `docs/arquitetura.md`; só a frase da regra deve restar (conferido). A revisão do PR #22 confirma
+- **Verificação:** buscar `T-23` e `T-24` em `docs/arquitetura.md`; só a frase da regra deve restar (conferido). Confirmado na revisão (duas aprovações) e no merge do PR #22
 
 ### Causa raiz (5 porquês)
 
