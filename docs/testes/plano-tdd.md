@@ -312,8 +312,22 @@ Pontos que as fontes não resolvem. Nenhum deles é regra oficial: os que viram 
 
 ## 5. Matriz regra → caso → teste → status
 
-Atualizada pelas tasks seguintes. O status começa em "sem teste" e muda quando o teste red é escrito (T-20 e T-21).
+Atualizada pelas tasks seguintes. O status começa em `sem teste`, passa a `red` quando o teste é escrito e falha (T-20 e T-21) e a `green` quando o teste passa.
 
-| Regra | Caso | Teste | Status |
+| Regra | Casos | Teste (task) | Status |
 |---|---|---|---|
-| (preenchida à medida que os casos são escritos) | | | |
+| RN-01 | RN-01-T1 a T8 | T-20 | sem teste |
+| RN-02 | RN-02-T1 a T13, mais CT-01 (V01 a V21) | T-20; T-30 (restrição no banco) | sem teste |
+| RN-03 | RN-03-T1 a T9, mais CT-02 | T-37 | sem teste |
+| RN-04 | RN-04-T1 a T11, mais CEN-04 | T-35 | sem teste |
+| RN-05 | RN-05-T1 a T7 | T-21 | sem teste |
+| RN-06 | RN-06-T1 a T10 | T-21 | sem teste |
+| RN-07 | RN-07-T1 a T11 | T-34; T-49 (matriz de autorização) | sem teste |
+| RN-08 | RN-08-T1 a T9 | T-21; T-30 (o T9, no banco) | sem teste |
+| RN-09 | RN-09-T1 a T12 | T-40 | sem teste |
+| RN-10 (proposta) | RN-10-T1 a T11 | sem task no backlog | sem teste, proposta |
+| RN-11 (proposta) | RN-11-T1 a T6 | sem task no backlog | sem teste, proposta |
+| RN-12 (proposta) | RN-12-T1 a T6 | sem task no backlog | sem teste, proposta |
+| RN-13 (proposta) | RN-13-T1 a T14 | sem task no backlog | sem teste, proposta |
+
+**Regras sem teste: todas, por enquanto.** As propostas (RN-10 a RN-13) ainda não têm task no backlog.
