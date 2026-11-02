@@ -17,3 +17,29 @@ Novo → Triado → Em correção → Em verificação → Fechado
 | Fechado | Verificado, com teste de regressão ou evidência | Quem verificou |
 
 Saídas fora do caminho principal: **Duplicado**, **Não reproduzível**, **Não será corrigido** (com motivo) e **Reaberto** (o defeito voltou).
+
+## Severidade e prioridade
+
+**Severidade** mede o dano: confidencialidade, integridade, disponibilidade, fluxo bloqueado e quantas pessoas são afetadas. É uma análise técnica.
+
+**Prioridade** é a decisão de quando resolver: urgência, compromisso com a entrega, exposição, existência de um contorno e custo de esperar. É uma decisão do time.
+
+| Severidade | Quando usar |
+|---|---|
+| Crítica | Dupla reserva possível, falha de autorização, perda de dados ou aplicação que não executa |
+| Alta | Um fluxo principal bloqueado, sem contorno |
+| Média | Um fluxo prejudicado, mas com contorno |
+| Baixa | Efeito pequeno: texto, alinhamento, documentação |
+
+| Prioridade | Significado |
+|---|---|
+| P1 | Corrigir já; bloqueia o trabalho ou a nota |
+| P2 | Corrigir nesta semana |
+| P3 | Corrigir quando houver espaço |
+
+A combinação não é automática. Exemplos do projeto:
+
+| | Prioridade baixa | Prioridade alta |
+|---|---|---|
+| **Severidade baixa** | Desalinhamento em uma tela administrativa rara | Referência errada na documentação, na véspera da entrega |
+| **Severidade alta** | Falha grave em uma função que ainda não foi liberada | Possibilidade de dupla reserva |
