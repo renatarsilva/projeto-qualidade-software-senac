@@ -204,6 +204,25 @@ Fonte: PRD, seção 4.4 · RF-04, RF-10. Premissas: L11 (cancelar não é apagar
 | RN-08-T8 | Inválida | Apagar uma reserva que não existe | Recusada (não encontrada), sem alterar nada |
 | RN-08-T9 | Integração | Um `DELETE` direto no banco de uma reserva que tem auditoria | Recusado pela chave estrangeira, e a auditoria e a reserva continuam (arquitetura 3.2) |
 
+### RN-09 · Toda mudança de estado gera auditoria
+
+Fonte: PRD, seção 4.4 · RF-10. Premissas: L07 (o conteúdo do registro não está definido: aqui, estado anterior, estado novo, usuário e instante) e a criação da reserva conta como mudança de estado (estado anterior vazio). Alterar o horário não é mudança de estado e fica fora desta regra. Quem consulta a auditoria é a DP-02, da T-40.
+
+| Caso | Tipo | Situação | Resultado esperado |
+|---|---|---|---|
+| RN-09-T1 | Feliz | Criar uma reserva | 1 registro: estado anterior vazio, novo `SOLICITADA`, usuário e instante |
+| RN-09-T2 | Feliz | O Responsável aprova | 1 registro: `SOLICITADA→APROVADA`, com o Responsável como usuário |
+| RN-09-T3 | Feliz | Cada transição do fluxo principal (`APROVADA→EM_USO` e `EM_USO→CONCLUIDA`) | 1 registro por transição (teste parametrizado) |
+| RN-09-T4 | Feliz | Cada caminho alternativo (`REJEITADA`, `CANCELADA` e `NAO_COMPARECEU`) | 1 registro por transição; no `NAO_COMPARECEU`, o usuário é o sistema (job diário) |
+| RN-09-T5 | Feliz | Cancelamento por falta de aprovação (RN-06-T9) | 1 registro com o motivo "não aprovada a tempo", feito pelo sistema |
+| RN-09-T6 | Estado proibido | Uma transição proibida (por exemplo, `SOLICITADA→EM_USO`) | Recusada, e nenhum registro é gravado |
+| RN-09-T7 | Conflito | Um pedido recusado por conflito de horário | Nenhuma reserva e nenhum registro (nada foi gravado) |
+| RN-09-T8 | Integração | A gravação da auditoria falha | A mudança de estado é desfeita, e a reserva mantém o estado anterior (mesma transação) |
+| RN-09-T9 | Feliz | O instante do registro, com o `Clock` fixo | Igual ao instante do `Clock` (ADR-0008) |
+| RN-09-T10 | Estado proibido | Alterar ou apagar um registro de auditoria | Recusado (a auditoria só recebe inserções; risco R-05) |
+| RN-09-T11 | Concorrência | Aprovar e cancelar a mesma reserva ao mesmo tempo (RN-07-T9) | Uma transição vence e há exatamente 1 registro |
+| RN-09-T12 | Integração | A notificação falha depois da mudança de estado | O registro de auditoria permanece (RNF-10) |
+
 ### RN-10 · Janela de funcionamento (proposta)
 
 Segunda a sexta, de 07:00 às 22:45. Sábado, de 08:00 às 14:00. Domingo e feriados, fechado. A reserva começa não antes da abertura, termina não depois do fechamento e fica dentro de **um único dia**. Os horários são os de Brasília, e o `Clock` do teste é fixo.
