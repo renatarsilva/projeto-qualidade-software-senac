@@ -595,15 +595,15 @@ As decisões ficam em [`docs/adr/`](adr/). Os ADRs desta arquitetura:
 
 ### 5.1 Matriz requisito → decisão → componente → evidência
 
-Cobre os 14 requisitos funcionais. A evidência é a task que vai escrever o teste: ainda não há código.
+Cobre os 14 requisitos funcionais. A evidência é a task que vai escrever o teste (a fase red, como a T-20 e a T-21), e não a que implementa o código (a fase green, como a T-23 e a T-24): ainda não há código.
 
 | Requisito | Decisão | Componente | Evidência |
 |---|---|---|---|
 | RF-01 autenticação e perfil | ADR-0007, ADR-0009 | Segurança | T-15, T-49 |
 | RF-02 cadastro e consulta | ADR-0004 | Recursos | T-16, T-17, T-18 |
 | RF-03 pesquisa | nenhuma (índice em aberto, R-04) | Recursos | T-43 |
-| RF-04 reservas | D-02, S-01, S-02, ADR-0008 | Reservas, Ciclo de vida | T-23, T-24 |
-| RF-05 sobreposição | S-01, S-02, D-02 | Reservas, Repositórios | T-20, T-23 |
+| RF-04 reservas | D-02, S-01, S-02, ADR-0008 | Reservas, Ciclo de vida | T-20, T-21 |
+| RF-05 sobreposição | S-01, S-02, D-02 | Reservas, Repositórios | T-20 |
 | RF-06 dupla reserva | D-01, D-02, ADR-0004 | Repositórios (restrição de exclusão) | T-37 |
 | RF-07 aprovação de restrito | S-03, ADR-0007 | Ciclo de vida, Segurança | T-34 |
 | RF-08 manutenção | S-04, S-05 | Recursos (manutenção) | T-35 |
@@ -725,7 +725,7 @@ Cada abordagem da arquitetura, com a tática do [catálogo](taticas-arquiteturai
 
 | Abordagem | Folha | Tática (Bass) | Métrica | Custo | Teste planejado |
 |---|---|---|---|---|---|
-| Restrição de exclusão no banco, na mesma transação que grava a reserva (2.4.3, 3.2) | F1, F2 | Transactions · Schedule Resources | 1 reserva ativa em 20 pedidos simultâneos (CEN-02); 21 de 21 verificações de sobreposição (CEN-01) | Contenção: a segunda transação espera a primeira, o que limita a vazão em pico | Concorrência (T-37) e sobreposição (T-23) |
+| Restrição de exclusão no banco, na mesma transação que grava a reserva (2.4.3, 3.2) | F1, F2 | Transactions · Schedule Resources | 1 reserva ativa em 20 pedidos simultâneos (CEN-02); 21 de 21 verificações de sobreposição (CEN-01) | Contenção: a segunda transação espera a primeira, o que limita a vazão em pico | Concorrência (T-37) e sobreposição (T-20) |
 | Ciclo de vida como ponto único de mudança de estado, com tabela de transições (2.3) | F3, F6 | Sanity Checking · Audit · Timestamp | 100% das transições inválidas recusadas; 1 registro de auditoria por mudança de estado | Um componente obrigatório no caminho; volume da tabela de auditoria | Ciclo de vida (T-21) e auditoria (T-40) |
 | Segurança na frente de todas as entradas, com matriz de perfil por operação (2.3) | F4, F5 | Authenticate Actors · Authorize Actors | 0 operações por perfil não autorizado; 100% das células da matriz com o resultado esperado (RNF-06) | Complexidade do modelo de permissões | Matriz parametrizada (T-49) |
 | Notificação depois da transação, com timeouts configuráveis (2.4.1) | F7 | Bound Execution Times · Exception Handling | 0 reversões de reserva com HTTP 500 ou timeout; timeouts de 500 ms e 1500 ms (candidatas, DP-08) | Notificação perdida, sem reenvio (FE-05) | WireMock (T-31) |
