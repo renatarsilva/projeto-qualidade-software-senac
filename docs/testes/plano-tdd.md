@@ -135,6 +135,39 @@ Base dos casos: sala 102 em manutenção na terça, das 10:00 às 12:00, salvo i
 
 Quem pode criar manutenção (só o Administrador) é autorização e fica para a matriz da T-48.
 
+### RN-05 e RN-06 · Estados da reserva
+
+Fonte: PRD, seção 4.4 · RF-04, RF-07. Só o fluxo principal é oficial: os caminhos alternativos são **propostas** (L04, spec do ciclo de vida na T-21). Cada transição permitida gera auditoria (RN-09), tratada em outra seção.
+
+**Fluxo principal (RN-05)**
+
+| Caso | Tipo | Situação | Resultado esperado |
+|---|---|---|---|
+| RN-05-T1 | Feliz | `SOLICITADA` aprovada pelo Responsável | Estado `APROVADA` |
+| RN-05-T2 | Feliz | `APROVADA` passa a ser usada | Estado `EM_USO` |
+| RN-05-T3 | Feliz | `EM_USO` é encerrada | Estado `CONCLUIDA` |
+| RN-05-T4 | Estado proibido | `SOLICITADA` direto para `EM_USO` (pula a aprovação) | Recusada, e continua `SOLICITADA` |
+| RN-05-T5 | Estado proibido | `SOLICITADA` direto para `CONCLUIDA` | Recusada, e o estado não muda |
+| RN-05-T6 | Estado proibido | `APROVADA` direto para `CONCLUIDA` (pula o uso) | Recusada, e o estado não muda |
+| RN-05-T7 | Estado proibido | Retrocesso: `APROVADA→SOLICITADA`, `EM_USO→APROVADA`, `CONCLUIDA→EM_USO` | Todas recusadas |
+
+**Caminhos alternativos (RN-06)**
+
+| Caso | Tipo | Situação | Resultado esperado |
+|---|---|---|---|
+| RN-06-T1 | Feliz | `SOLICITADA` rejeitada pelo Responsável (NC-04) | Estado `REJEITADA` |
+| RN-06-T2 | Feliz | `SOLICITADA` cancelada pelo dono | Estado `CANCELADA` |
+| RN-06-T3 | Feliz | `APROVADA` cancelada pelo dono, antes do início | Estado `CANCELADA` |
+| RN-06-T4 | Feliz | `APROVADA` cujo início já passou sem uso, pelo job diário (S-06) | Estado `NAO_COMPARECEU` |
+| RN-06-T5 | Estado proibido | `EM_USO` cancelada (premissa: o fim antecipado é `CONCLUIDA`, RN-13) | Recusada, e continua `EM_USO` |
+| RN-06-T6 | Estado proibido | `EM_USO` para `REJEITADA` ou `NAO_COMPARECEU` | Recusadas |
+| RN-06-T7 | Estado proibido | Qualquer saída de `CONCLUIDA`, `REJEITADA`, `CANCELADA` ou `NAO_COMPARECEU` (estados finais) | Recusada, e o estado não muda |
+| RN-06-T8 | Inválida | Mudar para um estado que não existe (por exemplo, `"ABC"`) | Recusada, e o estado não muda |
+| RN-06-T9 | Feliz | `SOLICITADA` chega à hora de início sem aprovação (A-05) | Estado `CANCELADA`, com o motivo "não aprovada a tempo" na auditoria |
+| RN-06-T10 | Feliz | Depois do T9, outro usuário pede o mesmo recurso e horário, com início igual ou depois de agora | Aceita (`CANCELADA` não ocupa o horário) |
+
+O cancelamento por falta de aprovação (RN-06-T9) é feito pelo sistema, e não pelo dono: é uma proposta, com validação pendente.
+
 ### RN-10 · Janela de funcionamento (proposta)
 
 Segunda a sexta, de 07:00 às 22:45. Sábado, de 08:00 às 14:00. Domingo e feriados, fechado. A reserva começa não antes da abertura, termina não depois do fechamento e fica dentro de **um único dia**. Os horários são os de Brasília, e o `Clock` do teste é fixo.
@@ -219,6 +252,7 @@ Pontos que as fontes não resolvem. Nenhum deles é regra oficial: os que viram 
 | A-02 | Até quantos dias à frente se pode reservar? Sem número nas fontes | RN-12 | Sem limite máximo de antecedência |
 | A-03 | Feriados: quais são e quem os cadastra (tabela do Administrador ou bloqueios)? | RN-10 | Os casos de feriado ficam marcados como validação pendente |
 | A-04 | O que faz uma reserva passar a `EM_USO`: uma ação do usuário ("iniciar uso") ou a chegada da hora de início? A fonte não define. Por isso a RN-13 decide pelo **horário** (agora antes ou depois do início) | RN-05, RN-13 | A decisão é pelo horário, não pelo estado |
+| A-05 | Uma reserva `SOLICITADA` que nunca foi aprovada, quando chega a hora de começar, vira `REJEITADA`, `CANCELADA` ou continua `SOLICITADA`? A fonte não diz. **Resolvida por proposta**: vira `CANCELADA` pelo sistema, com o motivo "não aprovada a tempo" (validação pendente) | RN-05, RN-06 | Vale a proposta (RN-06-T9) |
 
 ## 5. Matriz regra → caso → teste → status
 
