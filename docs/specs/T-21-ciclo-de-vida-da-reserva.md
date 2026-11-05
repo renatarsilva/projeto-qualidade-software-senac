@@ -57,6 +57,8 @@ Uma reserva passa por estados (`SOLICITADA`, `APROVADA`, `EM_USO`, `CONCLUIDA` e
 
 `CONCLUIDA`, `REJEITADA`, `CANCELADA` e `NAO_COMPARECEU` são estados finais: não têm saída.
 
+**Alterar uma reserva aprovada.** A alteração pelo `PUT` (T-20, CA-11) devolve a `APROVADA` ao estado `SOLICITADA`. Isso não é uma transição do `PATCH`: `APROVADA→SOLICITADA` por `PATCH` continua proibida (CA-02), e a tabela segue com 7 transições. O prazo para alterar é o do CA-13.
+
 **Cancelar depois do início.** Com check-in (`EM_USO`), o cancelamento é `EM_USO → CONCLUIDA`. Sem check-in (`APROVADA`), é `APROVADA → NAO_COMPARECEU`. Não existe `APROVADA → EM_USO → CONCLUIDA` encadeado: `APROVADA→CONCLUIDA` continua proibida (RN-05-T6), e o RN-13-T14 vale só para `EM_USO`. Decisão do grill (Pergunta 7).
 
 **Sem tolerância de atraso (decisão do grill, diverge da resposta do professor):** a reserva `APROVADA` ocupa o horário inteiro até o dono cancelar ou fazer check-in. Quem chega às 10:35 numa reserva das 10:00 às 11:00 ainda faz check-in. Só vira `NAO_COMPARECEU` se não houver check-in até o fim, ou se o dono cancelar sem check-in. A resposta do professor falava em check-in em até 15 min (P-01): confirmar.
