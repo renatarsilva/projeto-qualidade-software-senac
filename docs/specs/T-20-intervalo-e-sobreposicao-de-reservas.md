@@ -46,6 +46,8 @@ Uma reserva é um pedido de uso de recursos (sala, material, professor) em um in
 - **RN-01:** o término da reserva deve ser posterior ao início. A comparação é entre data e hora. Término igual ou anterior ao início é recusado, e início ou término ausente também.
 - **RN-02:** reservas do mesmo recurso (sala, material ou professor) não podem se sobrepor. O pedido é verificado contra **cada** recurso pedido: basta um ocupado para recusar o pedido inteiro.
 
+- **Alteração (decisão do grill):** alterar uma reserva `APROVADA` a devolve ao estado `SOLICITADA`, a aguardar nova aprovação. O horário antigo é liberado e o novo é ocupado (`SOLICITADA` ocupa). Se a alteração for rejeitada ou o prazo de aprovação vencer (A-05), a reserva vira `REJEITADA` ou `CANCELADA` e o dono perde o horário antigo. A resposta avisa isso. O prazo para alterar (L11) é da T-21 (CA-13).
+
 **Premissas da arquitetura** (S-01 e S-02 confirmadas pelo professor em 2026-11-05; D-02 segue da arquitetura):
 
 - **S-01 (confirmada):** o período é fechado no início e aberto no término, `[início, fim)`. Uma reserva que termina exatamente quando outra começa **não** é sobreposição.
@@ -151,6 +153,14 @@ Uma reserva é um pedido de uso de recursos (sala, material, professor) em um in
 - **Então** o pedido é recusado por inteiro e nada é gravado
 - **E** os recursos livres do pedido continuam livres
 
+### CA-11: Alterar uma reserva aprovada exige nova aprovação
+
+- **Dado** uma reserva `APROVADA`
+- **Quando** o dono a altera para um horário ou recursos livres
+- **Então** a alteração é aceita e a reserva volta a `SOLICITADA`
+- **E** o horário antigo fica livre e o novo fica ocupado
+- **E** a resposta avisa que a reserva precisa ser aprovada de novo
+
 ## 6. Casos de teste
 
 Todo critério de aceite precisa de pelo menos um caso. Use classes de equivalência e valor limite.
@@ -190,6 +200,10 @@ Os casos da regra são testes **unitários** da regra de reserva, com o `Clock` 
 | TC-29 (contrato) | CA-02 | Classe inválida | `POST /api/reservas` com término igual ao início | 400 `ProblemDetail`, `erros` com `campo = termino` | Integração |
 | TC-30 (contrato) | CA-04 | Conflito | `POST /api/reservas` sobreposta a uma reserva existente | 409 `ProblemDetail` em linguagem de negócio | Integração |
 | TC-31 (contrato) | CA-01 | Classe válida | `POST /api/reservas` com intervalo livre | 201 com a reserva no estado `SOLICITADA` | Integração |
+| TC-32 (sem caso no plano) | CA-11 | Classe válida | Dono altera uma reserva `APROVADA` para um horário livre | Estado `SOLICITADA`; horário antigo livre, novo ocupado | Unitário |
+| TC-33 (sem caso no plano) | CA-11 | Classe válida | Dono altera uma reserva `SOLICITADA` para um horário livre | Continua `SOLICITADA` | Unitário |
+| TC-34 (sem caso no plano) | CA-11 | Conflito | Dono altera uma reserva `APROVADA` para um horário ocupado | Recusa 409; continua `APROVADA` no horário original | Unitário |
+| TC-35 (contrato) | CA-11 | Classe válida | `PUT /api/reservas/{id}` de uma reserva `APROVADA` | 200 com a reserva `SOLICITADA` e o aviso de nova aprovação | Integração |
 
 ## 7. Riscos
 
@@ -202,6 +216,7 @@ Os casos da regra são testes **unitários** da regra de reserva, com o `Clock` 
 | O estado `CONCLUIDA` não tem caso no plano TDD | Baixo | TC-26 cobre a lacuna; incluir o caso no plano em uma nova revisão da T-19 |
 | Duas solicitações simultâneas passam pela verificação ao mesmo tempo | Alto | Fora desta spec: o teste de concorrência (RN-03) é da semana 42; a verificação desta spec é sequencial |
 | Reserva no passado e demais restrições de horário (RN-10 a RN-12) | Médio | Fora desta spec: são propostas do time e precisam de spec própria |
+| Alterar uma reserva aprovada faz o dono perder o horário antigo se a alteração for rejeitada | Médio | Aceito (grill): a resposta e a tela avisam; guardar a versão anterior ficou fora |
 | Fuso horário diferente entre pedido e `Clock` | Baixo | Todos os instantes em UTC (ADR 0008) |
 
 ## 8. Mini-plano de implementação (ciclos TDD)
@@ -218,6 +233,7 @@ Na T-20 as assinaturas mínimas devolvem um resultado neutro (que não é aceite
 | 6 | TC-10, TC-12, TC-14 e TC-17: reservas encostadas | Intervalo fechado no início e aberto no término | Nomear a regra da fronteira |
 | 7 | TC-27 e TC-28: recursos e intervalos distintos | Comparar só o mesmo recurso e só intervalos que se sobrepõem | Remover duplicação entre as verificações |
 | 8 | TC-21 a TC-26: estados que ocupam o horário | Filtrar as reservas existentes pelo estado | Extrair o conjunto de estados que ocupam |
+| 9b | TC-32 a TC-35: alterar reserva aprovada | Voltar a `SOLICITADA` ao alterar | Isolar a regra de reinício da aprovação |
 | 9 | TC-15, TC-16 e TC-18: alteração | Ignorar a própria reserva na verificação | Reaproveitar a verificação na criação e na alteração |
 | 10 | TC-19 e TC-20: vários recursos | Verificar todos os recursos antes de gravar | Isolar a gravação em uma única operação |
 | 11 | TC-29 a TC-31: contrato HTTP | Mapear os erros para 400 e 409 no formato da T-22 | Consolidar a tradução dos erros |
@@ -250,6 +266,7 @@ Resultado de `./scripts/validar-spec.sh` (preenchido pelo autor após o script p
 
 | # | Pergunta | Resposta / decisão | Documento afetado |
 |---|---|---|---|
-| 1 | _preencher_ | _preencher_ | _preencher_ |
+| 1 | Alterar uma reserva `APROVADA` | Volta a `SOLICITADA`, a aguardar nova aprovação | CA-11, TC-32 a TC-35; T-21 |
+| 2 | Alteração rejeitada ou vencida | O dono perde o horário antigo; a resposta avisa | Seção 7 |
 
 **Resultado:** _preencher_ (Liberada / Pendências) · AAAA-MM-DD
