@@ -21,6 +21,7 @@ Uma reserva passa por estados (`SOLICITADA`, `APROVADA`, `EM_USO`, `CONCLUIDA` e
 - A tabela de transições de estado (válidas e proibidas), incluindo estado final e estado inexistente.
 - O cancelamento pelo dono e seu efeito conforme o instante (`CANCELADA` ou encerramento antecipado `CONCLUIDA`).
 - Só o dono cancela ou altera a própria reserva (NC-01).
+- O prazo de alteração pelo dono: até 24 h antes do início, ou até 1 h antes se a reserva foi solicitada no mesmo dia (L11, resposta do professor). Intervalo e sobreposição ao alterar continuam na T-20.
 - Reserva nunca é apagada.
 - Contrato dos endpoints de mudança de estado, cancelamento e exclusão.
 
@@ -29,7 +30,6 @@ Uma reserva passa por estados (`SOLICITADA`, `APROVADA`, `EM_USO`, `CONCLUIDA` e
 - O job diário que dispara `NAO_COMPARECEU` e conclui as `EM_USO` vencidas (S-06): esta spec define a transição que ele usa, não o job.
 - Auditoria de cada mudança (RN-09, incluindo os casos RN-13-T13 e o motivo de RN-06-T9): semana 43.
 - A chave estrangeira que impede `DELETE` direto no banco (RN-08-T9): é do esquema do banco, na arquitetura 3.2.
-- Até quando a reserva pode ser alterada (L11): sem resposta nas fontes, sem caso no plano.
 - Intervalo e sobreposição ao alterar: são da T-20.
 - O formato das respostas de erro: é da T-22.
 
@@ -38,7 +38,9 @@ Uma reserva passa por estados (`SOLICITADA`, `APROVADA`, `EM_USO`, `CONCLUIDA` e
 - **RN-05 (oficial):** o fluxo principal é `SOLICITADA → APROVADA → EM_USO → CONCLUIDA`. Não se pula nem se volta.
 - **RN-06 (alternativos oficiais; as transições são propostas):** os estados alternativos são `REJEITADA`, `CANCELADA` e `NAO_COMPARECEU`.
 - **RN-08 (oficial):** reservas iniciadas não podem ser apagadas. Pela premissa L11 e pela restrição 5 da arquitetura, **nenhuma** reserva é apagada: o caminho é cancelar.
-- **RN-13 (proposta, validação pendente):** o dono cancela até o instante do início (`CANCELADA`, horário inteiro livre); depois do início e antes do fim é um encerramento antecipado (`CONCLUIDA`, resto livre); depois do fim, não há o que cancelar.
+- **RN-13 (validada pelo professor, com ajuste):** o dono cancela até o instante do início (`CANCELADA`, horário inteiro livre). Depois do início e antes do fim: se já houve check-in (`EM_USO`), é um encerramento antecipado (`CONCLUIDA`, resto livre); se não houve check-in (`APROVADA`), é `NAO_COMPARECEU` (resto livre). Depois do fim, não há o que cancelar.
+- **L11 (resposta do professor):** o dono altera a reserva até 24 h antes do início; se ela foi solicitada no mesmo dia, até 1 h antes.
+- **A-05 (resposta do professor):** a `SOLICITADA` não aprovada até 24 h antes do início é cancelada automaticamente; se foi solicitada no mesmo dia, precisa ser aprovada até 1 h antes, senão é cancelada.
 - **NC-01:** o Solicitante altera e cancela somente as próprias reservas.
 
 **Tabela de transições permitidas.** Qualquer outra combinação de origem e destino (42 das 49, inclusive repetir o estado atual) é recusada, e o estado não muda.
@@ -47,17 +49,19 @@ Uma reserva passa por estados (`SOLICITADA`, `APROVADA`, `EM_USO`, `CONCLUIDA` e
 |---|---|---|
 | `SOLICITADA` | `APROVADA` | Responsável aprova (RN-07) |
 | `SOLICITADA` | `REJEITADA` | Responsável rejeita (NC-04) |
-| `SOLICITADA` | `CANCELADA` | Dono, até o início; ou o sistema, na hora do início sem aprovação (A-05) |
-| `APROVADA` | `EM_USO` | O uso começa (o gatilho está em aberto, A-04) |
+| `SOLICITADA` | `CANCELADA` | Dono, até o início; ou o sistema, quando o prazo de aprovação vence (24 h antes do início, ou 1 h antes se solicitada no mesmo dia, A-05) |
+| `APROVADA` | `EM_USO` | Só o sistema, pelo check-in da sala (A-04), em qualquer instante do horário reservado (`[início, fim)`); pedido de usuário via `PATCH` é recusado com 403 |
 | `APROVADA` | `CANCELADA` | Dono, até o instante do início |
-| `APROVADA` | `NAO_COMPARECEU` | Sistema, depois do início sem uso (S-06) |
-| `EM_USO` | `CONCLUIDA` | O uso termina, ou o dono encerra antes do fim (RN-13) |
+| `APROVADA` | `NAO_COMPARECEU` | Sistema, no instante do fim sem nenhum check-in (S-06); ou o dono, ao cancelar depois do início sem check-in; o horário fica livre |
+| `EM_USO` | `CONCLUIDA` | O sistema, a partir do instante do fim (S-01, `[início, fim)`); ou o dono, encerrando antes do fim (RN-13) |
 
 `CONCLUIDA`, `REJEITADA`, `CANCELADA` e `NAO_COMPARECEU` são estados finais: não têm saída.
 
-**Encerramento antecipado sem pular o uso.** Se o dono cancela uma reserva `APROVADA` depois do início (RN-13-T14), a reserva percorre `APROVADA → EM_USO → CONCLUIDA` na mesma operação. Isso mantém a RN-05-T6 (proíbe `APROVADA→CONCLUIDA` direto) e a RN-13-T14 ao mesmo tempo. É uma **interpretação desta spec**, e a decisão final fica para o grill.
+**Cancelar depois do início.** Com check-in (`EM_USO`), o cancelamento é `EM_USO → CONCLUIDA`. Sem check-in (`APROVADA`), é `APROVADA → NAO_COMPARECEU`. Não existe `APROVADA → EM_USO → CONCLUIDA` encadeado: `APROVADA→CONCLUIDA` continua proibida (RN-05-T6), e o RN-13-T14 vale só para `EM_USO`. Decisão do grill (Pergunta 7).
 
-**Premissas em validação pendente:** A-04 (o gatilho de `EM_USO` não está definido), A-05 (`SOLICITADA` sem aprovação vira `CANCELADA`), S-06 (o job diário), S-01 (`[início, fim)`, usada para decidir o instante do fim) e S-02 (`CANCELADA`, `REJEITADA`, `NAO_COMPARECEU` e `CONCLUIDA` não ocupam o horário). A L04 (reserva de recurso não restrito passa por `APROVADA`?) segue sem premissa: o plano só cobre o fluxo completo.
+**Sem tolerância de atraso (decisão do grill, diverge da resposta do professor):** a reserva `APROVADA` ocupa o horário inteiro até o dono cancelar ou fazer check-in. Quem chega às 10:35 numa reserva das 10:00 às 11:00 ainda faz check-in. Só vira `NAO_COMPARECEU` se não houver check-in até o fim, ou se o dono cancelar sem check-in. A resposta do professor falava em check-in em até 15 min (P-01): confirmar.
+
+**Premissas ainda em validação pendente:** S-06 (o job diário). Já confirmadas pelo professor: A-04, A-05, L04 (fluxo completo passa por `APROVADA`), L11, S-01 (`[início, fim)`), S-02 (não ocupam o horário, mas ficam registradas para relatório). P-01 (15 min) foi descartada nesta spec e precisa de confirmação.
 
 ## 4. Contrato da API
 
@@ -82,7 +86,7 @@ Os endpoints e os campos são uma proposta desta spec, porque o PRD ainda não o
 | Reserva não encontrada | 404 | `ProblemDetail`: "Recurso não encontrado" |
 | Transição proibida, cancelamento fora de hora ou reserva final | 409 | `ProblemDetail` em linguagem de negócio, por exemplo "Esta reserva não pode mais ser cancelada" |
 | `DELETE` de reserva existente | 409 | `ProblemDetail`: "Reservas não podem ser apagadas. Use o cancelamento." |
-| Quem não é o dono tenta cancelar ou alterar | 403 | `ProblemDetail`, mesmo formato (regra de acesso na T-15) |
+| Quem não é o dono tenta cancelar ou alterar, ou um usuário pede `EM_USO` | 403 | `ProblemDetail`, mesmo formato (regra de acesso na T-15) |
 | Sem autenticação | 401 | Fora desta spec (T-15), mesmo formato |
 
 ## 5. Critérios de aceite
@@ -102,9 +106,9 @@ Os endpoints e os campos são uma proposta desta spec, porque o PRD ainda não o
 ### CA-03: Os caminhos alternativos válidos são aceitos
 
 - **Dado** uma reserva `SOLICITADA` ou `APROVADA`
-- **Quando** ocorre uma das saídas previstas: rejeição pelo Responsável, cancelamento pelo dono antes do início, hora de início sem aprovação (A-05) ou início passado sem uso (S-06)
+- **Quando** ocorre uma das saídas previstas: rejeição pelo Responsável, cancelamento pelo dono antes do início, prazo de aprovação vencido (A-05) ou fim do horário sem nenhum check-in (S-06)
 - **Então** a reserva passa a `REJEITADA`, `CANCELADA`, `CANCELADA` ou `NAO_COMPARECEU`, respectivamente
-- **E** `NAO_COMPARECEU` só é aceito depois do instante de início
+- **E** `NAO_COMPARECEU` só é aceito no instante do fim sem check-in (ou no cancelamento do dono sem check-in) e libera o horário. Antes disso a reserva `APROVADA` ocupa o horário
 
 ### CA-04: Estados finais não têm saída e `EM_USO` não vira alternativo
 
@@ -135,8 +139,9 @@ Os endpoints e os campos são uma proposta desta spec, porque o PRD ainda não o
 ### CA-08: O cancelamento durante o uso é um encerramento antecipado
 
 - **Dado** uma reserva já iniciada e ainda não terminada
-- **Quando** o dono a cancela, a partir de um minuto depois do início
-- **Então** a reserva passa a `CONCLUIDA` (o uso aconteceu), continua no histórico e o resto do horário volta a ficar livre
+- **Quando** o dono a cancela em qualquer instante depois do início (o tempo é contínuo, sem arredondar para o minuto) e antes do fim
+- **Então** se já houve check-in (`EM_USO`), a reserva passa a `CONCLUIDA` (o uso aconteceu); se não houve (`APROVADA`), passa a `NAO_COMPARECEU`
+- **E** continua no histórico e o resto do horário volta a ficar livre
 
 ### CA-09: O cancelamento fora de hora ou fora de estado é recusado
 
@@ -163,6 +168,12 @@ Os endpoints e os campos são uma proposta desta spec, porque o PRD ainda não o
 - **Quando** o cliente tenta cancelar ou apagar
 - **Então** o pedido é recusado com 404 e nada muda
 
+### CA-13: O prazo de alteração pelo dono
+
+- **Dado** uma reserva do dono
+- **Quando** ele tenta alterá-la; o limite é 24 h antes do início, ou 1 h antes se a reserva foi solicitada no mesmo dia (L11)
+- **Então** a alteração é aceita até o limite (inclusive) e recusada com 409 depois dele, e a reserva não muda
+
 ## 6. Casos de teste
 
 Todo critério de aceite precisa de pelo menos um caso. Use classes de equivalência e valor limite.
@@ -181,9 +192,9 @@ Os casos da regra são testes **unitários** da regra de ciclo de vida, com o `C
 | TC-08 (RN-06-T1) | CA-03 | Classe válida | `SOLICITADA` rejeitada pelo Responsável | Estado `REJEITADA` | Unitário |
 | TC-09 (RN-06-T2) | CA-03 | Classe válida | `SOLICITADA` cancelada pelo dono | Estado `CANCELADA` | Unitário |
 | TC-10 (RN-06-T3) | CA-03 | Classe válida | `APROVADA` cancelada pelo dono antes do início | Estado `CANCELADA` | Unitário |
-| TC-11 (RN-06-T4) | CA-03 | Classe válida | `APROVADA` cujo início já passou sem uso (job diário, S-06) | Estado `NAO_COMPARECEU` | Unitário |
-| TC-12 (sem caso no plano) | CA-03 | Valor limite | `APROVADA` marcada `NAO_COMPARECEU` antes do início | Recusa; o estado não muda | Unitário |
-| TC-13 (RN-06-T9) | CA-03 | Classe válida | `SOLICITADA` chega à hora de início sem aprovação (A-05) | Estado `CANCELADA` pelo sistema | Unitário |
+| TC-11 (RN-06-T4) | CA-03 | Classe válida | `APROVADA` sem check-in às 11:00, no fim (reserva 10:00-11:00; job, S-06) | Estado `NAO_COMPARECEU`; o horário fica livre | Unitário |
+| TC-12 (sem caso no plano) | CA-03 | Valor limite | `APROVADA` marcada `NAO_COMPARECEU` às 10:35, sem check-in e antes do fim | Recusa; o estado não muda | Unitário |
+| TC-13 (RN-06-T9) | CA-03 | Classe válida | `SOLICITADA` no mesmo dia, sem aprovação às 09:00 (1 h antes das 10:00) | Estado `CANCELADA` pelo sistema | Unitário |
 | TC-14 (RN-06-T5) | CA-04 | Classe inválida | `EM_USO` para `CANCELADA` por transição direta | Recusa; continua `EM_USO` | Unitário |
 | TC-15 (RN-06-T6) | CA-04 | Classe inválida | `EM_USO` para `REJEITADA` ou `NAO_COMPARECEU` | As duas recusadas | Unitário |
 | TC-16 (RN-06-T7) | CA-04 | Classe inválida | Qualquer saída de `CONCLUIDA`, `REJEITADA`, `CANCELADA` ou `NAO_COMPARECEU` | Todas recusadas; o estado não muda | Unitário |
@@ -194,9 +205,9 @@ Os casos da regra são testes **unitários** da regra de ciclo de vida, com o `C
 | TC-21 (RN-13-T3) | CA-07 | Classe válida | Dono cancela reserva ainda `SOLICITADA`, antes do início | `CANCELADA`; o horário fica livre | Unitário |
 | TC-22 (RN-13-T4) | CA-07 | Valor limite | Dono cancela às 09:59 | `CANCELADA` | Unitário |
 | TC-23 (RN-13-T5) | CA-07 | Valor limite | Dono cancela às 10:00 em ponto | `CANCELADA`; o horário inteiro fica livre | Unitário |
-| TC-24 (RN-13-T6) | CA-08 | Classe válida | Reserva 10:00-12:00; dono encerra às 10:40 | `CONCLUIDA`; continua no histórico | Unitário |
+| TC-24 (RN-13-T6) | CA-08 | Classe válida | Reserva 10:00-12:00 `EM_USO` (com check-in); dono encerra às 10:40 | `CONCLUIDA`; continua no histórico | Unitário |
 | TC-25 (RN-13-T7) | CA-08 | Classe válida | Depois do T6, outro usuário reserva a sala das 11:00 às 12:00 | Aceita (o resto do horário foi liberado) | Unitário |
-| TC-26 (RN-13-T14) | CA-08 | Valor limite | Dono cancela às 10:01, um minuto depois do início | `CONCLUIDA`; o resto do horário fica livre | Unitário |
+| TC-26 (RN-13-T14) | CA-08 | Valor limite | Dono cancela uma reserva `EM_USO` às 10:01, um minuto depois do início (exemplo: vale qualquer instante após 10:00:00, como 10:00:01) | `CONCLUIDA`; o resto do horário fica livre | Unitário |
 | TC-27 (RN-13-T8) | CA-09 | Classe inválida | Dono tenta cancelar às 11:30, depois do fim | Recusa; o estado não muda | Unitário |
 | TC-28 (sem caso no plano) | CA-09 | Valor limite | Dono tenta cancelar às 11:00 em ponto, no instante do fim | Recusa (premissa S-01: `[início, fim)`) | Unitário |
 | TC-29 (RN-13-T9) | CA-09 | Classe inválida | Cancelar reserva já `CANCELADA` | Recusa; o estado não muda | Unitário |
@@ -214,19 +225,25 @@ Os casos da regra são testes **unitários** da regra de ciclo de vida, com o `C
 | TC-41 (contrato) | CA-02 | Classe inválida | `PATCH /api/reservas/{id}/estado` com transição proibida | 409 `ProblemDetail` em linguagem de negócio | Integração |
 | TC-42 (contrato) | CA-05 | Classe inválida | `PATCH /api/reservas/{id}/estado` com `"ABC"` | 400 `ProblemDetail`, `erros` com `campo = estado` | Integração |
 | TC-43 (contrato) | CA-11 | Estado proibido | `DELETE /api/reservas/{id}` de uma reserva existente | 409 `ProblemDetail`: reservas não são apagadas, use o cancelamento | Integração |
+| TC-44 (sem caso no plano) | CA-08 | Classe válida | Dono cancela às 10:05 uma reserva `APROVADA` sem check-in | `NAO_COMPARECEU`; o resto do horário fica livre | Unitário |
+| TC-45 (sem caso no plano) | CA-13 | Valor limite | Reserva solicitada com antecedência; dono altera 24 h antes do início, exatas | Aceita | Unitário |
+| TC-46 (sem caso no plano) | CA-13 | Valor limite | Mesma reserva; dono altera 23 h 59 min antes | Recusa; a reserva não muda | Unitário |
+| TC-47 (sem caso no plano) | CA-13 | Valor limite | Reserva solicitada no mesmo dia; dono altera 1 h antes, exata | Aceita | Unitário |
+| TC-48 (sem caso no plano) | CA-13 | Valor limite | Reserva solicitada no mesmo dia; dono altera 59 min antes | Recusa; a reserva não muda | Unitário |
+| TC-49 (sem caso no plano) | CA-03 | Valor limite | `SOLICITADA` com antecedência, sem aprovação 24 h antes do início | `CANCELADA` pelo sistema | Unitário |
 
 ## 7. Riscos
 
 | Risco | Impacto | Como a spec ou os testes tratam |
 |---|---|---|
-| O plano proíbe `APROVADA→CONCLUIDA` (RN-05-T6) mas permite o cancelamento que conclui (RN-13-T14) | Alto | A spec trata como duas transições encadeadas (seção 3); TC-06 e TC-26 cobrem os dois lados; vai para o grill |
-| O gatilho de `EM_USO` não está definido (A-04) | Médio | Os testes aplicam a transição diretamente e usam o `Clock` só para cancelar; o gatilho fica para quando for decidido |
-| RN-13 e A-05 são propostas sem validação do professor | Alto | TC-13 e TC-19 e TC-26 dependem delas; revistos antes da T-24 |
+| O plano proíbe `APROVADA→CONCLUIDA` (RN-05-T6) mas permite o cancelamento que conclui (RN-13-T14) | Alto | Resolvido no grill: RN-13-T14 vale só para `EM_USO`; `APROVADA` cancelada depois do início vira `NAO_COMPARECEU` (TC-44) |
+| O sistema de check-in não existe ainda (A-04) | Médio | Os testes aplicam `APROVADA→EM_USO` diretamente; o check-in real fica para a implementação |
+| Sem tolerância de 15 min: diverge da resposta do professor (P-01); `NAO_COMPARECEU` pelo cancelamento sem check-in (TC-44) é interpretação desta spec | Médio | Confirmar com o professor |
 | Erro de um minuto na fronteira do instante de início ou de fim | Alto | TC-22, TC-23 e TC-26, TC-28, TC-35 e TC-36 testam 09:59, 10:00, 10:01 e 11:00 |
 | Uma combinação de estados esquecida na tabela | Alto | TC-18 percorre as 49 combinações e exige exatamente 7 aceitas |
 | Reserva apagada por um caminho não previsto | Alto | TC-33 e TC-37 e TC-43; o `DELETE` direto no banco é protegido pela chave estrangeira (arquitetura 3.2) |
 | Quem aprova e rejeita (RN-07) fica sem teste de permissão aqui | Médio | Fora desta spec: semanas 41 e 44; a T-21 assume o ator já autorizado |
-| L04 sem premissa: reserva de recurso não restrito passa por `APROVADA`? | Médio | O plano cobre só o fluxo completo; se o professor decidir o contrário, a tabela muda |
+| O professor não disse se o dono pode cancelar a reserva solicitada 1 h antes até 15 min antes do início (exceção da A-05) | Médio | Fora desta spec até esclarecer; hoje o dono cancela até o início |
 | Auditoria de cada mudança fica de fora | Médio | Semana 43; a mudança de estado fica concentrada em um único ponto para a auditoria se plugar |
 
 ## 8. Mini-plano de implementação (ciclos TDD)
@@ -242,6 +259,7 @@ Na T-21 as assinaturas mínimas devolvem um resultado neutro (que não é aceite
 | 5 | TC-18: as 49 combinações | Consolidar a tabela de transições em um único lugar | Substituir as regras soltas pela tabela |
 | 6 | TC-19 a TC-23: cancelar até o início | Cancelamento pelo dono, que libera o horário | Reaproveitar a verificação de sobreposição da T-20 |
 | 7 | TC-24 a TC-26: encerramento antecipado | Cancelar depois do início encerra como `CONCLUIDA` | Nomear a regra da fronteira do instante de início |
+| 7b | TC-44 a TC-49: sem check-in, alteração e prazo de aprovação | `NAO_COMPARECEU` ao cancelar sem check-in; prazo de alteração; cancelamento automático | Isolar a regra de prazos |
 | 8 | TC-27, TC-28, TC-29, TC-30, TC-31, TC-32 e TC-39: recusas do cancelamento e do dono | Recusa depois do fim, em estado final e para quem não é o dono; reserva inexistente | Isolar a verificação de dono |
 | 9 | TC-33 a TC-38: nunca apagar | Recusar a exclusão em qualquer estado; cancelar preserva o histórico | Remover qualquer caminho de exclusão |
 | 10 | TC-40 a TC-43: contrato HTTP | Mapear os erros para 400, 403, 404 e 409 no formato da T-22 | Consolidar a tradução dos erros |
@@ -274,6 +292,14 @@ Resultado de `./scripts/validar-spec.sh` (preenchido pelo autor após o script p
 
 | # | Pergunta | Resposta / decisão | Documento afetado |
 |---|---|---|---|
-| 1 | _preencher_ | _preencher_ | _preencher_ |
+| 1 | CA-02 proíbe `APROVADA→CONCLUIDA`, mas cancelar às 10:01 vira `CONCLUIDA`? | Interpretação encadeada aprovada; depois substituída pela pergunta 7 | Seção 3 |
+| 2 | O que acontece entre 10:00 e 10:01? | Tempo contínuo: até 10:00:00 é `CANCELADA`, depois é encerramento | CA-08, TC-26 |
+| 3 | Quem move `APROVADA→EM_USO`? | Só o sistema (check-in da sala); usuário recebe 403 | Seção 3, seção 4 |
+| 4 | `NAO_COMPARECEU` e o horário | Sem tolerância: `APROVADA` ocupa o horário todo; `NAO_COMPARECEU` só no fim sem check-in, ou no cancelamento sem check-in (diverge do professor) | Seção 3, CA-03, TC-11, TC-12 |
+| 5 | Quem conclui uma `EM_USO` esquecida? | O sistema, a partir do instante do fim | Seção 3 |
+| 6 | L04: recurso não restrito passa por `APROVADA`? | Sim, resposta do professor | Seção 3 |
+| 7 | Cancelar depois do início sem check-in | `NAO_COMPARECEU`; `CONCLUIDA` só para `EM_USO` | Seção 3, CA-08, TC-44 |
+| 8 | L11: prazo de alteração | 24 h antes do início; 1 h se solicitada no mesmo dia (professor) | CA-13, TC-45 a TC-48 |
+| 9 | A-05: prazo de aprovação | 24 h antes, ou 1 h no mesmo dia (professor) | CA-03, TC-13, TC-49 |
 
 **Resultado:** _preencher_ (Liberada / Pendências) · AAAA-MM-DD
