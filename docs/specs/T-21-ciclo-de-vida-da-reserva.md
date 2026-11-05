@@ -5,7 +5,7 @@
 | Task | T-21 (a mesma spec vale para a implementação, T-24) |
 | Autor(a) | @renatarsilva |
 | Revisor(a) | @Samwel-Merces |
-| Status | Rascunho |
+| Status | Em revisão |
 | Regra crítica | Sim |
 | Requisitos | RF-04, RF-07 |
 | Característica ISO 25010 | Adequação funcional |
