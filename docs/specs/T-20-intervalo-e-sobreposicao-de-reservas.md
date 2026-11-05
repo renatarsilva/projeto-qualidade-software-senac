@@ -14,7 +14,7 @@ Rascunho → Em revisão → Aprovada → Validada → Liberada
 | Task | T-20 (a mesma spec vale para a implementação, T-23) |
 | Autor(a) | @renatarsilva |
 | Revisor(a) | @CaiosAguiar |
-| Status | Rascunho |
+| Status | Em revisão |
 | Regra crítica | Sim |
 | Requisitos | RF-04, RF-05 |
 | Característica ISO 25010 | Adequação funcional |
@@ -46,10 +46,10 @@ Uma reserva é um pedido de uso de recursos (sala, material, professor) em um in
 - **RN-01:** o término da reserva deve ser posterior ao início. A comparação é entre data e hora. Término igual ou anterior ao início é recusado, e início ou término ausente também.
 - **RN-02:** reservas do mesmo recurso (sala, material ou professor) não podem se sobrepor. O pedido é verificado contra **cada** recurso pedido: basta um ocupado para recusar o pedido inteiro.
 
-**Premissas da arquitetura** (ainda em "validação pendente"; a decisão final é do professor):
+**Premissas da arquitetura** (S-01 e S-02 confirmadas pelo professor em 2026-11-05; D-02 segue da arquitetura):
 
-- **S-01:** o período é fechado no início e aberto no término, `[início, fim)`. Uma reserva que termina exatamente quando outra começa **não** é sobreposição.
-- **S-02:** `SOLICITADA`, `APROVADA` e `EM_USO` ocupam o horário. `REJEITADA`, `CANCELADA`, `NAO_COMPARECEU` e `CONCLUIDA` não ocupam.
+- **S-01 (confirmada):** o período é fechado no início e aberto no término, `[início, fim)`. Uma reserva que termina exatamente quando outra começa **não** é sobreposição.
+- **S-02 (confirmada):** `SOLICITADA`, `APROVADA` e `EM_USO` ocupam o horário. `REJEITADA`, `CANCELADA`, `NAO_COMPARECEU` e `CONCLUIDA` não bloqueiam conflito, mas continuam registradas para relatório. Uma `APROVADA` ocupa o horário inteiro até o dono cancelar ou fazer check-in, sem tolerância de atraso (ver T-21).
 - **D-02:** a reserva se liga aos recursos pela tabela `reserva_recurso`, então uma reserva pode ocupar sala, professor e material ao mesmo tempo.
 
 ## 4. Contrato da API
@@ -195,7 +195,7 @@ Os casos da regra são testes **unitários** da regra de reserva, com o `Clock` 
 
 | Risco | Impacto | Como a spec ou os testes tratam |
 |---|---|---|
-| O professor decide S-01 ou S-02 de outro jeito | Alto | TC-10, TC-12, TC-14 e TC-17 (S-01) e TC-21 a TC-26 (S-02) são revistos antes da T-23 |
+| A regra de ocupação depende do ciclo de vida da T-21 (sem tolerância de 15 min, que diverge da resposta do professor) | Médio | TC-21 a TC-26 seguem a T-21; revistos se o professor decidir diferente |
 | Erro de um minuto na fronteira (`<` no lugar de `<=`) | Alto | TC-03, TC-04, TC-10, TC-12, TC-14 e TC-17 testam as fronteiras dos dois lados |
 | A verificação de sobreposição é esquecida na alteração | Médio | TC-08, TC-15, TC-16 e TC-18 cobrem a alteração; o CA-09 existe só para isso |
 | Pedido com vários recursos grava parte dele antes de falhar | Alto | TC-19 e TC-20, junto com o CA-10, exigem recusa por inteiro e nada gravado |
