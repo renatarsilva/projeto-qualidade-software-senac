@@ -53,7 +53,7 @@ Hoje o Spring Security sobe sem configuração: gera uma senha aleatória e não
 **Valores que o ADR-0007 deixa para esta spec (propostas, em validação pendente):**
 
 - **P-01:** o token vale **30 minutos**, contados do instante de emissão. Com a hora atual vindo do `Clock` injetado (ADR 0008), o token é válido enquanto a hora atual for menor que a de expiração.
-- **P-02:** a senha tem de 8 a 72 bytes. O mínimo é uma proposta; o máximo vem do BCrypt, que ignora o que passa de 72 bytes.
+- **P-02:** a senha tem de 8 a 72 bytes. O mínimo é uma proposta; o máximo vem do BCrypt, que ignora o que passa de 72 bytes. A contagem é em bytes UTF-8, nada é truncado em silêncio, e a mensagem de erro fala em linguagem simples: "A senha deve ter de 8 a 72 caracteres (acentos e símbolos contam mais)".
 - **P-03:** o login falha sempre com a mesma mensagem, "E-mail ou senha inválidos", seja por senha errada, e-mail inexistente ou usuário desativado, para não revelar quais e-mails existem.
 - **P-04:** o último Administrador ativo não pode ser desativado nem rebaixado, para o sistema não ficar sem quem gerencie usuários.
 
@@ -154,7 +154,7 @@ Nenhuma resposta traz senha nem hash.
 - **Dado** um Administrador autenticado
 - **Quando** ele cria um usuário, troca o perfil ou desativa um usuário
 - **Então** a operação é aceita e a resposta não traz senha nem hash
-- **E** o perfil só pode ser um dos três valores; um e-mail já cadastrado dá `409`; uma senha fora de 8 a 72 bytes dá `400`
+- **E** o perfil só pode ser um dos três valores; um e-mail já cadastrado dá `409`; uma senha fora de 8 a 72 bytes dá `400` com a mensagem em linguagem simples do P-02
 - **E** o usuário desativado continua no banco e não consegue mais entrar
 
 ### CA-10: A senha nunca aparece em texto
@@ -168,7 +168,7 @@ Nenhuma resposta traz senha nem hash.
 
 - **Dado** o navegador
 - **Quando** a pessoa envia o formulário de login correto, abre uma página protegida sem sessão, ou abre uma página de outro perfil
-- **Então** o login cria a sessão e leva para a página inicial; sem sessão vai para `/login`; sem permissão vê uma página de erro `403` amigável, sem termo técnico
+- **Então** o login cria a sessão e leva para a página inicial; sem sessão vai para `/login`; sem permissão vê uma página de erro `403` amigável, sem termo técnico, com um link de volta para a página inicial; continua logado e não é levado para `/login`
 
 ### CA-12: O CSRF protege as telas e não atrapalha a API
 
@@ -188,6 +188,21 @@ Nenhuma resposta traz senha nem hash.
 - **Dado** um único Administrador ativo
 - **Quando** alguém tenta desativá-lo ou trocar o perfil dele
 - **Então** o pedido é recusado com `409`
+
+### CA-15: Desativação e troca de perfil valem na hora
+
+- **Dado** um usuário com token válido ou sessão aberta
+- **Quando** o Administrador o desativa, ou troca o perfil dele
+- **Então** a próxima chamada dele é recusada com `401` (desativado) ou avaliada pelo perfil novo (troca de perfil)
+- **E** o perfil gravado no token é ignorado: o sistema confere o estado e o perfil atuais no banco a cada chamada
+
+### CA-16: O primeiro administrador vem do ambiente
+
+- **Dado** um banco sem nenhum Administrador
+- **Quando** a aplicação sobe
+- **Então** ela cria um Administrador ativo com o e-mail e a senha das variáveis de ambiente iniciais, com a senha em hash BCrypt
+- **E** sem as variáveis e sem Administrador a aplicação se recusa a subir, com mensagem clara
+- **E** a migração Flyway não grava nenhuma senha, e com um Administrador já existente as variáveis são ignoradas
 
 ## 6. Casos de teste
 
@@ -228,11 +243,18 @@ A autorização é testada com um controller de teste (só em `src/test`) com um
 | TC-29 | CA-10 | Classe inválida | Falha de login e criação de usuário, com o log capturado | Nenhuma senha em texto no log nem na resposta | Integração |
 | TC-30 | CA-11 | Classe válida | `POST /login` (formulário) com credenciais corretas | Redireciona para a página inicial e cria a sessão | Integração |
 | TC-31 | CA-11 | Classe inválida | `GET` de página protegida sem sessão | Redireciona para `/login` | Integração |
-| TC-32 | CA-11 | Classe inválida | SOLICITANTE abre página só do Administrador | Página de erro 403 amigável, sem termo técnico | Integração |
+| TC-32 | CA-11 | Classe inválida | SOLICITANTE abre página só do Administrador | Página de erro 403 amigável, sem termo técnico, com link para a página inicial; a sessão continua | Integração |
 | TC-33 | CA-12 | Classe inválida | `POST` de formulário autenticado sem o token CSRF | 403 | Integração |
 | TC-34 | CA-12 | Classe válida | `POST /api/...` com token Bearer e sem token CSRF | Aceito (a API não usa cookie) | Integração |
 | TC-35 | CA-13 | Classe inválida | Subir a aplicação sem a variável da chave de assinatura | A aplicação não inicia, com erro claro | Integração |
 | TC-36 | CA-13 | Classe válida | Buscar a chave ou senha fixa no repositório | Nenhuma ocorrência no código nem nos arquivos de configuração | Integração |
+| TC-37 | CA-15 | Estado proibido | Usuário com token válido é desativado e faz uma chamada | 401 `ProblemDetail` neutro | Integração |
+| TC-38 | CA-15 | Classe válida | SOLICITANTE com token válido vira ADMINISTRADOR e chama uma rota só do Administrador | Aceita (vale o perfil atual, não o do token) | Integração |
+| TC-39 | CA-15 | Estado proibido | Usuário com sessão aberta é desativado e abre uma página | Levado para `/login` | Integração |
+| TC-40 | CA-16 | Classe válida | Subir com banco sem Administrador e com as variáveis iniciais | Administrador criado, ativo, senha em hash | Integração |
+| TC-41 | CA-16 | Classe inválida | Subir com banco sem Administrador e sem as variáveis | A aplicação não sobe; mensagem clara | Integração |
+| TC-42 | CA-16 | Classe válida | Subir com um Administrador já existente e com as variáveis | Nenhum usuário novo é criado | Integração |
+| TC-43 | CA-09 | Valor limite | Senha de 40 caracteres acentuados (mais de 72 bytes) | Recusa `400`; a mensagem fala em caracteres, acentos e símbolos; nada é truncado | Unitário |
 
 ## 7. Riscos
 
@@ -240,7 +262,7 @@ A autorização é testada com um controller de teste (só em `src/test`) com um
 |---|---|---|
 | Falha de autorização é limitador de nota; um perfil executa o que não devia | Alto | A tabela de decisão (TC-17 a TC-21), a regra de negar por padrão (TC-22) e o teste de cada perfil |
 | A chave de assinatura vai parar no repositório (como no ACH-01) | Alto | TC-35 e TC-36 e CA-13; a chave vem de variável de ambiente |
-| Um token não pode ser revogado antes de expirar | Médio | Validade curta de 30 minutos (P-01), testada nos limites (TC-11 e TC-12) |
+| Um token não pode ser revogado antes de expirar | Médio | Validade de 30 minutos (P-01) e conferência do usuário e do perfil no banco a cada chamada (CA-15, TC-37 a TC-39); custa uma consulta por requisição |
 | Vazar quais e-mails existem pela mensagem de login | Médio | TC-07 a TC-09 exigem a mesma resposta nos três casos (P-03) |
 | A senha aparece em log, resposta ou banco | Alto | TC-01 e TC-02 e TC-29; CA-10 |
 | CSRF ligado na API, ou desligado nas telas | Alto | TC-33 e TC-34 testam as duas cadeias |
@@ -260,6 +282,8 @@ A autorização é testada com um controller de teste (só em `src/test`) com um
 | 6 | TC-22: negar por padrão | Toda rota não declarada é recusada | Revisar as rotas públicas |
 | 7 | TC-23 a TC-28: gestão de usuários | Criar, trocar perfil, desativar e proteger o último administrador | Remover duplicação entre as operações |
 | 8 | TC-30 a TC-34: telas, sessão e CSRF | Cadeia de segurança das telas e da API | Separar a configuração das duas cadeias |
+| 9 | TC-37 a TC-39: desativação na hora | Conferir usuário ativo e perfil atual no banco em cada chamada | Isolar a leitura do usuário atual |
+| 10 | TC-40 a TC-42: primeiro administrador | Criar o Administrador inicial a partir do ambiente | Isolar a leitura das variáveis iniciais |
 | 9 | TC-29: senha fora do log | Garantir que nenhum log ou resposta traga a senha | Revisar mensagens de log |
 | 10 | TC-35 e TC-36: segredo no ambiente | Falhar na inicialização sem a chave; remover segredos fixos | Documentar a variável de ambiente |
 
@@ -291,6 +315,9 @@ Resultado de `./scripts/validar-spec.sh` (preenchido pelo autor após o script p
 
 | # | Pergunta | Resposta / decisão | Documento afetado |
 |---|---|---|---|
-| 1 | _preencher_ | _preencher_ | _preencher_ |
+| 1 | Token de usuário desativado ou com perfil trocado | A cada chamada o sistema confere o usuário e o perfil no banco; vale na hora | CA-15, TC-37 a TC-39 |
+| 2 | Primeiro administrador | Criado na subida a partir de variáveis de ambiente; a migração não grava senha; sem variáveis e sem Administrador a aplicação não sobe | CA-16, TC-40 a TC-42 |
+| 3 | Limite da senha | Contagem em bytes UTF-8, mensagem em linguagem simples, nada truncado em silêncio | P-02, CA-09, TC-43 |
+| 4 | Página sem permissão nas telas | `403` amigável com link para a página inicial; continua logado, sem ir para `/login` | CA-11, TC-32 |
 
 **Resultado:** _preencher_ (Liberada / Pendências) · AAAA-MM-DD
