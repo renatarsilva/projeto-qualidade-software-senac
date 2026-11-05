@@ -71,6 +71,8 @@ Uma reserva é um pedido de uso de recursos (sala, material, professor) em um in
 }
 ```
 
+O **dono** da reserva é o usuário autenticado que fez o `POST`: o corpo não traz campo de dono, e ninguém reserva em nome de outra pessoa (a identidade vem da T-15).
+
 `PUT /api/reservas/{id}`: altera uma reserva, com o mesmo corpo. A reserva que está sendo alterada **não** conta como conflito consigo mesma.
 
 **Respostas** (erros no formato da T-22):
@@ -80,6 +82,9 @@ Uma reserva é um pedido de uso de recursos (sala, material, professor) em um in
 | Sucesso | 201 (criação) ou 200 (alteração) | A reserva, no estado `SOLICITADA` na criação |
 | Término igual ou anterior ao início | 400 | `ProblemDetail`, `erros` com `campo = termino` e `motivo = "deve ser posterior ao início"` |
 | Início ou término ausente | 400 | `ProblemDetail`, `erros` com o campo ausente e `motivo = "deve ser informado"` |
+| Alterar reserva que não está `SOLICITADA` nem `APROVADA`, ou fora do prazo da T-21 (CA-13) | 409 | `ProblemDetail` em linguagem de negócio, por exemplo "Esta reserva não pode mais ser alterada"; a reserva não muda |
+| Recurso que não existe | 404 | `ProblemDetail`: "Recurso não encontrado"; nada é gravado |
+| Lista de recursos vazia | 400 | `ProblemDetail`, `erros` com `campo = recursos` e `motivo = "deve ter ao menos um recurso"` |
 | Sobreposição em algum recurso | 409 | `ProblemDetail` em linguagem de negócio, por exemplo "A sala já está reservada neste horário" |
 | Sem autenticação e perfil sem permissão | 401 e 403 | Fora desta spec (T-15), mesmo formato |
 
@@ -112,6 +117,7 @@ Uma reserva é um pedido de uso de recursos (sala, material, professor) em um in
 - **Quando** o cliente pede o mesmo recurso em um intervalo que se sobrepõe a ela, em qualquer uma destas formas: começa dentro, termina dentro, está contido, contém ou é idêntico; ou quando altera uma reserva para um horário já ocupado
 - **Então** o pedido é recusado com 409
 - **E** a mensagem diz, em linguagem de negócio, que o recurso já está reservado no horário
+- **E** a mensagem não revela quem reservou nem outros dados da reserva existente
 - **E** na alteração, a reserva mantém o horário original
 
 ### CA-05: Sobreposição na agenda do professor é recusada
@@ -161,6 +167,27 @@ Uma reserva é um pedido de uso de recursos (sala, material, professor) em um in
 - **E** o horário antigo fica livre e o novo fica ocupado
 - **E** a resposta avisa que a reserva precisa ser aprovada de novo
 
+### CA-12: Recurso inexistente ou lista vazia é recusado
+
+- **Dado** o cadastro ou a alteração de reserva
+- **Quando** o pedido traz um recurso que não existe, ou nenhum recurso
+- **Então** o recurso inexistente é recusado com 404 e a lista vazia com 400, e nada é gravado
+- **E** na lista vazia o erro aponta o campo `recursos`
+
+### CA-13: Só se altera reserva solicitada ou aprovada, dentro do prazo
+
+- **Dado** uma reserva do dono
+- **Quando** ele tenta alterá-la e ela está `EM_USO`, `CONCLUIDA`, `CANCELADA`, `REJEITADA` ou `NAO_COMPARECEU`
+- **Então** o pedido é recusado com 409 e a reserva não muda
+- **E** para `SOLICITADA` e `APROVADA`, vale o prazo de alteração da T-21 (CA-13)
+
+### CA-14: O dono é o usuário autenticado
+
+- **Dado** um usuário autenticado
+- **Quando** ele cria uma reserva
+- **Então** o dono da reserva é esse usuário
+- **E** um campo de dono enviado no corpo é ignorado
+
 ## 6. Casos de teste
 
 Todo critério de aceite precisa de pelo menos um caso. Use classes de equivalência e valor limite.
@@ -204,6 +231,15 @@ Os casos da regra são testes **unitários** da regra de reserva, com o `Clock` 
 | TC-33 (sem caso no plano) | CA-11 | Classe válida | Dono altera uma reserva `SOLICITADA` para um horário livre | Continua `SOLICITADA` | Unitário |
 | TC-34 (sem caso no plano) | CA-11 | Conflito | Dono altera uma reserva `APROVADA` para um horário ocupado | Recusa 409; continua `APROVADA` no horário original | Unitário |
 | TC-35 (contrato) | CA-11 | Classe válida | `PUT /api/reservas/{id}` de uma reserva `APROVADA` | 200 com a reserva `SOLICITADA` e o aviso de nova aprovação | Integração |
+| TC-36 (sem caso no plano) | CA-12 | Classe inválida | Pedido com a sala 999, que não existe | Recusa como não encontrada; nada gravado | Unitário |
+| TC-37 (sem caso no plano) | CA-12 | Classe inválida | Pedido com a lista de recursos vazia | Recusa; o erro aponta `recursos` | Unitário |
+| TC-38 (contrato) | CA-12 | Classe inválida | `POST /api/reservas` com um recurso inexistente | 404 `ProblemDetail`: "Recurso não encontrado" | Integração |
+| TC-39 (sem caso no plano) | CA-13 | Estado proibido | Dono altera uma reserva `EM_USO` | Recusa; a reserva não muda | Unitário |
+| TC-40 (sem caso no plano) | CA-13 | Estado proibido | Dono altera uma reserva `CONCLUIDA`, `CANCELADA`, `REJEITADA` ou `NAO_COMPARECEU` | As quatro recusadas | Unitário |
+| TC-41 (contrato) | CA-13 | Estado proibido | `PUT /api/reservas/{id}` de uma reserva `CONCLUIDA` | 409 `ProblemDetail`: "Esta reserva não pode mais ser alterada" | Integração |
+| TC-42 (sem caso no plano) | CA-14 | Classe válida | Usuário autenticado cria uma reserva | O dono é esse usuário | Unitário |
+| TC-43 (contrato) | CA-14 | Classe inválida | `POST /api/reservas` com um `solicitanteId` de outro usuário no corpo | 201; o dono é o usuário autenticado e o campo é ignorado | Integração |
+| TC-44 (contrato) | CA-04 | Conflito | `POST /api/reservas` sobreposta a uma reserva de outro usuário | 409; a mensagem cita o recurso e não cita o outro usuário | Integração |
 
 ## 7. Riscos
 
@@ -233,6 +269,9 @@ Na T-20 as assinaturas mínimas devolvem um resultado neutro (que não é aceite
 | 6 | TC-10, TC-12, TC-14 e TC-17: reservas encostadas | Intervalo fechado no início e aberto no término | Nomear a regra da fronteira |
 | 7 | TC-27 e TC-28: recursos e intervalos distintos | Comparar só o mesmo recurso e só intervalos que se sobrepõem | Remover duplicação entre as verificações |
 | 8 | TC-21 a TC-26: estados que ocupam o horário | Filtrar as reservas existentes pelo estado | Extrair o conjunto de estados que ocupam |
+| 9e | TC-42 e TC-43: dono da reserva | Gravar o usuário autenticado como dono | Isolar a leitura da identidade (T-15) |
+| 9d | TC-39 a TC-41: estados que não podem ser alterados | Recusar a alteração fora de `SOLICITADA` e `APROVADA` | Compartilhar a regra de prazo com a T-21 |
+| 9c | TC-36 a TC-38: recurso inexistente e lista vazia | Validar os recursos do pedido | Reaproveitar a tradução de erros da T-22 |
 | 9b | TC-32 a TC-35: alterar reserva aprovada | Voltar a `SOLICITADA` ao alterar | Isolar a regra de reinício da aprovação |
 | 9 | TC-15, TC-16 e TC-18: alteração | Ignorar a própria reserva na verificação | Reaproveitar a verificação na criação e na alteração |
 | 10 | TC-19 e TC-20: vários recursos | Verificar todos os recursos antes de gravar | Isolar a gravação em uma única operação |
@@ -268,5 +307,10 @@ Resultado de `./scripts/validar-spec.sh` (preenchido pelo autor após o script p
 |---|---|---|---|
 | 1 | Alterar uma reserva `APROVADA` | Volta a `SOLICITADA`, a aguardar nova aprovação | CA-11, TC-32 a TC-35; T-21 |
 | 2 | Alteração rejeitada ou vencida | O dono perde o horário antigo; a resposta avisa | Seção 7 |
+| 3 | Conflito do professor | Só entre reservas que o alocam como recurso `PROFESSOR` (CA-05); ser solicitante não ocupa a agenda | CA-05 |
+| 4 | Recurso inexistente ou lista vazia | 404 para inexistente; 400 com `campo = recursos` para lista vazia | CA-12, TC-36 a TC-38 |
+| 5 | Quais estados podem ser alterados | Só `SOLICITADA` e `APROVADA`, dentro do prazo da T-21 (CA-13); os outros devolvem 409 | CA-13, TC-39 a TC-41 |
+| 6 | Dono da reserva | O usuário autenticado; o corpo não traz o dono | CA-14, TC-42 e TC-43 |
+| 7 | Mensagem do 409 | Só o recurso e o fato; não revela quem reservou | CA-04, TC-44 |
 
 **Resultado:** _preencher_ (Liberada / Pendências) · AAAA-MM-DD
