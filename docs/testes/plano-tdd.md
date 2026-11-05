@@ -65,6 +65,8 @@ Fonte: PRD, seção 4.4 · RF-04. A comparação é entre **data e hora**, não 
 | RN-01-T6 | Inválida | Início ausente | Recusada com mensagem de erro compreensível, e nada é gravado |
 | RN-01-T7 | Inválida | Término ausente | Recusada com mensagem de erro compreensível, e nada é gravado |
 | RN-01-T8 | Inválida | Alterar uma reserva existente para um término anterior ao início | Recusada, e a reserva mantém o horário original |
+| RN-01-T9 | Inválida | Pedido com um recurso que não existe (sala 999) | Recusada como não encontrada, e nada é gravado |
+| RN-01-T10 | Inválida | Pedido com a lista de recursos vazia | Recusada, e o erro aponta o campo `recursos` |
 | (conflito) | Conflito | Não se aplica: a regra compara os dois horários da própria reserva, sem outra reserva envolvida | — |
 | (estado) | Estado proibido | Não se aplica: a regra não depende do estado da reserva | — |
 
@@ -89,6 +91,8 @@ Base dos casos: sala 102, terça, 10:00 às 11:00, reserva `APROVADA` do usuári
 | RN-02-T9 | Estado | Idem, com a existente `CANCELADA` | Aceita (não ocupa) |
 | RN-02-T10 | Estado | Idem, com a existente `REJEITADA` | Aceita (não ocupa) |
 | RN-02-T11 | Estado | Idem, com a existente `NAO_COMPARECEU` | Aceita (não ocupa) |
+| RN-02-T14 | Estado | Idem, com a existente `CONCLUIDA` (S-02) | Aceita (não ocupa) |
+| RN-02-T15 | Estado | B pede 10:30 às 11:00, e a existente é `APROVADA` sem check-in | Recusada (a `APROVADA` ocupa o horário inteiro, sem tolerância de atraso) |
 | RN-02-T12 | Feliz | B pede a sala 101, terça das 10:00 às 11:00, com a sala 102 reservada | Aceita (recursos diferentes) |
 | RN-02-T13 | Feliz | B pede a sala 102 em outro dia, das 10:00 às 11:00 | Aceita |
 | (inválida) | Inválida | Não se aplica: os dados malformados são da RN-01 | — |
@@ -144,8 +148,8 @@ Fonte: PRD, seção 4.4 · RF-04, RF-07. Só o fluxo principal é oficial: os ca
 | Caso | Tipo | Situação | Resultado esperado |
 |---|---|---|---|
 | RN-05-T1 | Feliz | `SOLICITADA` aprovada pelo Responsável | Estado `APROVADA` |
-| RN-05-T2 | Feliz | `APROVADA` passa a ser usada | Estado `EM_USO` |
-| RN-05-T3 | Feliz | `EM_USO` é encerrada | Estado `CONCLUIDA` |
+| RN-05-T2 | Feliz | `APROVADA` recebe o check-in na sala, em qualquer instante do horário | Estado `EM_USO` |
+| RN-05-T3 | Feliz | `EM_USO` é encerrada (pelo sistema no instante do fim, ou pelo dono antes do fim) | Estado `CONCLUIDA` |
 | RN-05-T4 | Estado proibido | `SOLICITADA` direto para `EM_USO` (pula a aprovação) | Recusada, e continua `SOLICITADA` |
 | RN-05-T5 | Estado proibido | `SOLICITADA` direto para `CONCLUIDA` | Recusada, e o estado não muda |
 | RN-05-T6 | Estado proibido | `APROVADA` direto para `CONCLUIDA` (pula o uso) | Recusada, e o estado não muda |
@@ -158,15 +162,18 @@ Fonte: PRD, seção 4.4 · RF-04, RF-07. Só o fluxo principal é oficial: os ca
 | RN-06-T1 | Feliz | `SOLICITADA` rejeitada pelo Responsável (NC-04) | Estado `REJEITADA` |
 | RN-06-T2 | Feliz | `SOLICITADA` cancelada pelo dono | Estado `CANCELADA` |
 | RN-06-T3 | Feliz | `APROVADA` cancelada pelo dono, antes do início | Estado `CANCELADA` |
-| RN-06-T4 | Feliz | `APROVADA` cujo início já passou sem uso, pelo job diário (S-06) | Estado `NAO_COMPARECEU` |
+| RN-06-T4 | Feliz | `APROVADA` que chega ao fim do horário sem nenhum check-in, pelo job (S-06) | Estado `NAO_COMPARECEU`; o horário fica livre |
 | RN-06-T5 | Estado proibido | `EM_USO` cancelada (premissa: o fim antecipado é `CONCLUIDA`, RN-13) | Recusada, e continua `EM_USO` |
 | RN-06-T6 | Estado proibido | `EM_USO` para `REJEITADA` ou `NAO_COMPARECEU` | Recusadas |
 | RN-06-T7 | Estado proibido | Qualquer saída de `CONCLUIDA`, `REJEITADA`, `CANCELADA` ou `NAO_COMPARECEU` (estados finais) | Recusada, e o estado não muda |
 | RN-06-T8 | Inválida | Mudar para um estado que não existe (por exemplo, `"ABC"`) | Recusada, e o estado não muda |
-| RN-06-T9 | Feliz | `SOLICITADA` chega à hora de início sem aprovação (A-05) | Estado `CANCELADA`, com o motivo "não aprovada a tempo" na auditoria |
+| RN-06-T9 | Feliz | `SOLICITADA` no mesmo dia, sem aprovação 1 h antes do início (A-05) | Estado `CANCELADA` pelo sistema, com o motivo "não aprovada a tempo" na auditoria |
 | RN-06-T10 | Feliz | Depois do T9, outro usuário pede o mesmo recurso e horário, com início igual ou depois de agora | Aceita (`CANCELADA` não ocupa o horário) |
+| RN-06-T11 | Estado proibido | `APROVADA` sem check-in marcada `NAO_COMPARECEU` às 10:35, antes do fim (reserva 10:00-11:00) | Recusada, e o estado não muda |
+| RN-06-T12 | Feliz | `SOLICITADA` com antecedência, sem aprovação 24 h antes do início (A-05) | Estado `CANCELADA` pelo sistema |
+| RN-06-T13 | Feliz | Dono altera uma reserva `APROVADA` para um horário livre | Estado `SOLICITADA`, a aguardar nova aprovação; horário antigo livre e novo ocupado |
 
-O cancelamento por falta de aprovação (RN-06-T9) é feito pelo sistema, e não pelo dono: é uma proposta, com validação pendente.
+O cancelamento por falta de aprovação (RN-06-T9 e T12) é feito pelo sistema, e não pelo dono. O prazo (24 h antes, ou 1 h antes se solicitada no mesmo dia) vem da resposta do professor.
 
 ### RN-07 · Somente o Responsável aprova recursos restritos
 
@@ -270,9 +277,9 @@ A reserva vale para hoje ou para qualquer dia futuro, **nunca no passado**, desd
 | RN-12-T6 | Conflito | Uma quinta futura, em horário já ocupado no mesmo recurso | Recusada pela RN-02, e nada é gravado |
 | (estado) | Estado proibido | Não se aplica: a regra compara datas, não estados | — |
 
-### RN-13 · Cancelamento libera o recurso (proposta)
+### RN-13 · Cancelamento libera o recurso (validada pelo professor, com ajustes)
 
-O **dono** da reserva pode cancelá-la. Até o instante do início (inclusive), a reserva vira `CANCELADA` e o horário inteiro volta a ficar livre. Depois do início e antes do fim, é um **encerramento antecipado**: a reserva vira `CONCLUIDA` (o uso aconteceu) e o resto do horário volta a ficar livre. Depois do fim, não há o que cancelar. A reserva nunca é apagada (RN-08) e toda mudança gera auditoria (RN-09).
+O **dono** da reserva pode cancelá-la. Até o instante do início (inclusive), a reserva vira `CANCELADA` e o horário inteiro volta a ficar livre. Depois do início e antes do fim, o resultado depende do **check-in**: com check-in (`EM_USO`), é um **encerramento antecipado** e a reserva vira `CONCLUIDA`; sem check-in (`APROVADA`), vira `NAO_COMPARECEU`. Nos dois casos o resto do horário volta a ficar livre. O dono altera a reserva até 24 h antes do início (1 h se foi solicitada no mesmo dia, L11); alterar uma `APROVADA` a devolve a `SOLICITADA`. Depois do fim, não há o que cancelar. A reserva nunca é apagada (RN-08) e toda mudança gera auditoria (RN-09).
 
 Os casos usam o `Clock` fixo em segunda, às 08:00, e uma reserva `APROVADA` do usuário A, na sala 102, das 10:00 às 11:00, salvo indicação.
 
@@ -283,7 +290,7 @@ Os casos usam o `Clock` fixo em segunda, às 08:00, e uma reserva `APROVADA` do 
 | RN-13-T3 | Feliz | A cancela uma reserva ainda `SOLICITADA` (sem aprovação), antes do início | Estado `CANCELADA`; o horário fica livre |
 | RN-13-T4 | Limite | A cancela às 09:59, um minuto antes do início | Estado `CANCELADA` |
 | RN-13-T5 | Limite | A cancela às 10:00 em ponto, no instante do início (o uso ainda não começou) | Estado `CANCELADA`, e o horário inteiro das 10:00 às 11:00 volta a ficar livre |
-| RN-13-T6 | Feliz | Reserva das 10:00 às 12:00; A encerra às 10:40 | Estado `CONCLUIDA`; a reserva continua no histórico |
+| RN-13-T6 | Feliz | Reserva das 10:00 às 12:00, `EM_USO` (com check-in); A encerra às 10:40 | Estado `CONCLUIDA`; a reserva continua no histórico |
 | RN-13-T7 | Feliz | Depois de T6, B reserva a sala 102 das 11:00 às 12:00 | Aceita (o resto do horário foi liberado) |
 | RN-13-T8 | Estado proibido | A tenta cancelar às 11:30, depois do fim | Recusada, e o estado não muda |
 | RN-13-T9 | Estado proibido | A cancela uma reserva que já está `CANCELADA` | Recusada, e o estado não muda |
@@ -291,7 +298,15 @@ Os casos usam o `Clock` fixo em segunda, às 08:00, e uma reserva `APROVADA` do 
 | RN-13-T11 | Conflito | B, que não é o dono, tenta cancelar a reserva de A | Recusada, e a reserva fica intacta (premissa: só o dono cancela; o caso do Administrador entra na matriz de autorização, T-48) |
 | RN-13-T12 | Inválida | Cancelar uma reserva que não existe | Recusada, sem alterar nada |
 | RN-13-T13 | Feliz | Em T1, T4 e T6, o registro de auditoria traz o estado anterior, o novo, o usuário e o instante | Um registro por mudança (RN-09) |
-| RN-13-T14 | Limite | A cancela às 10:01, um minuto depois do início | Encerramento antecipado: estado `CONCLUIDA`, e o resto do horário fica livre |
+| RN-13-T14 | Limite | A cancela uma reserva `EM_USO` às 10:01, um minuto depois do início (vale qualquer instante após 10:00:00) | Encerramento antecipado: estado `CONCLUIDA`, e o resto do horário fica livre |
+| RN-13-T15 | Feliz | A cancela às 10:05 uma reserva `APROVADA` sem check-in | Estado `NAO_COMPARECEU`; o resto do horário fica livre |
+| RN-13-T16 | Limite | A tenta cancelar às 11:00 em ponto, no instante do fim | Recusada (`[início, fim)`, S-01) |
+| RN-13-T17 | Conflito | B, que não é o dono, tenta alterar a reserva de A | Recusada, e a reserva fica intacta |
+| RN-13-T18 | Limite | Reserva solicitada com antecedência; A altera exatamente 24 h antes do início | Aceita |
+| RN-13-T19 | Limite | Mesma reserva; A altera 23 h 59 min antes | Recusada, e a reserva não muda |
+| RN-13-T20 | Limite | Reserva solicitada no mesmo dia; A altera exatamente 1 h antes | Aceita |
+| RN-13-T21 | Limite | Reserva solicitada no mesmo dia; A altera 59 min antes | Recusada, e a reserva não muda |
+| RN-13-T22 | Estado proibido | A altera uma reserva `EM_USO`, `CONCLUIDA`, `CANCELADA`, `REJEITADA` ou `NAO_COMPARECEU` | Recusada, e a reserva não muda |
 
 ## 4. Ambiguidades, lacunas e perguntas
 
@@ -299,16 +314,17 @@ Pontos que as fontes não resolvem. Nenhum deles é regra oficial: os que viram 
 
 | ID | Ambiguidade | Regra afetada | Premissa de teste atual |
 |---|---|---|---|
-| L01 · S-01 | Uma reserva que termina quando outra começa conta como sobreposição? | RN-02 | Não conta: período `[início, fim)` |
-| L02 · S-02 | Quais estados ocupam o horário? | RN-02, RN-03 | `SOLICITADA`, `APROVADA` e `EM_USO` ocupam; os demais não |
+| L01 · S-01 | Uma reserva que termina quando outra começa conta como sobreposição? | RN-02 | **Confirmada pelo professor**: período `[início, fim)` |
+| L02 · S-02 | Quais estados ocupam o horário? | RN-02, RN-03 | **Confirmada pelo professor**: `SOLICITADA`, `APROVADA` e `EM_USO` ocupam; os demais não bloqueiam, mas ficam registrados para relatório |
 | L03 | O que é "simultâneo" e que resposta recebe a solicitação recusada? | RN-03 | Sem premissa: o teste só verifica que uma reserva fica ativa |
-| L04 | A reserva de um recurso não restrito passa por `APROVADA`? | RN-05 | Sem premissa: o plano só cobre o fluxo completo |
-| L11 | Até quando uma reserva pode ser alterada ou cancelada? Cancelar uma reserva iniciada conta como "apagar"? | RN-06, RN-08 | **Respondida por proposta (RN-13, validação pendente)**: cancelar não apaga; a reserva fica no histórico e o resto do horário é liberado |
+| L04 | A reserva de um recurso não restrito passa por `APROVADA`? | RN-05 | **Respondida pelo professor**: passa por `SOLICITADA → APROVADA` |
+| L11 | Até quando uma reserva pode ser alterada ou cancelada? Cancelar uma reserva iniciada conta como "apagar"? | RN-06, RN-08 | **Respondida pelo professor**: o dono altera até 24 h antes do início (1 h se solicitada no mesmo dia); cancelar não apaga, e o resto do horário é liberado |
 | A-01 | Horário de funcionamento e duração das reservas: nada nas fontes define. **Resolvida por proposta**: RN-10 e RN-11 (validação pendente, sugerir registrar no PRD) | RN-10, RN-11 | Valem as regras propostas |
 | A-02 | Até quantos dias à frente se pode reservar? Sem número nas fontes | RN-12 | Sem limite máximo de antecedência |
 | A-03 | Feriados: quais são e quem os cadastra (tabela do Administrador ou bloqueios)? | RN-10 | Os casos de feriado ficam marcados como validação pendente |
-| A-04 | O que faz uma reserva passar a `EM_USO`: uma ação do usuário ("iniciar uso") ou a chegada da hora de início? A fonte não define. Por isso a RN-13 decide pelo **horário** (agora antes ou depois do início) | RN-05, RN-13 | A decisão é pelo horário, não pelo estado |
-| A-05 | Uma reserva `SOLICITADA` que nunca foi aprovada, quando chega a hora de começar, vira `REJEITADA`, `CANCELADA` ou continua `SOLICITADA`? A fonte não diz. **Resolvida por proposta**: vira `CANCELADA` pelo sistema, com o motivo "não aprovada a tempo" (validação pendente) | RN-05, RN-06 | Vale a proposta (RN-06-T9) |
+| A-04 | O que faz uma reserva passar a `EM_USO`: uma ação do usuário ("iniciar uso") ou a chegada da hora de início? A fonte não define. Por isso a RN-13 decide pelo **horário** (agora antes ou depois do início) | RN-05, RN-13 | **Respondida pelo professor**: o sistema de check-in da sala leva a `EM_USO`; a RN-13 decide pelo estado (com ou sem check-in) |
+| A-05 | Uma reserva `SOLICITADA` que nunca foi aprovada, quando chega a hora de começar, vira `REJEITADA`, `CANCELADA` ou continua `SOLICITADA`? A fonte não diz. **Respondida pelo professor**: cancelada pelo sistema se não for aprovada 24 h antes (1 h antes se solicitada no mesmo dia) | RN-05, RN-06 | Valem RN-06-T9 e T12 |
+| P-01 | O professor falou em check-in em até 15 min; o time decidiu **sem tolerância** (a `APROVADA` ocupa o horário inteiro e só vira `NAO_COMPARECEU` no fim sem check-in). **Divergência, confirmar com o professor** | RN-06, RN-13 | Vale a decisão do time (RN-06-T4, RN-06-T11 e RN-13-T15) |
 
 ## 5. Matriz regra → caso → teste → status
 
@@ -316,18 +332,18 @@ Atualizada pelas tasks seguintes. O status começa em `sem teste`, passa a `red`
 
 | Regra | Casos | Teste (task) | Status |
 |---|---|---|---|
-| RN-01 | RN-01-T1 a T8 | T-20 | sem teste |
-| RN-02 | RN-02-T1 a T13, mais CT-01 (V01 a V21) | T-20; T-30 (restrição no banco) | sem teste |
+| RN-01 | RN-01-T1 a T10 | T-20 | sem teste |
+| RN-02 | RN-02-T1 a T15, mais CT-01 (V01 a V21) | T-20; T-30 (restrição no banco) | sem teste |
 | RN-03 | RN-03-T1 a T9, mais CT-02 | T-37 | sem teste |
 | RN-04 | RN-04-T1 a T11, mais CEN-04 | T-35 | sem teste |
 | RN-05 | RN-05-T1 a T7 | T-21 | sem teste |
-| RN-06 | RN-06-T1 a T10 | T-21 | sem teste |
+| RN-06 | RN-06-T1 a T13 | T-21 | sem teste |
 | RN-07 | RN-07-T1 a T11 | T-34; T-49 (matriz de autorização) | sem teste |
 | RN-08 | RN-08-T1 a T9 | T-21; T-30 (o T9, no banco) | sem teste |
 | RN-09 | RN-09-T1 a T12 | T-40 | sem teste |
 | RN-10 (proposta) | RN-10-T1 a T11 | sem task no backlog | sem teste, proposta |
 | RN-11 (proposta) | RN-11-T1 a T6 | sem task no backlog | sem teste, proposta |
 | RN-12 (proposta) | RN-12-T1 a T6 | sem task no backlog | sem teste, proposta |
-| RN-13 (proposta) | RN-13-T1 a T14 | sem task no backlog | sem teste, proposta |
+| RN-13 (validada, com ajustes) | RN-13-T1 a T22 | T-21 (T-20 para a alteração) | sem teste |
 
 **Regras sem teste: todas, por enquanto.** As propostas (RN-10 a RN-13) ainda não têm task no backlog.
