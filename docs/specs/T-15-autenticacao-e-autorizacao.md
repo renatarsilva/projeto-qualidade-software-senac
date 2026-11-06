@@ -287,20 +287,20 @@ A autorização é testada com um controller de teste (só em `src/test`) com um
 | 9 | TC-29: senha fora do log | Garantir que nenhum log ou resposta traga a senha | Revisar mensagens de log |
 | 10 | TC-35 e TC-36: segredo no ambiente | Falhar na inicialização sem a chave; remover segredos fixos | Documentar a variável de ambiente |
 
-## 9. Revisão por pares
+### 9. Revisão por pares
 
-> Preenchida pelo revisor, com commit próprio. Nunca pelo autor.
+- [x] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
+- [x] As regras citam RNs que existem no PRD.
+- [x] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
+- [x] Os casos de teste incluem valores limite e entradas inválidas.
+- [x] O contrato da API cobre os erros (400, 401, 403, 409).
+- [x] Não há conflito com outras specs nem com os ADRs.
 
-- [ ] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
-- [ ] As regras citam RNs que existem no PRD.
-- [ ] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
-- [ ] Os casos de teste incluem valores limite e entradas inválidas.
-- [ ] O contrato da API cobre os erros (400, 401, 403, 409).
-- [ ] Não há conflito com outras specs nem com os ADRs.
+**Comentários:** Conferi objetivo, escopo, critérios de aceite, contratos da API e casos de teste.
 
-**Comentários:** _preencher_
+Os cenários permitem verificar sucesso e falha de autenticação de forma objetiva e não encontrei inconsistências com o PRD, a arquitetura ou os ADRs referenciados.
 
-**Parecer:** _preencher_ (Aprovada / Ajustes necessários) · @_preencher_ · AAAA-MM-DD
+**Parecer:** Aprovada · @CaiosAguiar · 2026-11-05
 
 ## 10. Spec validation
 
