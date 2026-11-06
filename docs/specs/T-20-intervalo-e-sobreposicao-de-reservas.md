@@ -277,20 +277,20 @@ Na T-20 as assinaturas mínimas devolvem um resultado neutro (que não é aceite
 | 10 | TC-19 e TC-20: vários recursos | Verificar todos os recursos antes de gravar | Isolar a gravação em uma única operação |
 | 11 | TC-29 a TC-31: contrato HTTP | Mapear os erros para 400 e 409 no formato da T-22 | Consolidar a tradução dos erros |
 
-## 9. Revisão por pares
+### 9. Revisão por pares
 
-> Preenchida pelo revisor, com commit próprio. Nunca pelo autor.
+- [x] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
+- [x] As regras citam RNs que existem no PRD.
+- [x] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
+- [x] Os casos de teste incluem valores limite e entradas inválidas.
+- [x] O contrato da API cobre os erros (400, 401, 403, 409).
+- [x] Não há conflito com outras specs nem com os ADRs.
 
-- [ ] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
-- [ ] As regras citam RNs que existem no PRD.
-- [ ] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
-- [ ] Os casos de teste incluem valores limite e entradas inválidas.
-- [ ] O contrato da API cobre os erros (400, 401, 403, 409).
-- [ ] Não há conflito com outras specs nem com os ADRs.
+**Comentários:** Conferi regras de intervalo, sobreposição, ocupação por estado, alteração de reserva, contratos da API e casos de teste.
 
-**Comentários:** _preencher_
+Os critérios permitem validar aprovação e falha de forma objetiva. Os cenários cobrem valores limite, recursos distintos, conflitos de professor, sala e material, além das fronteiras de tempo definidas pela premissa S-01. Não encontrei inconsistências com o PRD, a utility tree, a arquitetura ou os ADRs referenciados.
 
-**Parecer:** _preencher_ (Aprovada / Ajustes necessários) · @_preencher_ · AAAA-MM-DD
+**Parecer:** Aprovada · @CaiosAguiar · 2026-11-05
 
 ## 10. Spec validation
 
