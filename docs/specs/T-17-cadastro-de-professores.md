@@ -182,20 +182,20 @@ As validações são testadas em nível unitário; o contrato HTTP, a permissão
 | 6 | TC-13 e TC-14: permissão | Regra de perfil por operação (T-15) | Declarar o perfil exigido em um só lugar |
 | 7 | TC-15: estrutura do banco | Gravação em três tabelas | Revisar a migração |
 
-## 9. Revisão por pares
+### 9. Revisão por pares
 
-> Preenchida pelo revisor, com commit próprio. Nunca pelo autor.
+- [x] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
+- [x] As regras citam RNs que existem no PRD.
+- [x] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
+- [x] Os casos de teste incluem valores limite e entradas inválidas.
+- [x] O contrato da API cobre os erros (400, 401, 403, 409).
+- [x] Não há conflito com outras specs nem com os ADRs.
 
-- [ ] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
-- [ ] As regras citam RNs que existem no PRD.
-- [ ] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
-- [ ] Os casos de teste incluem valores limite e entradas inválidas.
-- [ ] O contrato da API cobre os erros (400, 401, 403, 409).
-- [ ] Não há conflito com outras specs nem com os ADRs.
+**Comentários:** Conferi objetivo, escopo, regras de negócio, critérios de aceite, contrato da API e casos de teste.
 
-**Comentários:** _preencher_
+Os critérios permitem validar aprovação e falha de forma objetiva. Os casos de teste cobrem entradas válidas, inválidas, limites e cenários de autorização. Não encontrei inconsistências com o PRD, a arquitetura ou o ADR-0009.
 
-**Parecer:** _preencher_ (Aprovada / Ajustes necessários) · @_preencher_ · AAAA-MM-DD
+**Parecer:** Aprovada · @CaiosAguiar · 2026-11-05
 
 ## 10. Spec validation
 
