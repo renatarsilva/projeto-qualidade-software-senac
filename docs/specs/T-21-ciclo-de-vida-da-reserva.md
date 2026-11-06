@@ -270,16 +270,32 @@ Na T-21 as assinaturas mínimas devolvem um resultado neutro (que não é aceite
 
 > Preenchida pelo revisor, com commit próprio. Nunca pelo autor.
 
-- [ ] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
+- [x] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
 - [ ] As regras citam RNs que existem no PRD.
 - [ ] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
 - [ ] Os casos de teste incluem valores limite e entradas inválidas.
 - [ ] O contrato da API cobre os erros (400, 401, 403, 409).
 - [ ] Não há conflito com outras specs nem com os ADRs.
 
-**Comentários:** _preencher_
+**Comentários:**
 
-**Parecer:** _preencher_ (Aprovada / Ajustes necessários) · @_preencher_ · AAAA-MM-DD
+O objetivo e o escopo estão claros, e a tabela com as 7 transições permitidas ajuda bastante. A autorização do `PATCH`, porém, precisa ser definida nesta spec.
+
+Autorização: a spec diz que quem chama o `PATCH /api/reservas/{id}/estado` depende da transição, mas não define isso nem testa. Como a T-24 vem antes da T-34, um Solicitante poderia aprovar a própria reserva ou mudar a reserva de outra pessoa. É preciso listar quem pode pedir cada destino ou recusar essas mudanças até a T-34, com casos de 403.
+
+Prazos: uma reserva pedida na segunda às 16:00 para terça às 10:00 já nasce com o prazo de 24 h vencido, e o mesmo ocorre no mesmo dia, com menos de 1 h de antecedência. Também falta definir "mesmo dia". Uma `APROVADA` alterada exatamente 24 h antes volta a `SOLICITADA` e cai no cancelamento automático, porque os dois prazos são iguais. O texto fala em "instante do fim" e em prazos exatos, mas o job previsto é diário, e não está definido o que acontece até ele rodar, nem se o Responsável pode aprovar depois do prazo.
+
+Regras no PRD: a RN-13 não existe no PRD, e as respostas do professor sobre L11, A-04 e A-05 ainda não estão na `main`. A P-01 aparece como descartada e pendente ao mesmo tempo, então é preciso confirmar os 15 min com o professor.
+
+Critérios: o CA-03 aceita `NAO_COMPARECEU` só "no instante do fim", o que não combina com um job que roda depois. O CA-11 pede o histórico, mas a auditoria está fora do escopo. O CA-09 não cobre cancelar de novo uma reserva já `CONCLUIDA` antes do fim.
+
+Testes: o `Clock` padrão é 08:00, mas o check-in só vale em `[início, fim)`, então TC-02, TC-03 e TC-40 precisam informar o instante. Faltam limites da janela de check-in (09:59, 10:00, 10:59 e 11:00). TC-20, TC-25 e TC-44 precisam de integração, porque a liberação do horário depende do banco. Faltam também testes de contrato para 403 e 404, e a frase "os quatro últimos são de integração" ficou desatualizada.
+
+Contrato: o cancelamento não cita `NAO_COMPARECEU`, previsto no CA-08. `SOLICITADA→EM_USO` aparece com 403 na tabela de respostas e 409 no CA-02, e o 403 de `EM_USO` não tem caso de teste.
+
+Conflitos: a T-20 diz que a RN-13 ainda não foi validada e precisa de spec própria. A regra "só o dono cancela ou altera" impede o Administrador de tratar as reservas afetadas por manutenção (S-05 da arquitetura). A volta de `APROVADA` para `SOLICITADA` pelo `PUT` fica fora da tabela de transições e contradiz "não se volta" da seção 3. Além disso, a seção 1 cita os testes da T-20, mas deveria citar a T-21.
+
+**Parecer:** Ajustes necessários · @Samwel-Merces · 2026-11-05
 
 ## 10. Spec validation
 
