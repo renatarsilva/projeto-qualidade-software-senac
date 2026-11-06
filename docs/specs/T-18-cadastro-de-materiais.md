@@ -190,11 +190,11 @@ As validações são testadas em nível unitário; o contrato HTTP, a permissão
 
 > Preenchida pelo revisor, com commit próprio. Nunca pelo autor.
 
-- [ ] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
-- [ ] As regras citam RNs que existem no PRD.
+- [x] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
+- [x] As regras citam RNs que existem no PRD.
 - [ ] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
 - [ ] Os casos de teste incluem valores limite e entradas inválidas.
-- [ ] O contrato da API cobre os erros (400, 401, 403, 409).
+- [x] O contrato da API cobre os erros (400, 401, 403, 409).
 - [ ] Não há conflito com outras specs nem com os ADRs.
 
 **Comentários:** _preencher_
