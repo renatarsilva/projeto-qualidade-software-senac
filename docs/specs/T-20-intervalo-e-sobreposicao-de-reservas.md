@@ -38,7 +38,7 @@ Uma reserva é um pedido de uso de recursos (sala, material, professor) em um in
 - Duas solicitações simultâneas (RN-03): o teste de concorrência é da semana 42. Aqui a verificação é sequencial.
 - Recurso em manutenção (RN-04): semana 41.
 - Auditoria (RN-09), autenticação e perfis (RN-07, T-15): semanas 43 e 44.
-- Janela de funcionamento, último horário, antecedência e cancelamento que libera o recurso (RN-10 a RN-13): são propostas do time, ainda sem validação do professor, e precisam de spec própria.
+- Janela de funcionamento, último horário e antecedência máxima (RN-10 a RN-12): são propostas do time e precisam de spec própria. O cancelamento que libera o recurso (RN-13) é da T-21.
 - O formato das respostas de erro: é da T-22. Esta spec só diz **qual** erro ocorre.
 
 ## 3. Regras de negócio
@@ -46,12 +46,13 @@ Uma reserva é um pedido de uso de recursos (sala, material, professor) em um in
 - **RN-01:** o término da reserva deve ser posterior ao início. A comparação é entre data e hora. Término igual ou anterior ao início é recusado, e início ou término ausente também.
 - **RN-02:** reservas do mesmo recurso (sala, material ou professor) não podem se sobrepor. O pedido é verificado contra **cada** recurso pedido: basta um ocupado para recusar o pedido inteiro.
 
+- **Antecedência mínima (decisão do time, vem da T-21):** o pedido precisa ser feito com pelo menos 1 h de antecedência do início; exatamente 1 h ainda vale. A reserva guarda o instante do pedido (`solicitada_em`), porque os prazos de aprovação e de alteração da T-21 dependem dele.
 - **Alteração (decisão do grill):** alterar uma reserva `APROVADA` a devolve ao estado `SOLICITADA`, a aguardar nova aprovação. O horário antigo é liberado e o novo é ocupado (`SOLICITADA` ocupa). Se a alteração for rejeitada ou o prazo de aprovação vencer (A-05), a reserva vira `REJEITADA` ou `CANCELADA` e o dono perde o horário antigo. A resposta avisa isso. O prazo para alterar (L11) é da T-21 (CA-13).
 
-**Premissas da arquitetura** (S-01 e S-02 confirmadas pelo professor em 2026-11-05; D-02 segue da arquitetura):
+**Premissas da arquitetura** (S-01 e S-02 são decisões do time; D-02 segue da arquitetura):
 
-- **S-01 (confirmada):** o período é fechado no início e aberto no término, `[início, fim)`. Uma reserva que termina exatamente quando outra começa **não** é sobreposição.
-- **S-02 (confirmada):** `SOLICITADA`, `APROVADA` e `EM_USO` ocupam o horário. `REJEITADA`, `CANCELADA`, `NAO_COMPARECEU` e `CONCLUIDA` não bloqueiam conflito, mas continuam registradas para relatório. Uma `APROVADA` ocupa o horário inteiro até o dono cancelar ou fazer check-in, sem tolerância de atraso (ver T-21).
+- **S-01 (decisão do time):** o período é fechado no início e aberto no término, `[início, fim)`. Uma reserva que termina exatamente quando outra começa **não** é sobreposição.
+- **S-02 (decisão do time):** `SOLICITADA`, `APROVADA` e `EM_USO` ocupam o horário. `REJEITADA`, `CANCELADA`, `NAO_COMPARECEU` e `CONCLUIDA` não bloqueiam conflito, mas continuam registradas para relatório. Uma `APROVADA` ocupa o horário inteiro até o dono cancelar ou fazer check-in, sem tolerância de atraso (ver T-21).
 - **D-02:** a reserva se liga aos recursos pela tabela `reserva_recurso`, então uma reserva pode ocupar sala, professor e material ao mesmo tempo.
 
 ## 4. Contrato da API
@@ -85,6 +86,7 @@ O **dono** da reserva é o usuário autenticado que fez o `POST`: o corpo não t
 | Alterar reserva que não está `SOLICITADA` nem `APROVADA`, ou fora do prazo da T-21 (CA-13) | 409 | `ProblemDetail` em linguagem de negócio, por exemplo "Esta reserva não pode mais ser alterada"; a reserva não muda |
 | Recurso que não existe | 404 | `ProblemDetail`: "Recurso não encontrado"; nada é gravado |
 | Lista de recursos vazia | 400 | `ProblemDetail`, `erros` com `campo = recursos` e `motivo = "deve ter ao menos um recurso"` |
+| Pedido com menos de 1 h de antecedência | 409 | `ProblemDetail` em linguagem de negócio, por exemplo "A reserva precisa ser pedida com pelo menos 1 hora de antecedência"; nada é gravado |
 | Sobreposição em algum recurso | 409 | `ProblemDetail` em linguagem de negócio, por exemplo "A sala já está reservada neste horário" |
 | Sem autenticação e perfil sem permissão | 401 e 403 | Fora desta spec (T-15), mesmo formato |
 
@@ -117,6 +119,7 @@ O **dono** da reserva é o usuário autenticado que fez o `POST`: o corpo não t
 - **Quando** o cliente pede o mesmo recurso em um intervalo que se sobrepõe a ela, em qualquer uma destas formas: começa dentro, termina dentro, está contido, contém ou é idêntico; ou quando altera uma reserva para um horário já ocupado
 - **Então** o pedido é recusado com 409
 - **E** a mensagem diz, em linguagem de negócio, que o recurso já está reservado no horário
+- **E** se dois pedidos disputarem o mesmo horário ao mesmo tempo e a recusa vier do banco (`EXCLUDE`), a resposta continua sendo 409 (T-22, CA-08)
 - **E** a mensagem não revela quem reservou nem outros dados da reserva existente
 - **E** na alteração, a reserva mantém o horário original
 
@@ -188,6 +191,14 @@ O **dono** da reserva é o usuário autenticado que fez o `POST`: o corpo não t
 - **Então** o dono da reserva é esse usuário
 - **E** um campo de dono enviado no corpo é ignorado
 
+### CA-15: Antecedência mínima de 1 hora
+
+- **Dado** o cadastro de reserva
+- **Quando** o início está a menos de 1 h do instante do pedido
+- **Então** o pedido é recusado com 409 e nada é gravado
+- **E** com exatamente 1 h de antecedência, ou mais, o pedido é aceito
+- **E** a reserva guarda o instante do pedido
+
 ## 6. Casos de teste
 
 Todo critério de aceite precisa de pelo menos um caso. Use classes de equivalência e valor limite.
@@ -240,12 +251,15 @@ Os casos da regra são testes **unitários** da regra de reserva, com o `Clock` 
 | TC-42 (sem caso no plano) | CA-14 | Classe válida | Usuário autenticado cria uma reserva | O dono é esse usuário | Unitário |
 | TC-43 (contrato) | CA-14 | Classe inválida | `POST /api/reservas` com um `solicitanteId` de outro usuário no corpo | 201; o dono é o usuário autenticado e o campo é ignorado | Integração |
 | TC-44 (contrato) | CA-04 | Conflito | `POST /api/reservas` sobreposta a uma reserva de outro usuário | 409; a mensagem cita o recurso e não cita o outro usuário | Integração |
+| TC-45 (sem caso no plano) | CA-15 | Valor limite | Pedido às 09:00 para as 10:00, exatamente 1 h antes | Aceita; guarda `solicitada_em = 09:00` | Unitário |
+| TC-46 (sem caso no plano) | CA-15 | Valor limite | Pedido às 09:01 para as 10:00, 59 min antes | Recusa 409; nada é gravado | Unitário |
+| TC-47 (contrato) | CA-15 | Classe inválida | `POST /api/reservas` com início a 30 min do pedido | 409 `ProblemDetail`; nada é gravado | Integração |
 
 ## 7. Riscos
 
 | Risco | Impacto | Como a spec ou os testes tratam |
 |---|---|---|
-| A regra de ocupação depende do ciclo de vida da T-21 (sem tolerância de 15 min, que diverge da resposta do professor) | Médio | TC-21 a TC-26 seguem a T-21; revistos se o professor decidir diferente |
+| A regra de ocupação depende do ciclo de vida da T-21 (sem tolerância de atraso) | Médio | TC-21 a TC-26 seguem a T-21; revistos se a T-21 mudar |
 | Erro de um minuto na fronteira (`<` no lugar de `<=`) | Alto | TC-03, TC-04, TC-10, TC-12, TC-14 e TC-17 testam as fronteiras dos dois lados |
 | A verificação de sobreposição é esquecida na alteração | Médio | TC-08, TC-15, TC-16 e TC-18 cobrem a alteração; o CA-09 existe só para isso |
 | Pedido com vários recursos grava parte dele antes de falhar | Alto | TC-19 e TC-20, junto com o CA-10, exigem recusa por inteiro e nada gravado |
@@ -269,6 +283,7 @@ Na T-20 as assinaturas mínimas devolvem um resultado neutro (que não é aceite
 | 6 | TC-10, TC-12, TC-14 e TC-17: reservas encostadas | Intervalo fechado no início e aberto no término | Nomear a regra da fronteira |
 | 7 | TC-27 e TC-28: recursos e intervalos distintos | Comparar só o mesmo recurso e só intervalos que se sobrepõem | Remover duplicação entre as verificações |
 | 8 | TC-21 a TC-26: estados que ocupam o horário | Filtrar as reservas existentes pelo estado | Extrair o conjunto de estados que ocupam |
+| 9f | TC-45 a TC-47: antecedência mínima | Recusar o pedido com menos de 1 h de antecedência e guardar o instante do pedido | Compartilhar a regra de prazos com a T-21 |
 | 9e | TC-42 e TC-43: dono da reserva | Gravar o usuário autenticado como dono | Isolar a leitura da identidade (T-15) |
 | 9d | TC-39 a TC-41: estados que não podem ser alterados | Recusar a alteração fora de `SOLICITADA` e `APROVADA` | Compartilhar a regra de prazo com a T-21 |
 | 9c | TC-36 a TC-38: recurso inexistente e lista vazia | Validar os recursos do pedido | Reaproveitar a tradução de erros da T-22 |
@@ -277,7 +292,7 @@ Na T-20 as assinaturas mínimas devolvem um resultado neutro (que não é aceite
 | 10 | TC-19 e TC-20: vários recursos | Verificar todos os recursos antes de gravar | Isolar a gravação em uma única operação |
 | 11 | TC-29 a TC-31: contrato HTTP | Mapear os erros para 400 e 409 no formato da T-22 | Consolidar a tradução dos erros |
 
-### 9. Revisão por pares
+## 9. Revisão por pares
 
 - [x] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
 - [x] As regras citam RNs que existem no PRD.
@@ -312,5 +327,6 @@ Resultado de `./scripts/validar-spec.sh` (preenchido pelo autor após o script p
 | 5 | Quais estados podem ser alterados | Só `SOLICITADA` e `APROVADA`, dentro do prazo da T-21 (CA-13); os outros devolvem 409 | CA-13, TC-39 a TC-41 |
 | 6 | Dono da reserva | O usuário autenticado; o corpo não traz o dono | CA-14, TC-42 e TC-43 |
 | 7 | Mensagem do 409 | Só o recurso e o fato; não revela quem reservou | CA-04, TC-44 |
+| 8 | Antecedência mínima do pedido | 1 h, inclusive; a reserva guarda `solicitada_em`; 409 se menos | CA-15, TC-45 a TC-47 |
 
-**Resultado:** _preencher_ (Liberada / Pendências) · AAAA-MM-DD
+**Resultado:** Pendências (o CA-15 é novo e precisa de nova revisão do Caio) · 2026-11-06
