@@ -46,7 +46,7 @@ Uma reserva é um pedido de uso de recursos (sala, material, professor) em um in
 - **RN-01:** o término da reserva deve ser posterior ao início. A comparação é entre data e hora. Término igual ou anterior ao início é recusado, e início ou término ausente também.
 - **RN-02:** reservas do mesmo recurso (sala, material ou professor) não podem se sobrepor. O pedido é verificado contra **cada** recurso pedido: basta um ocupado para recusar o pedido inteiro.
 
-- **Antecedência mínima (decisão do time, vem da T-21):** o pedido precisa ser feito com pelo menos 1 h de antecedência do início; exatamente 1 h ainda vale. A reserva guarda o instante do pedido (`solicitada_em`), porque os prazos de aprovação e de alteração da T-21 dependem dele.
+- **Antecedência mínima (decisão do time, vem da T-21):** o pedido precisa ser feito com pelo menos 1 h de antecedência do início; exatamente 1 h ainda vale. O instante do pedido é o `criada_em` da reserva (arquitetura 3.1), porque os prazos de aprovação e de alteração da T-21 dependem dele.
 - **Alteração (decisão do grill):** alterar uma reserva `APROVADA` a devolve ao estado `SOLICITADA`, a aguardar nova aprovação. O horário antigo é liberado e o novo é ocupado (`SOLICITADA` ocupa). Se a alteração for rejeitada ou o prazo de aprovação vencer (A-05), a reserva vira `REJEITADA` ou `CANCELADA` e o dono perde o horário antigo. A resposta avisa isso. O prazo para alterar (L11) é da T-21 (CA-13).
 
 **Premissas da arquitetura** (S-01 e S-02 são decisões do time; D-02 segue da arquitetura):
@@ -197,7 +197,7 @@ O **dono** da reserva é o usuário autenticado que fez o `POST`: o corpo não t
 - **Quando** o início está a menos de 1 h do instante do pedido
 - **Então** o pedido é recusado com 409 e nada é gravado
 - **E** com exatamente 1 h de antecedência, ou mais, o pedido é aceito
-- **E** a reserva guarda o instante do pedido
+- **E** o instante do pedido fica em `criada_em`
 
 ## 6. Casos de teste
 
@@ -251,7 +251,7 @@ Os casos da regra são testes **unitários** da regra de reserva, com o `Clock` 
 | TC-42 (sem caso no plano) | CA-14 | Classe válida | Usuário autenticado cria uma reserva | O dono é esse usuário | Unitário |
 | TC-43 (contrato) | CA-14 | Classe inválida | `POST /api/reservas` com um `solicitanteId` de outro usuário no corpo | 201; o dono é o usuário autenticado e o campo é ignorado | Integração |
 | TC-44 (contrato) | CA-04 | Conflito | `POST /api/reservas` sobreposta a uma reserva de outro usuário | 409; a mensagem cita o recurso e não cita o outro usuário | Integração |
-| TC-45 (sem caso no plano) | CA-15 | Valor limite | Pedido às 09:00 para as 10:00, exatamente 1 h antes | Aceita; guarda `solicitada_em = 09:00` | Unitário |
+| TC-45 (sem caso no plano) | CA-15 | Valor limite | Pedido às 09:00 para as 10:00, exatamente 1 h antes | Aceita; guarda `criada_em = 09:00` | Unitário |
 | TC-46 (sem caso no plano) | CA-15 | Valor limite | Pedido às 09:01 para as 10:00, 59 min antes | Recusa 409; nada é gravado | Unitário |
 | TC-47 (contrato) | CA-15 | Classe inválida | `POST /api/reservas` com início a 30 min do pedido | 409 `ProblemDetail`; nada é gravado | Integração |
 
@@ -327,6 +327,6 @@ Resultado de `./scripts/validar-spec.sh` (preenchido pelo autor após o script p
 | 5 | Quais estados podem ser alterados | Só `SOLICITADA` e `APROVADA`, dentro do prazo da T-21 (CA-13); os outros devolvem 409 | CA-13, TC-39 a TC-41 |
 | 6 | Dono da reserva | O usuário autenticado; o corpo não traz o dono | CA-14, TC-42 e TC-43 |
 | 7 | Mensagem do 409 | Só o recurso e o fato; não revela quem reservou | CA-04, TC-44 |
-| 8 | Antecedência mínima do pedido | 1 h, inclusive; a reserva guarda `solicitada_em`; 409 se menos | CA-15, TC-45 a TC-47 |
+| 8 | Antecedência mínima do pedido | 1 h, inclusive; a reserva guarda `criada_em`; 409 se menos | CA-15, TC-45 a TC-47 |
 
 **Resultado:** Pendências (o CA-15 é novo e precisa de nova revisão do Caio) · 2026-11-06
