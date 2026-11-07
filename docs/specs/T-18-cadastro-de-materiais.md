@@ -14,7 +14,7 @@ Rascunho → Em revisão → Aprovada → Validada → Liberada
 | Task | T-18 |
 | Autor(a) | @renatarsilva |
 | Revisor(a) | @Samwel-Merces |
-| Status | Rascunho |
+| Status | Em revisão |
 | Regra crítica | Não |
 | Requisitos | RF-02 |
 | Característica ISO 25010 | Adequação funcional |
@@ -28,12 +28,13 @@ O material (projetor, notebook, equipamentos) é o terceiro tipo de recurso (RF-
 
 **Dentro:**
 - Cadastrar, alterar, consultar (por id e em lista) e excluir material, com nome, tipo, patrimônio e o indicador `restrito`.
-- Migração Flyway de `recurso` (tipo `MATERIAL`) e `material`.
-- Validação de entrada e `409` para patrimônio repetido.
+- Migração Flyway da tabela `material`, ligada a `recurso` (tipo `MATERIAL`). A tabela `recurso` é criada pela T-16, a primeira das três tasks de cadastro; a T-17 e esta só acrescentam a sua tabela.
+- Validação de entrada e `409` para patrimônio ou nome repetidos.
 - Escrita só do Administrador; `401` e `403` conforme a T-15.
 
 **Fora (e por quê):**
 - A **situação** do material pedida no backlog: ela se choca com o período de manutenção (RN-04) e com a retirada (RF-09), que já definem se o material está disponível. Ver a premissa P-05.
+- O teste da recusa de exclusão de material **com** reserva, retirada ou manutenção: essas tabelas ainda não existem. A regra é garantida pela chave estrangeira `ON DELETE RESTRICT` (arquitetura 3.2, restrição 5) e testada na T-23 (reserva), na T-42 (retirada) e na T-35 (manutenção).
 - Retirada, devolução (RF-09) e manutenção (RN-04): são de outras tasks.
 - Pesquisa com filtros (RF-03).
 - O que o indicador `restrito` provoca (RN-07): aqui é só um dado.
@@ -47,11 +48,12 @@ O material (projetor, notebook, equipamentos) é o terceiro tipo de recurso (RF-
 
 **Propostas desta spec** (validação pendente):
 
-- **P-01:** o material tem `patrimonio`, obrigatório, com até 30 caracteres, único entre os materiais (sem diferenciar maiúsculas) e sem espaços nas pontas. **O modelo da arquitetura precisa ganhar essa coluna.**
+- **P-01:** o material tem `patrimonio`, obrigatório, com até 30 caracteres, único entre os materiais (sem diferenciar maiúsculas) e sem espaços nas pontas. No banco, a unicidade é um índice único sobre `lower(patrimonio)`. **O modelo da arquitetura precisa ganhar essa coluna.**
 - **P-02:** o nome e o tipo têm até 100 caracteres.
-- **P-03:** a exclusão só é permitida para material sem nenhuma reserva nem retirada; com reserva ou retirada, é recusada.
-- **P-04:** `restrito` é opcional e vale `false` quando não informado.
-- **P-05:** a situação do material não é um campo guardado: a disponibilidade vem da manutenção, da reserva e da retirada. Se o professor exigir um campo de situação, a spec muda.
+- **P-06:** o nome é único entre os materiais, como manda a restrição `UNIQUE (tipo, nome)` da arquitetura (3.2, restrição 8). Dois materiais iguais precisam de nomes diferentes, como "Projetor Epson 01" e "Projetor Epson 02".
+- **P-03:** a exclusão só é permitida para material sem nenhuma reserva, retirada nem período de manutenção; com qualquer um deles, é recusada. A garantia vem das chaves estrangeiras `ON DELETE RESTRICT`.
+- **P-04:** `restrito` é opcional e vale `false` quando não informado, no cadastro e na alteração. O `PUT` substitui o material por inteiro, então um `restrito` omitido volta a `false`.
+- **P-05:** a situação do material não é um campo guardado: a disponibilidade vem da manutenção, da reserva e da retirada. Se o time decidir guardar a situação, a spec muda.
 
 ## 4. Contrato da API
 
@@ -72,7 +74,7 @@ Endpoints propostos. Os erros seguem o formato da T-22 (`ProblemDetail`).
 | Exclusão | 204 | Sem corpo |
 | Campo ausente ou inválido | 400 | `ProblemDetail`, `erros` com campo e motivo |
 | Material não encontrado | 404 | `ProblemDetail`: "Recurso não encontrado" |
-| Patrimônio repetido, ou exclusão de material com reserva ou retirada | 409 | `ProblemDetail` em linguagem de negócio |
+| Patrimônio ou nome repetidos, ou exclusão de material com reserva, retirada ou manutenção | 409 | `ProblemDetail` em linguagem de negócio |
 | Sem autenticação ou sem permissão | 401 e 403 | `ProblemDetail` (T-15) |
 
 ## 5. Critérios de aceite
@@ -91,11 +93,12 @@ Endpoints propostos. Os erros seguem o formato da T-22 (`ProblemDetail`).
 - **Então** o pedido é recusado com `400` e nada é gravado
 - **E** o erro aponta cada campo inválido
 
-### CA-03: Patrimônio repetido é recusado
+### CA-03: Patrimônio ou nome repetido é recusado
 
 - **Dado** um material cadastrado
-- **Quando** o cliente cadastra outro com o mesmo patrimônio (ainda que com maiúsculas diferentes)
+- **Quando** o cliente cadastra outro com o mesmo patrimônio (ainda que com maiúsculas diferentes), ou com o mesmo nome
 - **Então** o pedido é recusado com `409` em linguagem de negócio
+- **E** a mensagem diz qual dos dois já existe
 
 ### CA-04: Administrador altera um material
 
@@ -103,6 +106,7 @@ Endpoints propostos. Os erros seguem o formato da T-22 (`ProblemDetail`).
 - **Quando** o Administrador o altera com dados válidos
 - **Então** a resposta é `200` com o material atualizado
 - **E** as validações do cadastro valem na alteração
+- **E** um `restrito` omitido no `PUT` volta a `false` (P-04)
 
 ### CA-05: Qualquer usuário autenticado consulta
 
@@ -116,12 +120,12 @@ Endpoints propostos. Os erros seguem o formato da T-22 (`ProblemDetail`).
 - **Quando** o cliente consulta, altera ou exclui
 - **Então** a resposta é `404` com "Recurso não encontrado"
 
-### CA-07: Exclusão só sem reserva nem retirada
+### CA-07: Exclusão de material sem vínculos
 
-- **Dado** um material
+- **Dado** um material sem reserva, retirada nem período de manutenção
 - **Quando** o Administrador o exclui
-- **Então** sem reserva nem retirada, a resposta é `204`
-- **E** com reserva ou retirada, a resposta é `409` e o material continua
+- **Então** a resposta é `204` e o material deixa de existir
+- **E** a recusa com `409` para material com reserva, retirada ou manutenção é garantida pelo banco e testada na T-23, na T-42 e na T-35 (P-03)
 
 ### CA-08: Só o Administrador escreve
 
@@ -135,13 +139,12 @@ Endpoints propostos. Os erros seguem o formato da T-22 (`ProblemDetail`).
 - **Dado** a migração Flyway aplicada
 - **Quando** um material é gravado
 - **Então** existe um registro em `recurso` com tipo `MATERIAL` e outro em `material` ligado a ele
-- **E** o patrimônio é único também no banco
+- **E** o patrimônio é único também no banco, sem diferenciar maiúsculas
+- **E** o nome é único por tipo de recurso no banco
 
 ## 6. Casos de teste
 
-Todo critério de aceite precisa de pelo menos um caso. Use classes de equivalência e valor limite.
-
-As validações são testadas em nível unitário; o contrato HTTP, a permissão e a gravação em integração, com o banco de teste (Testcontainers). O caso de exclusão com reserva ou retirada só roda quando essas tabelas existirem (ver riscos).
+As validações são testadas em nível unitário; o contrato HTTP, a permissão e a gravação em integração, com o banco de teste (Testcontainers). A exclusão de material com reserva, retirada ou manutenção não é testada aqui (ver escopo).
 
 | Caso | Critério | Técnica | Entrada | Resultado esperado | Nível |
 |---|---|---|---|---|---|
@@ -150,18 +153,22 @@ As validações são testadas em nível unitário; o contrato HTTP, a permissão
 | TC-03 | CA-02 | Valor limite | Patrimônio com 30 caracteres / com 31 | 30 aceita; 31 recusa (400) | Unitário |
 | TC-04 | CA-02 | Valor limite | Nome com 100 caracteres / com 101 | 100 aceita; 101 recusa (400) | Unitário |
 | TC-05 | CA-02 | Classe válida | Patrimônio com espaços nas pontas | Aceito, gravado sem os espaços | Unitário |
-| TC-06 | CA-03 | Classe inválida | Cadastrar "PAT-1" depois de "pat-1" | 409 | Integração |
+| TC-06 | CA-03 | Classe inválida | Cadastrar "PAT-1" depois de "pat-1" | 409; a mensagem cita o patrimônio | Integração |
 | TC-07 | CA-04 | Classe válida | Alterar o nome e o tipo de um material | 200 com os dados novos | Integração |
 | TC-08 | CA-04 | Classe válida | Alterar mantendo o próprio patrimônio | 200 (não conflita consigo mesmo) | Integração |
 | TC-09 | CA-04 | Classe inválida | Alterar o patrimônio para o de outro material | 409 | Integração |
 | TC-10 | CA-05 | Classe válida | SOLICITANTE, RESPONSAVEL e ADMINISTRADOR consultam por id e a lista | 200 para os três | Integração |
 | TC-11 | CA-06 | Classe inválida | `GET`, `PUT` e `DELETE` com id inexistente | 404 | Integração |
 | TC-12 | CA-07 | Classe válida | Excluir material sem reserva nem retirada | 204 | Integração |
-| TC-13 | CA-07 | Conflito | Excluir material que tem reserva ou retirada | 409; o material continua | Integração |
 | TC-14 | CA-08 | Tabela de decisão | SOLICITANTE e RESPONSAVEL em `POST`, `PUT` e `DELETE` | 403; nada é gravado | Integração |
 | TC-15 | CA-08 | Tabela de decisão | Anônimo em `POST`, `PUT`, `DELETE` e `GET` | 401 | Integração |
 | TC-16 | CA-09 | Classe válida | Gravar um material | 1 linha em `recurso` (tipo `MATERIAL`) e 1 em `material` | Integração |
-| TC-17 | CA-09 | Conflito | `INSERT` direto no banco com patrimônio repetido | Recusado pelo banco (`UNIQUE`) | Integração |
+| TC-17 | CA-09 | Conflito | `INSERT` direto no banco com patrimônio "PAT-1" depois de "pat-1" | Recusado pelo banco (índice único sobre `lower(patrimonio)`) | Integração |
+| TC-18 | CA-02 | Valor limite | Tipo com 100 caracteres / com 101 | 100 aceita; 101 recusa (400) | Unitário |
+| TC-19 | CA-04 | Classe válida | `PUT` sem o campo `restrito`, em um material que era `restrito = true` | 200; `restrito = false` | Integração |
+| TC-20 | CA-03 | Classe inválida | Cadastrar outro material com o mesmo nome e outro patrimônio | 409; a mensagem cita o nome | Integração |
+| TC-21 | CA-04 | Classe inválida | Alterar o nome para o de outro material | 409 | Integração |
+| TC-22 | CA-09 | Conflito | `INSERT` direto no banco com o mesmo tipo e nome | Recusado pelo banco (`UNIQUE (tipo, nome)`) | Integração |
 
 ## 7. Riscos
 
@@ -170,21 +177,23 @@ As validações são testadas em nível unitário; o contrato HTTP, a permissão
 | A permissão do Administrador é esquecida em `PUT` ou `DELETE` | Alto | TC-14 e TC-15 cobrem as três operações de escrita |
 | Patrimônio duplicado entra por outro caminho | Alto | TC-06 e TC-09 na regra e TC-17 no banco |
 | O modelo da arquitetura não tem a coluna de patrimônio | Médio | A revisão deve aprovar a mudança do modelo (P-01) e atualizar `docs/arquitetura.md` |
-| O backlog pede a situação do material e a spec não a guarda | Médio | Decisão explícita em P-05; levar ao professor |
-| Excluir material deixa reserva ou retirada órfã | Alto | TC-13 e a proposta P-03; depende das tabelas de reserva e retirada, então roda quando existirem |
-| As propostas P-01 a P-05 não foram validadas pelo professor | Baixo | Marcadas como propostas; mudar um limite altera poucos testes |
+| O backlog pede a situação do material e a spec não a guarda | Médio | Decisão explícita em P-05 |
+| Excluir material deixa reserva, retirada ou manutenção órfã | Alto | P-03 e a chave estrangeira `ON DELETE RESTRICT`; o teste da recusa fica na T-23, na T-42 e na T-35 |
+| Nome repetido de dois materiais iguais é recusado pela restrição `UNIQUE (tipo, nome)` | Médio | P-06, TC-20 a TC-22: a spec mantém a restrição da arquitetura e exige nomes diferentes |
+| A T-16, a T-17 e a T-18 criariam a mesma tabela `recurso` | Médio | Só a T-16 a cria; a T-17 e a T-18 só acrescentam a sua tabela (a T-18 depende da T-16 mergeada) |
+| As propostas P-01 a P-06 são decisões do time | Baixo | Marcadas como propostas; mudar um limite altera poucos testes |
 
 ## 8. Mini-plano de implementação (ciclos TDD)
 
 | Ciclo | Teste (red) | Implementação (green) | Refatoração prevista |
 |---|---|---|---|
-| 1 | TC-01: cadastro válido | Entidade, migração, repositório e serviço de material | Tratar `recurso` e `material` como um agregado |
-| 2 | TC-02 a TC-05: campos obrigatórios e tamanhos | Validação de obrigatórios, tamanhos e limpeza de espaços | Extrair a validação para o objeto de entrada |
-| 3 | TC-06, TC-08 e TC-09: patrimônio único | Verificação de patrimônio repetido sem diferenciar maiúsculas | Mover a regra para o serviço |
-| 4 | TC-07, TC-10 e TC-11: alteração, consulta e 404 | Alteração, consultas e `404` | Reaproveitar a validação do cadastro |
-| 5 | TC-12 e TC-13: exclusão | Exclusão permitida só sem reserva nem retirada | Mover a regra para o serviço |
+| 1 | TC-01: cadastro válido | Entidade, migração de `material` (ligada a `recurso`), repositório e serviço de material | Tratar `recurso` e `material` como um agregado |
+| 2 | TC-02 a TC-05 e TC-18: campos obrigatórios e tamanhos | Validação de obrigatórios, tamanhos de nome, tipo e patrimônio e limpeza de espaços | Extrair a validação para o objeto de entrada |
+| 3 | TC-06 e TC-20: patrimônio e nome únicos | Verificação de patrimônio (sem diferenciar maiúsculas) e de nome repetidos no cadastro | Mover a regra para o serviço |
+| 4 | TC-07 a TC-11, TC-19 e TC-21: alteração, consulta e 404 | Alteração (com o `PUT` substituindo por inteiro), consultas e `404`; unicidade na alteração | Reaproveitar a validação do cadastro |
+| 5 | TC-12: exclusão | Exclusão de material sem vínculos | Mover a regra para o serviço |
 | 6 | TC-14 e TC-15: permissão | Regra de perfil por operação (T-15) | Declarar o perfil exigido em um só lugar |
-| 7 | TC-16 e TC-17: estrutura do banco | `UNIQUE` do patrimônio e gravação em duas tabelas | Revisar a migração |
+| 7 | TC-16, TC-17 e TC-22: estrutura do banco | Índice único sobre `lower(patrimonio)`, `UNIQUE (tipo, nome)` e gravação em duas tabelas | Revisar a migração |
 
 ## 9. Revisão por pares
 
