@@ -486,6 +486,7 @@ erDiagram
     MATERIAL {
         bigint recurso_id PK, FK
         varchar tipo_material
+        varchar patrimonio "unico, sem diferenciar maiusculas"
     }
     RESERVA {
         bigint id PK
@@ -553,7 +554,11 @@ O banco é a última linha de defesa: as regras que protegem os limitadores de n
 | 5 | Nenhuma reserva é apagada: as chaves estrangeiras usam `ON DELETE RESTRICT`, e o cancelamento só muda o estado | `RESERVA` e tabelas filhas | RN-08 |
 | 6 | Auditoria só recebe inserções, sem alteração nem exclusão | `AUDITORIA` | RN-09 |
 | 7 | Uma retirada por recurso reservado, e a devolução não vem antes da retirada: `UNIQUE (reserva_recurso_id)` e `CHECK (devolvida_em IS NULL OR devolvida_em >= retirada_em)` | `RETIRADA` | RF-09 |
-| 8 | E-mail único por usuário e nome único por tipo de recurso: `UNIQUE (email)` e `UNIQUE (tipo, nome)` | `USUARIO`, `RECURSO` | RF-01, RF-02 |
+| 8 | E-mail único por usuário e nome único por tipo de recurso, sem diferenciar maiúsculas: `UNIQUE (email)` e `UNIQUE (tipo, lower(nome))`. O nome é guardado já sem espaços extras | `USUARIO`, `RECURSO` | RF-01, RF-02 |
+| 9 | Patrimônio único entre os materiais, sem diferenciar maiúsculas: índice único sobre `lower(patrimonio)` | `MATERIAL` | RF-02 (T-18, P-01) |
+| 10 | Nome da sala no padrão `sala-NN`: `CHECK (tipo <> 'SALA' OR nome ~ '^sala-[0-9]{2,3}$')` | `RECURSO` | RF-02 (T-16, P-01) |
+| 11 | Nome do professor no padrão `primeironome-ultimonome-matricula`, com matrícula de 5 dígitos: `CHECK (tipo <> 'PROFESSOR' OR nome ~ '^[a-z]+-[a-z]+-[0-9]{5}$')` | `RECURSO` | RF-02 (T-17, P-01) |
+| 12 | Capacidade da sala maior que zero: `CHECK (capacidade > 0)` | `SALA` | RF-02 (T-16, CA-09) |
 
 **A restrição 1 em SQL** (a extensão `btree_gist` permite combinar igualdade e sobreposição no mesmo índice):
 
