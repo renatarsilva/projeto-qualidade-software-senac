@@ -250,25 +250,27 @@ Os testes de integração usam um controller de teste (só em `src/test`) em uma
 - [x] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
 - [x] As regras citam RNs que existem no PRD.
 - [ ] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
-- [ ] Os casos de teste incluem valores limite e entradas inválidas.
+- [x] Os casos de teste incluem valores limite e entradas inválidas.
 - [ ] O contrato da API cobre os erros (400, 401, 403, 409).
 - [ ] Não há conflito com outras specs nem com os ADRs.
 
 **Comentários:**
 
-O objetivo e o escopo estão claros, e os requisitos citados existem no PRD. O formato do `ProblemDetail` está bem definido, e o `detail` fixo no erro 500 protege contra vazamento de detalhes internos. Os pontos abaixo precisam de ajuste porque as outras specs dependem desta.
+Reli a versão atual. A spec avançou bastante: os erros que o Spring já trata, `UNIQUE` e `EXCLUDE` como 409, o formato de 401 e 403, a rota de teste própria, as telas, os títulos em português e o status estão resolvidos. Os pontos abaixo tratam principalmente do encaixe com as outras specs.
 
-Critérios: "orientações gerais" no CA-05 não dá um resultado objetivo. A linha sobre as telas promete os mesmos erros da API, mas CA-05 e TC-10 cobrem só a falha não tratada; faltam 404 e 409 nas telas e a falha durante a renderização. O CA-06 também não exige `title` em português, então "Bad Request" passaria.
+Critério verificável: CA-01 e CA-02 ainda citam `/api/salas`, que esta task não cria, enquanto os testes usam `/api/testes-de-erro/**`. O CA-10 descreve a resposta de um filtro de segurança, mas TC-25 e TC-26 só testam a criação do objeto na fábrica. É preciso definir qual task prova a resposta real, com `Content-Type`, `title` e `instance`. A T-15 também passa a depender da fábrica da T-22, e isso não está no backlog.
 
-Testes: o tratamento genérico de `Exception` pode transformar em 500 erros que o Spring já trata, como JSON malformado, id não numérico, rota inexistente, 405 e 415. Faltam casos para eles. A lista de termos proibidos usa `at com.`, mas o pacote do projeto é `br.senac.recursos`, e ela também não cobre `INSERT`, `org.postgresql` e caminhos fora de `/src/`. No mini-plano, TC-03 não tem red real no ciclo 2, porque a regra de mínimo já precisa existir para TC-01 passar no ciclo 1.
+Contrato: o CA-08 leva qualquer outra falha de dados para 500, mas a T-18 conta com a chave estrangeira (SQLState 23503) para responder 409. É preciso incluir esse caso ou combinar que a T-18 verifica os vínculos no serviço. A spec trata 403 como erro de filtro, mas a T-21 gera 403 no serviço quando quem pede não é o dono. Falta definir essa exceção, para ela não cair no tratamento genérico como 500. O CA-06 também não define o cabeçalho `Accept`: com `Accept: application/json`, o Spring pode devolver `application/json` em vez de `application/problem+json`.
 
-Contrato: 401 e 403 ficam sem dono, porque a T-22 os deixa para a T-15 e a T-15 deixa o formato para a T-22. Esses erros acontecem nos filtros de segurança e não passam pelo advice, e o backlog pede formato único para todos os endpoints. Também é preciso definir que violação de restrição do banco (`UNIQUE` e `EXCLUDE`) vira 409: hoje o TC-08 leva falha de acesso a dados para 500, e quem perde a corrida entre pedidos simultâneos receberia 500.
+Conflitos: a T-16 espera `erros` com `campo = capacidade` para valores como `"abc"` e `2147483648`, mas a T-22 só define o campo para enum e regra entre campos, e `30.5` pode virar `30` na leitura do JSON. A mensagem fixa do 409 no banco não atende ao CA-03 da T-18, que pede para dizer qual campo repetiu, nem ao exemplo de sobreposição da T-20. É preciso aceitar a mensagem genérica nessas specs ou prever uma mensagem por restrição.
 
-Conflitos: o controller de teste usa `/api/salas`, a mesma rota que a T-16 vai criar, o que pode causar "Ambiguous mapping". Falta dizer como esses testes passam pela segurança. O `@RestControllerAdvice` precisa ficar limitado à API, senão também responde JSON nas telas do Thymeleaf. A lista `erros` não atende a T-21, que espera `campo = estado` para um enum inválido, nem a T-20, que espera `campo = termino` em uma regra que compara dois campos.
+Separação entre API e telas: a spec limita o tratamento a `/api/**`, mas `@RestControllerAdvice` limita por controlador, não por URL. Rota inexistente, 405 e 415 podem acontecer sem controlador escolhido, e falhas em filtros vão para `/error`. Falta definir o mecanismo que separa JSON e HTML nesses casos.
 
-Ajustes de texto: o status ainda está `Rascunho`, e a seção 11 deveria dizer "Não se aplica", porque a task não é crítica. As instruções do template continuam nas seções 3 e 6. Nos riscos, a medida candidata é a do RNF-07, não a do RNF-08.
+Testes: TC-21 e TC-22 simulam o SQLState; recomendo também um caso com viola\u00e7ão real no banco de teste. A lista de termos proibidos ainda não cobre `com.fasterxml`, `java.`, `org.hibernate`, `duplicate key`, `violates`, minúsculas e caminhos fora de `/src/`, e TC-16 a TC-20 não citam essa lista. A configuração de segurança de teste precisa definir a prioridade em relação às cadeias da T-15 e o tratamento de CSRF nos `POST`.
 
-**Parecer:** Ajustes necessários · @Samwel-Merces · 2026-11-05
+Ajuste de texto: nos riscos, a frase sobre a medida do RNF-07 não combina com a lista de termos proibidos, que é do RNF-08, e pode sair.
+
+**Parecer:** Ajustes necessários · @Samwel-Merces · 2026-11-07
 
 ## 10. Spec validation
 
