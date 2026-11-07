@@ -208,20 +208,25 @@ As validações são testadas em nível unitário; o contrato HTTP, a permissão
 - [x] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
 - [x] As regras citam RNs que existem no PRD.
 - [ ] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
-- [ ] Os casos de teste incluem valores limite e entradas inválidas.
+- [x] Os casos de teste incluem valores limite e entradas inválidas.
 - [x] O contrato da API cobre os erros (400, 401, 403, 409).
 - [ ] Não há conflito com outras specs nem com os ADRs.
 
 **Comentários:**
-O objetivo e o escopo da spec estão claros, e as funcionalidades fora do escopo estão justificadas. As regras citam requisitos que existem no PRD. O contrato da API contempla os erros 400, 401, 403 e 409, e há casos de teste associados aos critérios de aceite.
 
-Critério verificável: a parte do CA-07 "com reserva ou retirada" não pode ser verificada nesta task, porque essas tabelas ainda não existem e o TC-13 não roda no ciclo 5. É preciso indicar qual task fará esse teste ou tirar a exclusão do escopo. A P-03 também não considera material com período de manutenção.
+Reli a versão atual. A spec avançou bastante: o nome único, a criação de `recurso` pela T-16, o índice em `lower(patrimonio)`, o limite do tipo, a limpeza de espaços e a ordem de TC-08 e TC-09 estão resolvidos. O objetivo e o escopo continuam claros, e os casos de teste agora cobrem bem valores limite e entradas inválidas.
 
-Conflitos: a restrição `UNIQUE (tipo, nome)` da arquitetura (seção 3.2) impede dois materiais com o mesmo nome e patrimônios diferentes, e a spec não prevê esse caso. Além disso, T-16, T-17 e T-18 colocam a migração de `recurso` no próprio escopo, então é preciso definir qual task cria a tabela.
+Critério verificável: o último trecho do CA-07 fala da recusa com `409`, mas ela não pode ser verificada nesta task. Esse trecho deveria sair do critério e virar uma observação. A spec diz que o teste fica na T-23, na T-42 e na T-35, mas essas tasks não têm esse caso, então é preciso registrar a pendência no backlog ou em uma issue.
 
-Testes e regras: P-01 define a unicidade do patrimônio sem diferenciar maiúsculas, mas é necessário explicitar como essa regra também é garantida no banco. P-02 estabelece limite de 100 caracteres para nome e tipo, porém TC-04 cobre apenas o nome. O comportamento do campo `restrito` quando omitido no PUT não está definido. No mini-plano, TC-08 e TC-09 estão no ciclo 3, mas dependem do PUT, que só é implementado no ciclo 4.
+Exclusão: a spec conta com a chave estrangeira para responder `409`, mas a T-22 só traduz `UNIQUE` e `EXCLUDE`. Sem incluir a chave estrangeira ou checar os vínculos no serviço, a resposta seria 500. A restrição 5 da arquitetura também não cobre `PERIODO_MANUTENCAO`. O TC-12 confere só o `204`: falta provar que as linhas de `material` e `recurso` saíram e que o mesmo nome e patrimônio podem ser cadastrados de novo.
 
-**Parecer:** Ajustes necessários · @Samwel-Merces · 2026-11-05
+Conflitos: `UNIQUE (tipo, lower(nome))` não pode ser uma restrição de tabela no PostgreSQL; precisa ser um índice único. A T-16 e a T-17 continuam com `UNIQUE (tipo, nome)`, e a T-18 diz que só acrescenta `material`, mas o ciclo 7 precisaria alterar `recurso`. É preciso definir qual task cria o índice final. A arquitetura também precisa receber `patrimonio` e a nova restrição, e o backlog ainda cita só a T-15 como dependência da T-18.
+
+Regras: `restrito` omitido voltar a `false` no `PUT` retira a exigência de aprovação sem pedido explícito. Recomendo tornar o campo obrigatório no `PUT` ou registrar esse risco na seção 7. A P-05 deixou de citar o professor, embora o backlog peça a situação e a seção 3 ainda diga "validação pendente"; é preciso confirmar essa decisão.
+
+Testes: falta alterar maiúsculas ou espaços do próprio nome e do próprio patrimônio sem gerar `409`. O CA-03 pede para dizer qual campo já existe, mas a T-22 usa mensagem fixa quando o banco barra um pedido simultâneo, e não está definido o caso de nome e patrimônio repetidos juntos. TC-02 a TC-05, TC-18, TC-25 e TC-26 estão como unitários, mas esperam HTTP ou valor gravado. O TC-16 também não tem red real no ciclo 7, porque o ciclo 1 já grava nas duas tabelas.
+
+**Parecer:** Ajustes necessários · @Samwel-Merces · 2026-11-07
 
 ## 10. Spec validation
 
