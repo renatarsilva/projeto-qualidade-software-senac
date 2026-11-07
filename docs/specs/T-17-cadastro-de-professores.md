@@ -200,18 +200,32 @@ As validações são testadas em nível unitário; o contrato HTTP, a permissão
 
 ## 9. Revisão por pares
 
-- [x] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
+- [ ] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
 - [x] As regras citam RNs que existem no PRD.
-- [x] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
-- [x] Os casos de teste incluem valores limite e entradas inválidas.
-- [x] O contrato da API cobre os erros (400, 401, 403, 409).
-- [x] Não há conflito com outras specs nem com os ADRs.
+- [ ] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
+- [ ] Os casos de teste incluem valores limite e entradas inválidas.
+- [ ] O contrato da API cobre os erros (400, 401, 403, 409).
+- [ ] Não há conflito com outras specs nem com os ADRs.
 
-**Comentários:** Conferi objetivo, escopo, regras de negócio, critérios de aceite, contrato da API e casos de teste.
+**Comentários:**
 
-Os critérios permitem validar aprovação e falha de forma objetiva. Os casos de teste cobrem entradas válidas, inválidas, limites e cenários de autorização. Não encontrei inconsistências com o PRD, a arquitetura ou o ADR-0009.
+Reli a versão atual da spec, com atenção especial às alterações referentes ao nome e à matrícula do professor. A especificação ainda apresenta pontos que precisam ser corrigidos antes da aprovação.
 
-**Parecer:** Aprovada · @CaiosAguiar · 2026-11-05
+A matrícula de cinco dígitos aparece incorporada ao nome, mas a restrição `UNIQUE (tipo, nome)` compara o valor completo. Dessa forma, dois professores com nomes diferentes ainda podem ser cadastrados com a mesma matrícula. É necessário definir explicitamente se a matrícula deve ser única e, em caso positivo, criar uma restrição própria, um critério de aceite e casos de teste para matrícula duplicada.
+
+A exclusão de um professor relacionado a reservas ou outros registros depende de uma violação de chave estrangeira. Entretanto, a T-22 ainda não contempla o SQLState `23503`, tratando apenas violações como `23505` e `23P01`. O `ON DELETE RESTRICT` impede a exclusão no PostgreSQL, mas não garante sozinho que a API retorne `409 Conflict` com uma mensagem de negócio. Esse tratamento precisa ser definido nesta spec ou na T-22.
+
+O padrão do nome também precisa ser condicionado ao tipo `PROFESSOR`, pois a coluna `recurso.nome` é compartilhada por salas, professores e materiais. Um CHECK aplicado diretamente à coluna, sem considerar o tipo do recurso, pode recusar nomes válidos utilizados pelas specs T-16 e T-18. Os casos de teste correspondentes também precisam indicar explicitamente `tipo = PROFESSOR`.
+
+Além disso, a spec não define o tamanho máximo do nome. Sem esse limite, um valor pode atender à expressão regular, mas ultrapassar o tamanho da coluna e resultar em erro interno. O limite precisa aparecer na premissa correspondente, nos critérios de aceite e em casos de teste de fronteira.
+
+Também faltam cenários para atualização mantendo o próprio nome, recadastro do mesmo nome após a exclusão, nomes com separadores inválidos e cadastro de nomes diferentes com a mesma matrícula. Esses cenários são necessários para evitar falsos conflitos e comprovar que a exclusão remove corretamente os registros associados.
+
+Os campos opcionais ainda precisam ter comportamento definido. A spec deve esclarecer o que acontece quando `restrito` ou `competencias` são omitidos no cadastro ou na alteração, se competências omitidas são preservadas ou removidas e como espaços nas extremidades são tratados.
+
+Por fim, algumas responsabilidades aparecem prometidas sem uma task claramente responsável, e existem divergências com a T-22, com a tabela compartilhada `recurso` e com pontos da arquitetura. Esses conflitos precisam ser resolvidos e refletidos nos critérios e testes antes da aprovação.
+
+**Parecer:** Ajustes necessários · @CaiosAguiar · 2026-11-07
 
 ## 10. Spec validation
 
