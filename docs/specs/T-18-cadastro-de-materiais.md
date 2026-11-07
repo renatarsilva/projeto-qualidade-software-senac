@@ -227,26 +227,27 @@ Os testes TC-22 (índice de nome criado pela T-16) e TC-32 (tradução da corrid
 
 - [x] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
 - [x] As regras citam RNs que existem no PRD.
-- [ ] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
+- [x] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
 - [x] Os casos de teste incluem valores limite e entradas inválidas.
 - [x] O contrato da API cobre os erros (400, 401, 403, 409).
-- [ ] Não há conflito com outras specs nem com os ADRs.
-
+- [x] Não há conflito com outras specs nem com os ADRs.
 **Comentários:**
 
-Reli a versão atual. A spec avançou bastante: o nome único, a criação de `recurso` pela T-16, o índice em `lower(patrimonio)`, o limite do tipo, a limpeza de espaços e a ordem de TC-08 e TC-09 estão resolvidos. O objetivo e o escopo continuam claros, e os casos de teste agora cobrem bem valores limite e entradas inválidas.
+Reli a versão atual e os pontos das revisões anteriores foram tratados: a recusa da exclusão com vínculos saiu do CA-07 e foi para a T-61, a T-22 traduz a chave estrangeira para 409, o índice de nome ficou com a T-16, `restrito` é obrigatório no `PUT`, e os níveis de teste e os ciclos estão coerentes. A spec está pronta para seguir.
 
-Critério verificável: o último trecho do CA-07 fala da recusa com `409`, mas ela não pode ser verificada nesta task. Esse trecho deveria sair do critério e virar uma observação. A spec diz que o teste fica na T-23, na T-42 e na T-35, mas essas tasks não têm esse caso, então é preciso registrar a pendência no backlog ou em uma issue.
+A aprovação depende do merge do PR #34 e da T-16 antes deste PR, porque a T-18 usa a tabela `recurso`, o índice de nome e a T-61 definidos neles.
 
-Exclusão: a spec conta com a chave estrangeira para responder `409`, mas a T-22 só traduz `UNIQUE` e `EXCLUDE`. Sem incluir a chave estrangeira ou checar os vínculos no serviço, a resposta seria 500. A restrição 5 da arquitetura também não cobre `PERIODO_MANUTENCAO`. O TC-12 confere só o `204`: falta provar que as linhas de `material` e `recurso` saíram e que o mesmo nome e patrimônio podem ser cadastrados de novo.
+Pontos para acompanhar na implementação, sem bloquear a aprovação:
 
-Conflitos: `UNIQUE (tipo, lower(nome))` não pode ser uma restrição de tabela no PostgreSQL; precisa ser um índice único. A T-16 e a T-17 continuam com `UNIQUE (tipo, nome)`, e a T-18 diz que só acrescenta `material`, mas o ciclo 7 precisaria alterar `recurso`. É preciso definir qual task cria o índice final. A arquitetura também precisa receber `patrimonio` e a nova restrição, e o backlog ainda cita só a T-15 como dependência da T-18.
+- TC-11 deve incluir um id que existe em `recurso`, mas é de sala ou professor. `GET`, `PUT` e `DELETE` em `/api/materiais/{id}` devem responder 404 e não alterar o outro recurso.
+- O backlog ainda pede "situação" na T-18; vale ajustar esse texto no PR #34.
+- A spec diz que as regras novas entram no PRD, mas o PR #34 não traz regra de patrimônio nem de nome de material. Vale incluir uma RN ou tratá-las como premissas da spec.
+- A ordem 404 antes de 400 (TC-34) exige cuidado, porque a leitura do JSON e o `@Valid` normalmente rodam antes de buscar o material.
+- `restrito` deve ser `Boolean`, para `null` no `PUT` não virar `false`. Vale incluir esse caso.
+- A verificação de nome e patrimônio repetidos deve usar `lower()` no banco, para seguir a mesma regra dos índices.
+- Falta um caso de integração para a limpeza de espaços do tipo.
 
-Regras: `restrito` omitido voltar a `false` no `PUT` retira a exigência de aprovação sem pedido explícito. Recomendo tornar o campo obrigatório no `PUT` ou registrar esse risco na seção 7. A P-05 deixou de citar o professor, embora o backlog peça a situação e a seção 3 ainda diga "validação pendente"; é preciso confirmar essa decisão.
-
-Testes: falta alterar maiúsculas ou espaços do próprio nome e do próprio patrimônio sem gerar `409`. O CA-03 pede para dizer qual campo já existe, mas a T-22 usa mensagem fixa quando o banco barra um pedido simultâneo, e não está definido o caso de nome e patrimônio repetidos juntos. TC-02 a TC-05, TC-18, TC-25 e TC-26 estão como unitários, mas esperam HTTP ou valor gravado. O TC-16 também não tem red real no ciclo 7, porque o ciclo 1 já grava nas duas tabelas.
-
-**Parecer:** Ajustes necessários · @Samwel-Merces · 2026-11-07
+**Parecer:** Aprovada · @Samwel-Merces · 2026-11-07
 
 ## 10. Spec validation
 
