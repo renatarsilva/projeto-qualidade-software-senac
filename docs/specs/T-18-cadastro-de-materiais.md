@@ -48,9 +48,10 @@ O material (projetor, notebook, equipamentos) é o terceiro tipo de recurso (RF-
 
 **Propostas desta spec** (validação pendente):
 
-- **P-01:** o material tem `patrimonio`, obrigatório, com até 30 caracteres, único entre os materiais (sem diferenciar maiúsculas) e sem espaços nas pontas. No banco, a unicidade é um índice único sobre `lower(patrimonio)`. **O modelo da arquitetura precisa ganhar essa coluna.**
+- **P-01:** o material tem `patrimonio`, obrigatório, com até 30 caracteres, único entre os materiais (sem diferenciar maiúsculas) sem espaços nas pontas e com os espaços repetidos no meio reduzidos a um só (P-07). No banco, a unicidade é um índice único sobre `lower(patrimonio)`. **O modelo da arquitetura precisa ganhar essa coluna.**
 - **P-02:** o nome e o tipo têm até 100 caracteres.
-- **P-06:** o nome é único entre os materiais, como manda a restrição `UNIQUE (tipo, nome)` da arquitetura (3.2, restrição 8). Dois materiais iguais precisam de nomes diferentes, como "Projetor Epson 01" e "Projetor Epson 02".
+- **P-06:** o nome é único entre os materiais, sem diferenciar maiúsculas de minúsculas, como manda a restrição de nome único por tipo de recurso da arquitetura (3.2, restrição 8), que passa a ser `UNIQUE (tipo, lower(nome))`. Dois materiais iguais precisam de nomes diferentes, como "Projetor Epson 01" e "Projetor Epson 02".
+- **P-07:** o nome, o tipo e o patrimônio perdem os espaços das pontas e têm os espaços repetidos no meio reduzidos a um só antes de validar e gravar (`"  Projetor   Epson "` vira `"Projetor Epson"`). A unicidade e os limites de tamanho valem sobre o texto já limpo, e o banco guarda o texto limpo. O nome continua texto livre (sem padrão fixo).
 - **P-03:** a exclusão só é permitida para material sem nenhuma reserva, retirada nem período de manutenção; com qualquer um deles, é recusada. A garantia vem das chaves estrangeiras `ON DELETE RESTRICT`.
 - **P-04:** `restrito` é opcional e vale `false` quando não informado, no cadastro e na alteração. O `PUT` substitui o material por inteiro, então um `restrito` omitido volta a `false`.
 - **P-05:** a situação do material não é um campo guardado: a disponibilidade vem da manutenção, da reserva e da retirada. Se o time decidir guardar a situação, a spec muda.
@@ -96,7 +97,7 @@ Endpoints propostos. Os erros seguem o formato da T-22 (`ProblemDetail`).
 ### CA-03: Patrimônio ou nome repetido é recusado
 
 - **Dado** um material cadastrado
-- **Quando** o cliente cadastra outro com o mesmo patrimônio (ainda que com maiúsculas diferentes), ou com o mesmo nome
+- **Quando** o cliente cadastra outro com o mesmo patrimônio ou o mesmo nome (ainda que com maiúsculas ou espaços diferentes, P-06 e P-07)
 - **Então** o pedido é recusado com `409` em linguagem de negócio
 - **E** a mensagem diz qual dos dois já existe
 
@@ -140,7 +141,7 @@ Endpoints propostos. Os erros seguem o formato da T-22 (`ProblemDetail`).
 - **Quando** um material é gravado
 - **Então** existe um registro em `recurso` com tipo `MATERIAL` e outro em `material` ligado a ele
 - **E** o patrimônio é único também no banco, sem diferenciar maiúsculas
-- **E** o nome é único por tipo de recurso no banco
+- **E** o nome é único por tipo de recurso no banco, sem diferenciar maiúsculas
 
 ## 6. Casos de teste
 
@@ -168,7 +169,11 @@ As validações são testadas em nível unitário; o contrato HTTP, a permissão
 | TC-19 | CA-04 | Classe válida | `PUT` sem o campo `restrito`, em um material que era `restrito = true` | 200; `restrito = false` | Integração |
 | TC-20 | CA-03 | Classe inválida | Cadastrar outro material com o mesmo nome e outro patrimônio | 409; a mensagem cita o nome | Integração |
 | TC-21 | CA-04 | Classe inválida | Alterar o nome para o de outro material | 409 | Integração |
-| TC-22 | CA-09 | Conflito | `INSERT` direto no banco com o mesmo tipo e nome | Recusado pelo banco (`UNIQUE (tipo, nome)`) | Integração |
+| TC-22 | CA-09 | Conflito | `INSERT` direto no banco com o mesmo tipo e nome, em maiúsculas diferentes | Recusado pelo banco (`UNIQUE (tipo, lower(nome))`) | Integração |
+| TC-23 | CA-01 | Classe válida | Cadastro com nome `"  Projetor   Epson "` | 201; o nome gravado é `"Projetor Epson"` | Integração |
+| TC-24 | CA-03 | Classe inválida | Cadastrar `"projetor  epson"` (dois espaços, minúsculas) depois de `"Projetor Epson"` | 409; a mensagem cita o nome | Integração |
+| TC-25 | CA-02 | Valor limite | Nome de 100 caracteres mais espaços nas pontas / 101 caracteres depois da limpeza | O primeiro é aceito (conta 100); o segundo é recusado (400) | Unitário |
+| TC-26 | CA-02 | Classe válida | Patrimônio `"PAT   123"` (espaços repetidos no meio) | Aceito, gravado como `"PAT 123"` | Unitário |
 
 ## 7. Riscos
 
@@ -179,21 +184,22 @@ As validações são testadas em nível unitário; o contrato HTTP, a permissão
 | O modelo da arquitetura não tem a coluna de patrimônio | Médio | A revisão deve aprovar a mudança do modelo (P-01) e atualizar `docs/arquitetura.md` |
 | O backlog pede a situação do material e a spec não a guarda | Médio | Decisão explícita em P-05 |
 | Excluir material deixa reserva, retirada ou manutenção órfã | Alto | P-03 e a chave estrangeira `ON DELETE RESTRICT`; o teste da recusa fica na T-23, na T-42 e na T-35 |
-| Nome repetido de dois materiais iguais é recusado pela restrição `UNIQUE (tipo, nome)` | Médio | P-06, TC-20 a TC-22: a spec mantém a restrição da arquitetura e exige nomes diferentes |
+| Nome repetido, com maiúsculas ou espaços diferentes, de dois materiais iguais | Médio | P-06 e P-07, TC-20 a TC-24: a restrição da arquitetura passa a ser `UNIQUE (tipo, lower(nome))` e o nome é limpo antes de gravar; materiais iguais precisam de nomes diferentes |
+| Nomes parecidos, como "Projetor Epson" e "Projetor Epsom", são aceitos como materiais diferentes | Baixo | Aceito: o sistema compara só o texto limpo, não a semelhança. O Administrador corrige pela alteração (`PUT`) |
 | A T-16, a T-17 e a T-18 criariam a mesma tabela `recurso` | Médio | Só a T-16 a cria; a T-17 e a T-18 só acrescentam a sua tabela (a T-18 depende da T-16 mergeada) |
-| As propostas P-01 a P-06 são decisões do time | Baixo | Marcadas como propostas; mudar um limite altera poucos testes |
+| As propostas P-01 a P-07 são decisões do time | Baixo | Marcadas como propostas; mudar um limite altera poucos testes |
 
 ## 8. Mini-plano de implementação (ciclos TDD)
 
 | Ciclo | Teste (red) | Implementação (green) | Refatoração prevista |
 |---|---|---|---|
 | 1 | TC-01: cadastro válido | Entidade, migração de `material` (ligada a `recurso`), repositório e serviço de material | Tratar `recurso` e `material` como um agregado |
-| 2 | TC-02 a TC-05 e TC-18: campos obrigatórios e tamanhos | Validação de obrigatórios, tamanhos de nome, tipo e patrimônio e limpeza de espaços | Extrair a validação para o objeto de entrada |
-| 3 | TC-06 e TC-20: patrimônio e nome únicos | Verificação de patrimônio (sem diferenciar maiúsculas) e de nome repetidos no cadastro | Mover a regra para o serviço |
+| 2 | TC-02 a TC-05, TC-18, TC-23, TC-25 e TC-26: campos obrigatórios, tamanhos e limpeza de espaços | Limpeza de espaços (P-07) e validação de obrigatórios e de tamanhos de nome, tipo e patrimônio | Extrair a validação para o objeto de entrada |
+| 3 | TC-06, TC-20 e TC-24: patrimônio e nome únicos | Verificação de patrimônio (sem diferenciar maiúsculas) e de nome repetidos no cadastro | Mover a regra para o serviço |
 | 4 | TC-07 a TC-11, TC-19 e TC-21: alteração, consulta e 404 | Alteração (com o `PUT` substituindo por inteiro), consultas e `404`; unicidade na alteração | Reaproveitar a validação do cadastro |
 | 5 | TC-12: exclusão | Exclusão de material sem vínculos | Mover a regra para o serviço |
 | 6 | TC-14 e TC-15: permissão | Regra de perfil por operação (T-15) | Declarar o perfil exigido em um só lugar |
-| 7 | TC-16, TC-17 e TC-22: estrutura do banco | Índice único sobre `lower(patrimonio)`, `UNIQUE (tipo, nome)` e gravação em duas tabelas | Revisar a migração |
+| 7 | TC-16, TC-17 e TC-22: estrutura do banco | Índice único sobre `lower(patrimonio)`, `UNIQUE (tipo, lower(nome))` e gravação em duas tabelas | Revisar a migração |
 
 ## 9. Revisão por pares
 
