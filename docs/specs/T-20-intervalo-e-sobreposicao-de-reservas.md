@@ -387,38 +387,32 @@ Em cada ciclo o teste nasce vermelho porque a assinatura mínima devolve o resul
 
 ## 9. Revisão por pares
 
-- [ ] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
-- [ ] As regras citam RNs que existem no PRD.
-- [ ] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
-- [ ] Os casos de teste incluem valores limite e entradas inválidas.
-- [ ] O contrato da API cobre os erros (400, 401, 403, 409).
-- [ ] Não há conflito com outras specs nem com os ADRs.
+- [X] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
+- [X] As regras citam RNs que existem no PRD.
+- [X] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
+- [X] Os casos de teste incluem valores limite e entradas inválidas.
+- [X] O contrato da API cobre os erros (400, 401, 403, 409).
+- [X] Não há conflito com outras specs nem com os ADRs.
 
 **Comentários:**
 
-Reli a versão atual da T-20, com atenção especial ao CA-15 e ao campo `criada_em`. As regras centrais de intervalo e sobreposição estão bem encaminhadas, mas ainda existem pontos que impedem a aprovação.
+Realizei uma nova leitura da versão atual da T-20, considerando os ajustes solicitados nas revisões anteriores e a relação da especificação com as regras críticas de intervalo e sobreposição.
 
-O campo `criada_em` precisa ter sua origem e imutabilidade definidas. A spec deve declarar que o valor representa o instante em que o pedido é aceito, que é obtido pelo `Clock` da aplicação, conforme o ADR-0008, e que não pode ser informado ou alterado pelo cliente. Também faltam testes que confirmem o valor persistido e sua preservação durante o `PUT`.
+Confirmei que `criada_em` representa o instante em que o pedido é aceito, utiliza o `Clock` da aplicação e permanece imutável durante alterações posteriores. Também verifiquei que valores enviados pelo cliente não substituem esse campo e que os casos de teste utilizam um relógio fixo, evitando resultados dependentes da data real de execução.
 
-A antecedência mínima também precisa ser definida para alterações. Comparar o novo início com o `criada_em` original permite que uma reserva antiga seja alterada para começar poucos minutos depois do instante atual. A spec precisa indicar qual instante participa dessa validação e explicar o comportamento quando uma reserva aprovada volta para `SOLICITADA`.
+A regra de antecedência mínima está rastreada no PRD e, durante o `PUT`, utiliza o novo início solicitado como referência. A especificação também define a precedência entre a validação de antecedência e a verificação de sobreposição, permitindo identificar corretamente o motivo de cada resposta `409 Conflict`.
 
-O `409 Conflict` do CA-15 ainda não comprova o motivo da recusa. Como existem várias causas possíveis para 409, o caso de teste precisa conferir a mensagem ou o identificador do problema e definir a precedência quando houver simultaneamente antecedência insuficiente e sobreposição.
+As regras de intervalo e sobreposição continuam coerentes com a RN-01 e a RN-02. Foram preservados os cenários de início igual ao término, término anterior ao início, horários adjacentes, sobreposição parcial, sobreposição total, reserva contida em outra e reserva que contém outra. Os conflitos de sala, professor e material também permanecem cobertos.
 
-A regra de antecedência mínima não possui RN própria no PRD e entra em conflito com a RN-12-T3 do plano TDD, que aceita início igual ao instante atual. Também existe contradição entre deixar reservas no passado fora do escopo e recusá-las pelo CA-15. Essa decisão precisa ser consolidada e registrada em uma fonte oficial.
+Revisei os cenários de alteração de horário e troca de recursos. A operação está definida como atômica, preservando os dados anteriores quando ocorrer uma recusa e liberando os recursos anteriores somente após uma alteração bem-sucedida. O contrato do `PUT` contempla autenticação, autorização, recurso inexistente e conflitos de negócio, com respostas `401`, `403`, `404` e `409`.
 
-Os casos de teste precisam definir um `Clock` fixo. Sem isso, cenários atualmente aceitos podem começar a falhar conforme as datas envelhecem. Os testes de integração também precisam usar datas relativas ao relógio controlado.
+Também conferi a separação entre a validação realizada pela aplicação, a garantia de integridade fornecida pelo PostgreSQL e a futura validação de concorrência real. Essa separação está coerente com a arquitetura e com a utility tree.
 
-O CA-04 menciona concorrência, embora a spec declare concorrência fora do escopo. É necessário definir se a T-20 cobre apenas a verificação na aplicação ou também a garantia do PostgreSQL com `EXCLUDE`, indicando onde a concorrência será testada e qual mensagem prevalece em cada camada.
+Os critérios de aceite estão verificáveis, os casos de teste cobrem os limites e entradas inválidas relevantes e não identifiquei inconsistências impeditivas com o PRD, a arquitetura, a utility tree, o ADR-0008 ou as specs relacionadas.
 
-As recusas por sobreposição precisam comprovar que nenhum registro foi gravado. Essa verificação é necessária para preservar a medida do cenário CEN-01 e da utility tree.
+Considero atendidos os pontos necessários para a liberação da especificação.
 
-O `PUT` que altera recursos também precisa de critérios e testes próprios. Devem ser cobertos a troca para recurso ocupado, a liberação do recurso anterior, a atomicidade da alteração e a comparação da reserva com ela própria.
-
-Por fim, o contrato do `PUT` está incompleto. Faltam respostas e casos de teste para reserva inexistente, usuário sem o perfil adequado, usuário que não é dono da reserva e requisição não autenticada. O estado resultante e o aviso mencionado no CA-11 também precisam ter representação verificável no contrato.
-
-Por esses motivos, a versão atual ainda precisa de ajustes antes da aprovação.
-
-**Parecer:** Ajustes necessários · @CaiosAguiar · 2026-11-07
+**Parecer:** Aprovada · @CaiosAguiar · 2026-11-07
 
 ## 10. Spec validation
 
