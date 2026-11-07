@@ -14,7 +14,7 @@ Rascunho → Em revisão → Aprovada → Validada → Liberada
 | Task | T-15 |
 | Autor(a) | @renatarsilva |
 | Revisor(a) | @CaiosAguiar |
-| Status | Rascunho |
+| Status | Liberada |
 | Regra crítica | Sim |
 | Requisitos | RF-01, RNF-06 |
 | Característica ISO 25010 | Segurança |
@@ -40,7 +40,7 @@ Hoje o Spring Security sobe sem configuração: gera uma senha aleatória e não
 - A aprovação de recursos restritos (RN-07): semana 41.
 - Recuperação de senha, bloqueio por tentativas e autenticação em dois fatores: não estão nos requisitos.
 - SSO e provedores externos (FE-07).
-- O formato das respostas de erro: é da T-22. Esta spec só diz **qual** erro ocorre.
+- O formato das respostas de erro: é da T-22, inclusive a fábrica de `ProblemDetail` de `401` e `403` (T-22, CA-10). Esta spec diz **qual** erro ocorre e liga os filtros de segurança a essa fábrica.
 
 ## 3. Regras de negócio
 
@@ -287,7 +287,7 @@ A autorização é testada com um controller de teste (só em `src/test`) com um
 | 9 | TC-29: senha fora do log | Garantir que nenhum log ou resposta traga a senha | Revisar mensagens de log |
 | 10 | TC-35 e TC-36: segredo no ambiente | Falhar na inicialização sem a chave; remover segredos fixos | Documentar a variável de ambiente |
 
-### 9. Revisão por pares
+## 9. Revisão por pares
 
 - [x] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
 - [x] As regras citam RNs que existem no PRD.
@@ -306,8 +306,8 @@ Os cenários permitem verificar sucesso e falha de autenticação de forma objet
 
 Resultado de `./scripts/validar-spec.sh` (preenchido pelo autor após o script passar):
 
-- **Data:** _preencher_
-- **Resultado:** _preencher_
+- **Data:** 2026-11-06
+- **Resultado:** APROVADA na spec validation
 
 ## 11. Grill-with-docs
 
@@ -320,4 +320,4 @@ Resultado de `./scripts/validar-spec.sh` (preenchido pelo autor após o script p
 | 3 | Limite da senha | Contagem em bytes UTF-8, mensagem em linguagem simples, nada truncado em silêncio | P-02, CA-09, TC-43 |
 | 4 | Página sem permissão nas telas | `403` amigável com link para a página inicial; continua logado, sem ir para `/login` | CA-11, TC-32 |
 
-**Resultado:** _preencher_ (Liberada / Pendências) · AAAA-MM-DD
+**Resultado:** Liberada · 2026-11-06
