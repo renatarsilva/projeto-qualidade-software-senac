@@ -330,28 +330,28 @@ Nos ciclos 1 e 2, TC-02 e TC-03 já passam depois do primeiro verde e protegem o
 
 - [x] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
 - [x] As regras citam RNs que existem no PRD.
-- [ ] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
+- [x] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
 - [x] Os casos de teste incluem valores limite e entradas inválidas.
-- [ ] O contrato da API cobre os erros (400, 401, 403, 409).
-- [ ] Não há conflito com outras specs nem com os ADRs.
+- [x] O contrato da API cobre os erros (400, 401, 403, 409).
+- [x] Não há conflito com outras specs nem com os ADRs.
 
 **Comentários:**
 
-Reli a versão atual. A spec avançou bastante: os erros que o Spring já trata, `UNIQUE` e `EXCLUDE` como 409, o formato de 401 e 403, a rota de teste própria, as telas, os títulos em português e o status estão resolvidos. Os pontos abaixo tratam principalmente do encaixe com as outras specs.
+Reli a versão atual e os pontos das revisões anteriores foram tratados: a chave estrangeira vira 409, a leitura do JSON aponta o campo, o 403 do serviço tem tratamento, a separação entre API e telas é feita pelo caminho original, a lista de termos foi ampliada, e há testes reais no banco. A prova da resposta real de 401 e 403 ficou com a T-15, que agora verifica `Content-Type`, `title` e `instance`. A spec está pronta para seguir.
 
-Critério verificável: CA-01 e CA-02 ainda citam `/api/salas`, que esta task não cria, enquanto os testes usam `/api/testes-de-erro/**`. O CA-10 descreve a resposta de um filtro de segurança, mas TC-25 e TC-26 só testam a criação do objeto na fábrica. É preciso definir qual task prova a resposta real, com `Content-Type`, `title` e `instance`. A T-15 também passa a depender da fábrica da T-22, e isso não está no backlog.
+A aprovação depende do merge do PR #34 antes deste PR, porque a dependência da T-15 em relação à T-22 está nele.
 
-Contrato: o CA-08 leva qualquer outra falha de dados para 500, mas a T-18 conta com a chave estrangeira (SQLState 23503) para responder 409. É preciso incluir esse caso ou combinar que a T-18 verifica os vínculos no serviço. A spec trata 403 como erro de filtro, mas a T-21 gera 403 no serviço quando quem pede não é o dono. Falta definir essa exceção, para ela não cair no tratamento genérico como 500. O CA-06 também não define o cabeçalho `Accept`: com `Accept: application/json`, o Spring pode devolver `application/json` em vez de `application/problem+json`.
+Pontos para acompanhar na implementação, sem bloquear a aprovação:
 
-Conflitos: a T-16 espera `erros` com `campo = capacidade` para valores como `"abc"` e `2147483648`, mas a T-22 só define o campo para enum e regra entre campos, e `30.5` pode virar `30` na leitura do JSON. A mensagem fixa do 409 no banco não atende ao CA-03 da T-18, que pede para dizer qual campo repetiu, nem ao exemplo de sobreposição da T-20. É preciso aceitar a mensagem genérica nessas specs ou prever uma mensagem por restrição.
+- A ordem `404` e `403` por dono antes de `400` precisa de um mecanismo, porque a leitura do JSON e o `@Valid` normalmente rodam antes do serviço. Também falta dizer se JSON malformado fica fora dessa ordem. T-16, T-18, T-20 e T-21 dependem dessa decisão.
+- O ciclo 12 reaproveita a fábrica de 403, mas ela só é criada no ciclo 15. A fábrica precisa vir antes.
+- TC-33 e o caso `2147483648` do TC-36 não passam só com o ciclo 7, porque `erros` com o campo só aparece no ciclo 11.
+- Falta definir o formato de `campo` em lista ou objeto aninhado, como `recursos[0].id`, com um caso de teste.
+- A busca da lista de termos pode dar falso positivo em HTML com `<select>` ou `form-select`. Vale buscar no texto visível ou usar padrões como `select .* from`.
+- As telas prometem os mesmos erros da API, mas não há caso para 400 e 405. Vale cobrir esses códigos ou limitar a frase.
+- O log técnico não deve registrar senha, token nem o corpo da requisição.
 
-Separação entre API e telas: a spec limita o tratamento a `/api/**`, mas `@RestControllerAdvice` limita por controlador, não por URL. Rota inexistente, 405 e 415 podem acontecer sem controlador escolhido, e falhas em filtros vão para `/error`. Falta definir o mecanismo que separa JSON e HTML nesses casos.
-
-Testes: TC-21 e TC-22 simulam o SQLState; recomendo também um caso com viola\u00e7ão real no banco de teste. A lista de termos proibidos ainda não cobre `com.fasterxml`, `java.`, `org.hibernate`, `duplicate key`, `violates`, minúsculas e caminhos fora de `/src/`, e TC-16 a TC-20 não citam essa lista. A configuração de segurança de teste precisa definir a prioridade em relação às cadeias da T-15 e o tratamento de CSRF nos `POST`.
-
-Ajuste de texto: nos riscos, a frase sobre a medida do RNF-07 não combina com a lista de termos proibidos, que é do RNF-08, e pode sair.
-
-**Parecer:** Ajustes necessários · @Samwel-Merces · 2026-11-07
+**Parecer:** Aprovada · @Samwel-Merces · 2026-11-07
 
 ## 10. Spec validation
 
