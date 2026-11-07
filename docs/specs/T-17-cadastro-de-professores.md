@@ -14,7 +14,7 @@ Rascunho → Em revisão → Aprovada → Validada → Liberada
 | Task | T-17 |
 | Autor(a) | @renatarsilva |
 | Revisor(a) | @CaiosAguiar |
-| Status | Rascunho |
+| Status | Em revisão |
 | Regra crítica | Não |
 | Requisitos | RF-02 |
 | Característica ISO 25010 | Adequação funcional |
@@ -28,12 +28,13 @@ O professor também é um recurso reservável (RF-02): a agenda dele não pode t
 
 **Dentro:**
 - Cadastrar, alterar, consultar (por id e em lista) e excluir professor, com nome, indicador `restrito` e lista de competências.
-- Migração Flyway de `recurso` (tipo `PROFESSOR`), `professor` e `competencia`.
-- Validação de nome e de competências.
+- Migração Flyway das tabelas `professor` e `competencia`, ligadas a `recurso` (tipo `PROFESSOR`). A tabela `recurso` é criada pela T-16, a primeira das três tasks de cadastro; esta task só acrescenta as suas tabelas.
+- Validação de nome e de competências, e `409` para nome repetido.
 - Escrita só do Administrador; `401` e `403` conforme a T-15.
 
 **Fora (e por quê):**
 - Pesquisa por competência (RF-03): é de outra task.
+- O teste da recusa de exclusão de professor **com** reserva ou manutenção: essas tabelas ainda não existem. A regra é garantida pela chave estrangeira `ON DELETE RESTRICT` (arquitetura 3.2, restrição 5) e testada na T-23 (reserva) e na T-35 (manutenção).
 - A agenda e a sobreposição do professor (RN-02): são das T-20 e T-23.
 - Ligar o professor a um usuário do sistema: o ADR-0009 os mantém separados.
 - O formato das respostas de erro (T-22) e a autenticação (T-15).
@@ -46,10 +47,10 @@ O professor também é um recurso reservável (RF-02): a agenda dele não pode t
 
 **Propostas desta spec** (validação pendente):
 
-- **P-01:** o nome tem até 100 caracteres. Dois professores podem ter o mesmo nome, porque podem existir homônimos e o modelo não tem outro identificador.
+- **P-01:** o nome tem até 100 caracteres e é único entre os professores, como manda a restrição `UNIQUE (tipo, nome)` da arquitetura (3.2, restrição 8). Homônimos usam um nome distinto, como "Ana Souza (Dados)" e "Ana Souza (Redes)".
 - **P-02:** cada competência tem até 80 caracteres e é única dentro do mesmo professor, sem diferenciar maiúsculas de minúsculas. A lista pode ser vazia.
 - **P-03:** ao alterar, a lista de competências enviada **substitui** a anterior.
-- **P-04:** a exclusão só é permitida para professor sem nenhuma reserva (nem no histórico); com reserva, é recusada. Ao excluir, as competências saem junto.
+- **P-04:** a exclusão só é permitida para professor sem nenhuma reserva (nem no histórico) nem período de manutenção; com qualquer um deles, é recusada. A garantia vem das chaves estrangeiras `ON DELETE RESTRICT`. Ao excluir, as competências saem junto.
 - **P-05:** `restrito` é opcional e vale `false` quando não informado.
 
 ## 4. Contrato da API
@@ -70,8 +71,9 @@ Endpoints propostos. Os erros seguem o formato da T-22 (`ProblemDetail`).
 | Alteração ou consulta | 200 | O professor (ou a lista) |
 | Exclusão | 204 | Sem corpo |
 | Nome ou competência inválidos | 400 | `ProblemDetail`, `erros` com campo e motivo |
+| Nome repetido | 409 | `ProblemDetail` em linguagem de negócio, por exemplo "Já existe um professor com esse nome" |
 | Professor não encontrado | 404 | `ProblemDetail`: "Recurso não encontrado" |
-| Exclusão de professor com reserva | 409 | `ProblemDetail` em linguagem de negócio |
+| Exclusão de professor com reserva ou manutenção | 409 | `ProblemDetail` em linguagem de negócio |
 | Sem autenticação ou sem permissão | 401 e 403 | `ProblemDetail` (T-15) |
 
 ## 5. Critérios de aceite
@@ -115,12 +117,12 @@ Endpoints propostos. Os erros seguem o formato da T-22 (`ProblemDetail`).
 - **Quando** o cliente consulta, altera ou exclui
 - **Então** a resposta é `404` com "Recurso não encontrado"
 
-### CA-07: Exclusão só sem reserva
+### CA-07: Exclusão de professor sem vínculos
 
-- **Dado** um professor
+- **Dado** um professor sem reserva nem período de manutenção
 - **Quando** o Administrador o exclui
-- **Então** sem nenhuma reserva, a resposta é `204` e as competências saem junto
-- **E** com reserva, a resposta é `409` e o professor continua
+- **Então** a resposta é `204` e as competências saem junto
+- **E** a recusa com `409` para professor com reserva ou manutenção é garantida pelo banco e testada na T-23 e na T-35 (P-04)
 
 ### CA-08: Só o Administrador escreve
 
@@ -134,12 +136,17 @@ Endpoints propostos. Os erros seguem o formato da T-22 (`ProblemDetail`).
 - **Dado** a migração Flyway aplicada
 - **Quando** um professor é gravado
 - **Então** existe um registro em `recurso` com tipo `PROFESSOR`, outro em `professor` e um em `competencia` por competência
+- **E** o nome é único por tipo de recurso também no banco
+
+### CA-10: Nome repetido é recusado
+
+- **Dado** um professor cadastrado
+- **Quando** o cliente cadastra outro professor com o mesmo nome, ou altera o nome de um para o de outro
+- **Então** o pedido é recusado com `409` em linguagem de negócio e nada é gravado
 
 ## 6. Casos de teste
 
-Todo critério de aceite precisa de pelo menos um caso. Use classes de equivalência e valor limite.
-
-As validações são testadas em nível unitário; o contrato HTTP, a permissão e a gravação em integração, com o banco de teste (Testcontainers). O caso de exclusão com reserva só roda quando a tabela de reserva existir (ver riscos).
+As validações são testadas em nível unitário; o contrato HTTP, a permissão e a gravação em integração, com o banco de teste (Testcontainers). A exclusão de professor com reserva ou manutenção não é testada aqui (ver escopo).
 
 | Caso | Critério | Técnica | Entrada | Resultado esperado | Nível |
 |---|---|---|---|---|---|
@@ -154,35 +161,38 @@ As validações são testadas em nível unitário; o contrato HTTP, a permissão
 | TC-09 | CA-05 | Classe válida | SOLICITANTE, RESPONSAVEL e ADMINISTRADOR consultam por id e a lista | 200 para os três, com competências | Integração |
 | TC-10 | CA-06 | Classe inválida | `GET`, `PUT` e `DELETE` com id inexistente | 404 | Integração |
 | TC-11 | CA-07 | Classe válida | Excluir professor sem nenhuma reserva | 204; professor e competências somem | Integração |
-| TC-12 | CA-07 | Conflito | Excluir professor que tem reserva | 409; o professor continua | Integração |
 | TC-13 | CA-08 | Tabela de decisão | SOLICITANTE e RESPONSAVEL em `POST`, `PUT` e `DELETE` | 403; nada é gravado | Integração |
 | TC-14 | CA-08 | Tabela de decisão | Anônimo em `POST`, `PUT`, `DELETE` e `GET` | 401 | Integração |
 | TC-15 | CA-09 | Classe válida | Gravar um professor com 2 competências | 1 linha em `recurso` (tipo `PROFESSOR`), 1 em `professor`, 2 em `competencia` | Integração |
+| TC-16 | CA-10 | Classe inválida | Cadastrar outro professor com o mesmo nome | 409; nada é gravado | Integração |
+| TC-17 | CA-10 | Classe inválida | Alterar o nome de um professor para o de outro | 409 | Integração |
+| TC-18 | CA-09 | Conflito | `INSERT` direto no banco com o mesmo tipo e nome | Recusado pelo banco (`UNIQUE (tipo, nome)`) | Integração |
 
 ## 7. Riscos
 
 | Risco | Impacto | Como a spec ou os testes tratam |
 |---|---|---|
 | A permissão do Administrador é esquecida em `PUT` ou `DELETE` | Alto | TC-13 e TC-14 cobrem as três operações de escrita |
-| Excluir professor deixa reservas órfãs | Alto | TC-12 e a proposta P-04; depende da tabela de reserva (T-23), então roda quando ela existir |
+| Excluir professor deixa reserva ou manutenção órfã | Alto | P-04 e a chave estrangeira `ON DELETE RESTRICT`; o teste da recusa fica na T-23 e na T-35 |
 | Competência duplicada por diferença de maiúsculas | Baixo | TC-07 |
-| Homônimos criam dois professores iguais por engano | Baixo | Aceito (P-01); o modelo não tem outro identificador |
+| Dois professores com o mesmo nome (homônimos) são recusados pela restrição `UNIQUE (tipo, nome)` | Médio | P-01, TC-16 a TC-18: a spec mantém a restrição da arquitetura e exige um nome distinto |
+| A T-16, a T-17 e a T-18 criariam a mesma tabela `recurso` | Médio | Só a T-16 a cria; a T-17 e a T-18 só acrescentam as suas tabelas (a T-17 depende da T-16 mergeada) |
 | Pesquisa por competência (RF-03) fica sem dono | Médio | Fora desta spec; a lista de competências já fica pronta para a pesquisa |
-| As propostas P-01 a P-05 não foram validadas pelo professor | Baixo | Marcadas como propostas; mudar um limite altera poucos testes |
+| As propostas P-01 a P-05 são decisões do time | Baixo | Marcadas como propostas; mudar um limite altera poucos testes |
 
 ## 8. Mini-plano de implementação (ciclos TDD)
 
 | Ciclo | Teste (red) | Implementação (green) | Refatoração prevista |
 |---|---|---|---|
 | 1 | TC-01 e TC-02: cadastro válido | Entidade, migração, repositório e serviço de professor | Tratar `recurso` e `professor` como um agregado |
-| 2 | TC-03 e TC-04: nome | Validação de nome | Extrair a validação para o objeto de entrada |
+| 2 | TC-03, TC-04 e TC-16: nome | Validação de nome e recusa de nome repetido no cadastro | Extrair a validação para o objeto de entrada |
 | 3 | TC-05 a TC-07: competências | Validação de tamanho, vazio e repetição | Isolar a regra das competências |
-| 4 | TC-08 a TC-10: alteração, consulta e 404 | Alteração que substitui a lista, consultas e `404` | Reaproveitar a validação do cadastro |
-| 5 | TC-11 e TC-12: exclusão | Exclusão permitida só sem reserva | Mover a regra para o serviço |
+| 4 | TC-08 a TC-10 e TC-17: alteração, consulta e 404 | Alteração que substitui a lista, nome único na alteração, consultas e `404` | Reaproveitar a validação do cadastro |
+| 5 | TC-11: exclusão | Exclusão de professor sem vínculos | Mover a regra para o serviço |
 | 6 | TC-13 e TC-14: permissão | Regra de perfil por operação (T-15) | Declarar o perfil exigido em um só lugar |
-| 7 | TC-15: estrutura do banco | Gravação em três tabelas | Revisar a migração |
+| 7 | TC-15 e TC-18: estrutura do banco | Gravação em três tabelas e `UNIQUE (tipo, nome)` | Revisar a migração |
 
-### 9. Revisão por pares
+## 9. Revisão por pares
 
 - [x] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
 - [x] As regras citam RNs que existem no PRD.
