@@ -14,7 +14,7 @@ Rascunho → Em revisão → Aprovada → Validada → Liberada
 | Task | T-16 |
 | Autor(a) | @renatarsilva |
 | Revisor(a) | @Samwel-Merces |
-| Status | Rascunho |
+| Status | Em revisão |
 | Regra crítica | Não |
 | Requisitos | RF-02 |
 | Característica ISO 25010 | Adequação funcional |
@@ -28,7 +28,7 @@ A sala é o recurso principal das reservas (RF-02). Esta task cria o cadastro e 
 
 **Dentro:**
 - Cadastrar, alterar e consultar sala (por id e em lista), com nome, tipo da sala, capacidade, localização e o indicador `restrito`.
-- Migração Flyway das tabelas `recurso` e `sala`, conforme o modelo da arquitetura (D-02).
+- Migração Flyway das tabelas `recurso` e `sala`, conforme o modelo da arquitetura (D-02). **Esta task cria a tabela `recurso`**; a T-17 (professores) e a T-18 (materiais) só acrescentam as suas tabelas e dependem desta migração.
 - Validação de entrada e `409` para nome repetido.
 - Cadastro e alteração só do Administrador; `401` e `403` conforme a T-15.
 
@@ -46,12 +46,13 @@ A sala é o recurso principal das reservas (RF-02). Esta task cria o cadastro e 
 - **Modelo (arquitetura 3.1):** a sala é um `recurso` do tipo `SALA`, com `nome` e `restrito`, mais `capacidade`, `localizacao` e `tipo_sala`.
 - **S-03:** todo recurso tem o indicador booleano `restrito`.
 
-**Propostas desta spec** (o PRD não as define; validação pendente):
+**Propostas desta spec** (o PRD não as define; são decisões do time):
 
-- **P-01:** o nome da sala é único entre as salas (sem diferenciar maiúsculas de minúsculas) e tem até 100 caracteres. Localização e tipo da sala também têm até 100.
+- **P-01:** o nome da sala segue exatamente o padrão `sala-` seguido de 2 ou 3 dígitos (`sala-01`, `sala-99`, `sala-102`), tudo em minúsculas, sem espaços e sem nenhum outro caractere. Qualquer nome fora do padrão (espaço na frente ou atrás, `Sala-01`, `SALA-01`, `sala 01`, `saal-01`, `sala-1`, `sala-01x`) é recusado com `400`, e nada é corrigido automaticamente. O nome é único entre as salas. No banco, o padrão é um `CHECK` e a unicidade é a restrição `UNIQUE (tipo, nome)` da arquitetura (3.2, restrição 8). O tipo da sala e a localização têm até 100 caracteres.
 - **P-02:** não existe exclusão de sala nesta task. Quando houver, só poderá ocorrer para sala sem nenhuma reserva.
-- **P-03:** `restrito` é opcional e vale `false` quando não informado.
-- **P-04:** a capacidade é um número inteiro maior que zero, sem limite máximo definido.
+- **P-03:** `restrito` é opcional e vale `false` quando não informado, no cadastro e na alteração. O `PUT` substitui a sala por inteiro, então um `restrito` omitido volta a `false`.
+- **P-04:** a capacidade é um número inteiro maior que zero. Não há limite de negócio, mas o valor precisa caber no inteiro do banco (até 2.147.483.647); acima disso, `400`.
+- **P-05:** o tipo da sala e a localização perdem os espaços das pontas e têm os espaços repetidos no meio reduzidos a um só antes de validar e gravar. O nome **não** passa por limpeza: um espaço no nome é erro (P-01).
 
 ## 4. Contrato da API
 
@@ -60,7 +61,7 @@ Endpoints propostos. Os erros seguem o formato da T-22 (`ProblemDetail`).
 `POST /api/salas`: cadastra uma sala (ADMINISTRADOR).
 
 ```json
-{ "nome": "Sala 102", "tipoSala": "Laboratório", "capacidade": 30, "localizacao": "Bloco B, 1º andar", "restrito": false }
+{ "nome": "sala-102", "tipoSala": "Laboratório", "capacidade": 30, "localizacao": "Bloco B, 1º andar", "restrito": false }
 ```
 
 `PUT /api/salas/{id}`: altera uma sala, com o mesmo corpo (ADMINISTRADOR).
@@ -90,21 +91,21 @@ Endpoints propostos. Os erros seguem o formato da T-22 (`ProblemDetail`).
 ### CA-02: Capacidade menor que 1 é recusada
 
 - **Dado** o cadastro ou a alteração de sala
-- **Quando** o cliente informa capacidade 0, negativa ou que não é número inteiro
+- **Quando** o cliente informa capacidade 0, negativa, decimal, acima de 2.147.483.647 ou que não é número
 - **Então** o pedido é recusado com `400` e nada é gravado
 - **E** o erro aponta o campo `capacidade` com o motivo "deve ser maior que zero"
 
 ### CA-03: Campos obrigatórios ausentes são recusados
 
 - **Dado** o cadastro ou a alteração de sala
-- **Quando** o cliente deixa em branco o nome, o tipo, a capacidade ou a localização
+- **Quando** o cliente deixa em branco o nome, o tipo, a capacidade ou a localização, ou passa de 100 caracteres no tipo ou na localização
 - **Então** o pedido é recusado com `400` e nada é gravado
-- **E** o erro aponta cada campo ausente
+- **E** o erro aponta cada campo inválido
 
 ### CA-04: Nome repetido é recusado
 
 - **Dado** uma sala já cadastrada
-- **Quando** o cliente cadastra outra sala com o mesmo nome (ainda que com maiúsculas diferentes)
+- **Quando** o cliente cadastra outra sala com o mesmo nome, ou altera o nome de uma sala para o de outra
 - **Então** o pedido é recusado com `409` em linguagem de negócio
 
 ### CA-05: Administrador altera uma sala
@@ -113,6 +114,7 @@ Endpoints propostos. Os erros seguem o formato da T-22 (`ProblemDetail`).
 - **Quando** o Administrador a altera com dados válidos
 - **Então** a resposta é `200` com a sala atualizada
 - **E** as mesmas validações do cadastro valem na alteração
+- **E** um `restrito` omitido no `PUT` volta a `false` (P-03)
 
 ### CA-06: Qualquer usuário autenticado consulta
 
@@ -139,10 +141,17 @@ Endpoints propostos. Os erros seguem o formato da T-22 (`ProblemDetail`).
 - **Quando** uma sala é gravada
 - **Então** existe um registro em `recurso` com tipo `SALA` e outro em `sala` ligado a ele
 - **E** a capacidade só aceita valores maiores que zero também no banco
+- **E** o nome só aceita o padrão `sala-NN` (`CHECK`) e é único por tipo de recurso também no banco
+
+### CA-10: O nome segue o padrão sala-NN
+
+- **Dado** o cadastro ou a alteração de sala
+- **Quando** o nome não é exatamente `sala-` seguido de 2 ou 3 dígitos, em minúsculas: com espaço na frente, atrás ou no meio, com maiúscula, com erro na palavra `sala`, com 1 ou 4 dígitos, ou com qualquer outro caractere
+- **Então** o pedido é recusado com `400` e nada é gravado
+- **E** o erro aponta o campo `nome` com o motivo "deve seguir o padrão sala-NN"
+- **E** um nome no padrão é aceito (`sala-01`, `sala-99`, `sala-102`, `sala-999`)
 
 ## 6. Casos de teste
-
-Todo critério de aceite precisa de pelo menos um caso. Use classes de equivalência e valor limite.
 
 As regras de validação são testadas em nível unitário; o contrato HTTP, a permissão e a gravação em integração, com o banco de teste (Testcontainers).
 
@@ -156,8 +165,8 @@ As regras de validação são testadas em nível unitário; o contrato HTTP, a p
 | TC-06 | CA-03 | Classe inválida | Nome ausente | 400, `erros` com `campo = nome` | Unitário |
 | TC-07 | CA-03 | Classe inválida | Nome só com espaços | 400 | Unitário |
 | TC-08 | CA-03 | Classe inválida | Tipo, capacidade ou localização ausentes | 400; cada campo ausente aparece em `erros` | Unitário |
-| TC-09 | CA-03 | Valor limite | Nome com 100 caracteres / com 101 | 100 aceita; 101 recusa (400) | Unitário |
-| TC-10 | CA-04 | Classe inválida | Cadastrar "Sala 102" depois de "sala 102" | 409 | Integração |
+| TC-09 | CA-10 | Valor limite | Nome `sala-01` (2 dígitos) / `sala-1` (1 dígito) | `sala-01` aceita; `sala-1` recusa (400) | Unitário |
+| TC-10 | CA-04 | Classe inválida | Cadastrar `sala-01` depois de `sala-01` | 409 | Integração |
 | TC-11 | CA-05 | Classe válida | Alterar o nome e a capacidade de uma sala | 200 com os dados novos | Integração |
 | TC-12 | CA-05 | Classe inválida | Alterar a capacidade para 0 | 400; a sala não muda | Integração |
 | TC-13 | CA-05 | Classe inválida | Alterar mantendo o próprio nome | 200 (não conflita consigo mesma) | Integração |
@@ -167,6 +176,16 @@ As regras de validação são testadas em nível unitário; o contrato HTTP, a p
 | TC-17 | CA-08 | Tabela de decisão | Anônimo em `POST`, `PUT` e `GET` | 401 | Integração |
 | TC-18 | CA-09 | Classe válida | Gravar uma sala | Existe 1 linha em `recurso` (tipo `SALA`) e 1 em `sala` | Integração |
 | TC-19 | CA-09 | Valor limite | `INSERT` direto no banco com capacidade 0 | Recusado pelo banco (`CHECK`) | Integração |
+| TC-20 | CA-02 | Classe inválida | Capacidade = 30.5 (decimal) | 400, `erros` com `campo = capacidade` | Integração |
+| TC-21 | CA-02 | Valor limite | Capacidade = 2147483647 / 2147483648 | 2147483647 aceita; 2147483648 recusa (400) | Integração |
+| TC-22 | CA-03 | Valor limite | Tipo e localização com 100 caracteres / com 101 | 100 aceita; 101 recusa (400) | Unitário |
+| TC-23 | CA-04 | Classe inválida | Alterar o nome de uma sala para o de outra | 409; a sala não muda | Integração |
+| TC-24 | CA-05 | Classe válida | `PUT` sem o campo `restrito`, em uma sala que era `restrito = true` | 200; `restrito = false` | Integração |
+| TC-25 | CA-09 | Conflito | `INSERT` direto no banco com o nome `Sala-01` | Recusado pelo banco (`CHECK` do padrão) | Integração |
+| TC-26 | CA-09 | Conflito | `INSERT` direto no banco com o mesmo tipo e nome de outra sala | Recusado pelo banco (`UNIQUE (tipo, nome)`) | Integração |
+| TC-27 | CA-10 | Classe inválida | Nomes ` sala-01`, `sala-01 `, `Sala-01`, `SALA-01`, `sala 01`, `saal-01`, `sala-01x`, `sala_01` (teste parametrizado) | Todos recusados com 400; `erros` com `campo = nome` | Unitário |
+| TC-28 | CA-10 | Valor limite | Nome `sala-999` (3 dígitos) / `sala-1000` (4 dígitos) | `sala-999` aceita; `sala-1000` recusa (400) | Unitário |
+| TC-29 | CA-03 | Classe válida | Cadastro com tipo `"  Laboratório "` e localização com espaços repetidos | 201; tipo e localização gravados sem os espaços extras (P-05) | Integração |
 
 ## 7. Riscos
 
@@ -175,22 +194,25 @@ As regras de validação são testadas em nível unitário; o contrato HTTP, a p
 | Capacidade 0 ou negativa entra no banco por outro caminho | Alto | TC-03 e TC-04 na regra e TC-19 no banco (`CHECK`) |
 | Erro de um na fronteira da capacidade (`>=` no lugar de `>`) | Alto | TC-02 e TC-03 testam 1 e 0 |
 | A permissão do Administrador é esquecida em `PUT` | Alto | TC-16 e TC-17 cobrem `POST` e `PUT` por perfil |
-| Nome repetido por diferença de maiúsculas | Médio | TC-10 e a proposta P-01 |
+| Nome fora do padrão, com espaço ou parecido com outro ("Saal 102", "Sala 102") | Médio | O padrão `sala-NN` é obrigatório e nada é corrigido sozinho: TC-27 e TC-28, o `CHECK` do banco (TC-25) e a proposta P-01 |
+| Nome repetido | Médio | TC-10, TC-23 e `UNIQUE (tipo, nome)` (TC-26) |
 | O modelo `recurso` + `sala` fica inconsistente (uma tabela sem a outra) | Médio | TC-18 e gravação na mesma transação |
 | Pesquisa com filtros (RF-03) e exclusão ficam sem dono | Médio | Fora desta spec; a exclusão só virá para sala sem reserva (P-02) |
-| As propostas P-01 a P-04 não foram validadas pelo professor | Baixo | Marcadas como propostas; mudar um limite altera poucos testes |
+| As propostas P-01 a P-05 são decisões do time | Baixo | Marcadas como propostas; mudar um limite altera poucos testes |
+| A T-17 e a T-18 dependem da tabela `recurso`, criada aqui | Médio | A T-16 precisa ser mergeada antes das duas |
+| Capacidade acima do inteiro do banco causa erro 500 | Médio | P-04, TC-21 e TC-20 |
 
 ## 8. Mini-plano de implementação (ciclos TDD)
 
 | Ciclo | Teste (red) | Implementação (green) | Refatoração prevista |
 |---|---|---|---|
 | 1 | TC-01: cadastro válido | Entidade, migração, repositório e serviço de sala | Separar `recurso` e `sala` em um único agregado |
-| 2 | TC-02 a TC-05: capacidade | Validação de capacidade maior que zero | Extrair a validação para o objeto de entrada |
-| 3 | TC-06 a TC-09: campos obrigatórios | Validação de obrigatórios e de tamanho | Reaproveitar os textos de erro da T-22 |
-| 4 | TC-10 e TC-13: nome único | Verificação de nome repetido sem diferenciar maiúsculas | Mover a regra para o serviço |
-| 5 | TC-11, TC-12 e TC-15: alteração e inexistente | Alteração e `404` | Reaproveitar a validação do cadastro |
+| 2 | TC-02 a TC-05, TC-20 e TC-21: capacidade | Validação de capacidade maior que zero | Extrair a validação para o objeto de entrada |
+| 3 | TC-06 a TC-09, TC-22, TC-27 a TC-29: campos obrigatórios, padrão do nome e tamanhos | Validação do padrão `sala-NN`, de obrigatórios e de tamanho de tipo e localização, e limpeza de espaços do tipo e da localização (P-05) | Reaproveitar os textos de erro da T-22 |
+| 4 | TC-10: nome único no cadastro | Verificação de nome repetido | Mover a regra para o serviço |
+| 5 | TC-11 a TC-13, TC-15, TC-23 e TC-24: alteração e inexistente | Alteração (com o `PUT` substituindo por inteiro), nome único na alteração e `404` | Reaproveitar a validação do cadastro |
 | 6 | TC-14, TC-16 e TC-17: permissão | Regra de perfil por operação (T-15) | Declarar o perfil exigido em um só lugar |
-| 7 | TC-18 e TC-19: estrutura do banco | `CHECK` de capacidade e gravação em duas tabelas | Revisar a migração |
+| 7 | TC-18, TC-19, TC-25 e TC-26: estrutura do banco | `CHECK` de capacidade, `CHECK` do padrão do nome, `UNIQUE (tipo, nome)` e gravação em duas tabelas | Revisar a migração |
 
 ## 9. Revisão por pares
 
