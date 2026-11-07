@@ -261,27 +261,27 @@ A migração do ciclo 1 cria `recurso` e `sala` só com colunas e chaves. As res
 > Preenchida pelo revisor, com commit próprio. Nunca pelo autor.
 
 - [x] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
-- [ ] As regras citam RNs que existem no PRD.
-- [ ] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
+- [x] As regras citam RNs que existem no PRD.
+- [x] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
 - [x] Os casos de teste incluem valores limite e entradas inválidas.
 - [x] O contrato da API cobre os erros (400, 401, 403, 409).
-- [ ] Não há conflito com outras specs nem com os ADRs.
-
+- [x] Não há conflito com outras specs nem com os ADRs.
 **Comentários:**
 
-Reli a versão atual. A spec melhorou: os limites de tipo e localização, o nome repetido no `PUT` e a responsabilidade pela criação de `recurso` estão resolvidos. O objetivo e o escopo continuam claros, e o contrato traz os códigos 400, 401, 403 e 409.
+Reli a versão atual e os pontos das revisões anteriores foram tratados: `recurso` agora tem o `CHECK` condicionado ao tipo e o índice único `(tipo, lower(nome))`, a leitura do JSON não converte tipos, `restrito` é obrigatório no `PUT`, e os testes de regra estão separados dos testes de contrato. A spec está pronta para seguir.
 
-Regras no PRD: o padrão `sala-NN` é uma regra nova, que não está no PRD, na arquitetura nem no backlog. A arquitetura usa `SALA-102`, recusado pelo padrão, e a T-20 usa "sala 102". É preciso validar a regra e registrá-la no PRD. O padrão também não prevê nomes como `lab-01`, embora o tipo "Laboratório" seja aceito. A seção 3 fala em "propostas" e "decisões do time" ao mesmo tempo.
+A aprovação depende do merge do PR #34 antes deste, porque a RN-16 e as dependências novas do backlog só existem lá.
 
-Critérios: o CA-02 usa o motivo "deve ser maior que zero" para decimal, texto e valor acima do inteiro, o que fica falso para `2147483648`. A P-05 não tem critério próprio: TC-29 está ligado ao CA-03, que trata de recusas.
+Pontos para acompanhar na implementação, sem bloquear a aprovação:
 
-Testes: `30.5` pode virar `30` na leitura do JSON e `"30"` pode ser aceito como número, então a spec precisa definir essa configuração e o ciclo 2 deve incluí-la. Também é preciso alinhar com a T-22 como esses erros de leitura chegam a `erros` com `campo = capacidade`. Continuam abertos os casos marcados como unitários que esperam HTTP (TC-03, TC-04, TC-06 a TC-09, TC-22, TC-27 e TC-28) e o detalhamento de TC-08. Faltam casos para `sala-01` junto com `sala-001`, para tipo ou localização com 100 caracteres depois da limpeza e para valores só com espaços.
+- TC-38 está no ciclo 4, mas o índice único só entra no ciclo 7. O teste precisa ir para o ciclo 7, ou o índice precisa vir antes.
+- A ordem 404 antes de 400 (P-08 e TC-41) exige cuidado, porque a leitura do JSON e o `@Valid` normalmente rodam antes de buscar a sala.
+- `restrito` deve ser `Boolean`, para `null` no `PUT` não virar `false`. Vale incluir esse caso.
+- A configuração do Jackson sem coerção deve ficar em um só lugar, junto da T-22.
+- Os exemplos "sala 101" e "sala 102" que restam na T-20 e na arquitetura devem passar para o padrão `sala-NN`.
+- `sala-01` e `sala-001` convivem por decisão do time; vale registrar esse risco na seção 7.
 
-Contrato: o 409 de nome repetido está previsto, mas falta definir a resposta quando dois cadastros simultâneos passam pela verificação e um deles é barrado pelo `UNIQUE`. Sem essa tradução, a resposta seria 500. A escolha de `restrito` omitido voltar a `false` no `PUT` também retira a exigência de aprovação sem pedido explícito. Recomendo tornar o campo obrigatório no `PUT` ou registrar esse risco na seção 7.
-
-Conflitos: o `CHECK` do padrão fica em `recurso.nome`, coluna compartilhada, e precisa valer só para o tipo `SALA`, senão pode recusar professores e materiais. Falta um caso provando isso. A T-16 cria `UNIQUE (tipo, nome)`, mas a T-18 espera `UNIQUE (tipo, lower(nome))`, então é preciso definir a versão final ou a migração que faz a troca. A spec também não define o tamanho de `recurso.nome`. A T-17 e a T-18 agora dependem da T-16, mas o backlog ainda cita só a T-15.
-
-**Parecer:** Ajustes necessários · @Samwel-Merces · 2026-11-07
+**Parecer:** Aprovada · @Samwel-Merces · 2026-11-07
 
 ## 10. Spec validation
 
