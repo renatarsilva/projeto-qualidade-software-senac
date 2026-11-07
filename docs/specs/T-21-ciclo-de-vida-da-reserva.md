@@ -380,31 +380,30 @@ Na T-21 as assinaturas mínimas devolvem um resultado neutro (que não é aceite
 > Preenchida pelo revisor, com commit próprio. Nunca pelo autor.
 
 - [x] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
-- [ ] As regras citam RNs que existem no PRD.
-- [ ] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
+- [x] As regras citam RNs que existem no PRD.
+- [x] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
 - [x] Os casos de teste incluem valores limite e entradas inválidas.
-- [ ] O contrato da API cobre os erros (400, 401, 403, 409).
-- [ ] Não há conflito com outras specs nem com os ADRs.
+- [x] O contrato da API cobre os erros (400, 401, 403, 409).
+- [x] Não há conflito com outras specs nem com os ADRs.
 
 **Comentários:**
 
-Reli a versão atual. A spec avançou bastante: a antecedência agora usa `criada_em`, a aprovação depois do prazo tem resposta, a janela do check-in tem valores limite, e os casos de liberação do horário passaram para integração. O objetivo e o escopo continuam claros, mas ainda há pontos que impedem a aprovação.
+Reli a versão atual e os pontos das revisões anteriores foram tratados: só o Responsável aprova, há uma tabela de perfil por destino, o check-in tem endpoint e task, o job tem task, `prazo_aprovacao_em` guarda o prazo recalculado, CA-02 e CA-04 estão alinhados com o CA-14, e a ordem dos erros está no CA-17. A spec está pronta para seguir.
 
-Regras no PRD: a RN-13 e os prazos de 24 h e 1 h continuam fora do PRD. A nova versão troca "resposta do professor" por "decisão do time" e retira a divergência dos 15 min, enquanto o PR #33 ainda registra as respostas do professor. É preciso deixar claro qual fonte vale e registrar as regras no PRD.
+A aprovação depende do merge do PR #34 antes deste PR, porque RN-13 a RN-15, T-59, T-60 e `prazo_aprovacao_em` estão nele.
 
-Autorização: a spec deixa o Administrador aprovar, mas a RN-07 diz que somente o Responsável aprova recursos restritos, e o PRD diz que o Administrador fica fora dessa aprovação. É preciso separar recurso restrito de não restrito e definir quem aprova cada um, com um caso de 403 para o Administrador no restrito. TC-54 e TC-55 cobrem só duas combinações; recomendo uma tabela de perfil por destino, com os casos aceitos.
+Pontos para acompanhar na implementação, sem bloquear a aprovação:
 
-Critério verificável: o `PATCH` recusa `EM_USO` para todos, e o check-in do sistema não tem endpoint, ator nem task. Assim, nenhuma reserva chega a `EM_USO` pela aplicação, e o CA-01 e o CA-08 só passam chamando a regra diretamente. O CA-15 depende de um novo prazo de 1 h, mas `criada_em` não mostra que a reserva voltou de `APROVADA`: uma reserva pedida com 10 dias de antecedência poderia ser cancelada logo depois da alteração. Falta guardar esse prazo e definir se os prazos usam o início antigo ou o novo.
+- A T-24 pede todos os testes da T-21 verdes, mas T-59 e T-60 dependem dela. É preciso marcar que TC-62 a TC-66 ficam verdes na T-59, e que TC-13 e TC-81 dependem do job da T-60. Também falta um caso de integração do fluxo inteiro, como pede o CA-01.
+- Mudanças simultâneas de estado precisam de proteção, como `@Version` ou atualização condicionada ao estado, com 409 para quem perde. Um exemplo é o Responsável aprovar enquanto o dono cancela.
+- Uma `APROVADA` alterada exatamente 24 h antes, sem mudar o início, pode ser cancelada pelo job no minuto seguinte. Vale registrar esse risco e incluir o caso.
+- É preciso definir se o Responsável pode aprovar a própria reserva, caso possa criar reservas.
+- A linha do job diz que o cancelamento por prazo vale "a partir do instante", mas o CA-15 e o TC-81 dizem que ele só vale depois do prazo.
+- A volta para `SOLICITADA` pelo `PUT` deve passar pelo Ciclo de vida, para atualizar `ocupa` e permitir a auditoria.
+- Falta definir o que outro usuário recebe em `DELETE`, para a matriz da T-48 ter um valor único.
+- O risco sobre job diário na arquitetura pode virar uma dependência do PR #34.
 
-Contrato: CA-02 e CA-04 esperam 409 em pedidos que o CA-14 manda recusar com 403, como `SOLICITADA→EM_USO` e `EM_USO→CANCELADA`. O CA-14 também não cita `SOLICITADA`, embora o contrato dê 403 para outros destinos. Falta definir a ordem entre 400, 403 e 404 quando um Solicitante envia `"ABC"` ou um id inexistente. A mensagem de aprovação fora do prazo também não tem caso de integração.
-
-Prazos e job: a linha de prazos aceita aprovar exatamente no limite, mas o job pode cancelar a partir do mesmo instante. No TC-59, não fica claro quem cancela quando a aprovação chega depois do prazo e antes de o job rodar. O job está fora do escopo e não tem task no backlog, então as mudanças automáticas podem nunca acontecer.
-
-Conflitos: além da RN-07, a arquitetura ainda descreve um job diário no fim do dia, e não um job a cada minuto. Ela também não tem campo para o prazo reiniciado.
-
-Ajustes de texto: o escopo ainda omite `NAO_COMPARECEU` no cancelamento, e o TC-38 ainda pede "com o histórico". No ciclo 11, TC-51 e TC-52 não têm red real, porque o check-in já é aceito desde o ciclo 1.
-
-**Parecer:** Ajustes necessários · @Samwel-Merces · 2026-11-07
+**Parecer:** Aprovada · @Samwel-Merces · 2026-11-07
 
 ## 10. Spec validation
 
