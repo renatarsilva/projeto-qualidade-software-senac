@@ -1,5 +1,6 @@
 package br.senac.recursos.sala;
 
+import jakarta.validation.Valid;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,7 @@ public class SalaController {
     }
 
     @PostMapping
-    public ResponseEntity<SalaResponse> cadastra(@RequestBody SalaRequest pedido) {
+    public ResponseEntity<SalaResponse> cadastra(@Valid @RequestBody SalaRequest pedido) {
         Sala sala = servico.cadastra(pedido);
         return ResponseEntity.created(URI.create("/api/salas/" + sala.getId())).body(SalaResponse.de(sala));
     }
