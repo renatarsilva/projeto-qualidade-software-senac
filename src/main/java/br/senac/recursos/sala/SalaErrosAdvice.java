@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
- * Tratamento provisório dos erros das salas. O formato único de erro de toda a API é da T-22:
+ * Tratamento provisório dos erros das salas e dos professores. O formato único de erro de toda a API é da T-22:
  * quando ela entrar, este arquivo sai.
  */
-@RestControllerAdvice(assignableTypes = SalaController.class)
+@RestControllerAdvice(assignableTypes = {SalaController.class, br.senac.recursos.professor.ProfessorController.class})
 public class SalaErrosAdvice {
 
     @ExceptionHandler(EntradaInvalidaException.class)

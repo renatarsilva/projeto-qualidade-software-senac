@@ -6,5 +6,9 @@ public interface ProfessorRepository extends JpaRepository<Professor, Long> {
 
     boolean existsByNomeIgnoreCase(String nome);
 
+    boolean existsByNomeIgnoreCaseAndIdNot(String nome, Long id);
+
     boolean existsByMatricula(String matricula);
+
+    boolean existsByMatriculaAndIdNot(String matricula, Long id);
 }
