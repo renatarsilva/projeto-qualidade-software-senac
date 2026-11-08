@@ -14,7 +14,7 @@ Rascunho → Em revisão → Aprovada → Validada → Liberada
 | Task | T-17 |
 | Autor(a) | @renatarsilva |
 | Revisor(a) | @CaiosAguiar |
-| Status | Em revisão |
+| Status | Liberada |
 | Regra crítica | Não |
 | Requisitos | RF-02 |
 | Característica ISO 25010 | Adequação funcional |
@@ -286,8 +286,8 @@ Considero atendidos os pontos necessários para a liberação da especificação
 
 Resultado de `./scripts/validar-spec.sh` (preenchido pelo autor após o script passar):
 
-- **Data:** _preencher_
-- **Resultado:** _preencher_
+- **Data:** 2026-11-07
+- **Resultado:** APROVADA na spec validation
 
 ## 11. Grill-with-docs
 
