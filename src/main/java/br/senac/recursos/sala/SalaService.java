@@ -1,5 +1,8 @@
 package br.senac.recursos.sala;
 
+import br.senac.recursos.erro.ConflitoDeNegocioException;
+import br.senac.recursos.erro.EntradaInvalidaException;
+import br.senac.recursos.erro.RecursoNaoEncontradoException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.sql.SQLException;

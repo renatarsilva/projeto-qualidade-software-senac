@@ -1,8 +1,8 @@
 package br.senac.recursos.professor;
 
-import br.senac.recursos.sala.ConflitoDeNegocioException;
-import br.senac.recursos.sala.EntradaInvalidaException;
-import br.senac.recursos.sala.RecursoNaoEncontradoException;
+import br.senac.recursos.erro.ConflitoDeNegocioException;
+import br.senac.recursos.erro.EntradaInvalidaException;
+import br.senac.recursos.erro.RecursoNaoEncontradoException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.sql.SQLException;
