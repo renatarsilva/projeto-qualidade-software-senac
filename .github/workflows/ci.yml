@@ -1,0 +1,66 @@
+name: qualidade
+
+# Pipeline de CI (T-25). Roda em todo pull request e em todo push na main.
+# O job `build` é o check que a proteção da main deve exigir (ver docs/processo/ci.md).
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Só leitura: o pipeline não precisa escrever no repositório.
+permissions:
+  contents: read
+
+# Um novo push no mesmo PR cancela o run anterior.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      # Vem dos segredos do repositório. Em PR de fork o segredo fica vazio e a análise é pulada.
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # o SonarCloud precisa do histórico completo
+
+      - name: Instalar o Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      # O runner do GitHub já traz o Docker, que os testes com Testcontainers usam.
+      # `verify` roda os testes (surefire e failsafe), gera o relatório do JaCoCo e aplica o gate 80 % / 70 %.
+      - name: Compilar, testar e verificar a cobertura
+        run: ./mvnw -B verify
+
+      # Só roda se o segredo SONAR_TOKEN existir. Reaproveita o relatório do JaCoCo do passo anterior.
+      - name: Análise do SonarCloud
+        if: ${{ env.SONAR_TOKEN != '' }}
+        run: ./mvnw -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+
+      # always(): os relatórios precisam estar disponíveis também quando o build falha.
+      - name: Publicar os relatórios de teste
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorios-de-teste
+          path: |
+            target/surefire-reports/
+            target/failsafe-reports/
+          if-no-files-found: ignore
+
+      - name: Publicar o relatório de cobertura (JaCoCo)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-jacoco
+          path: target/site/jacoco/
+          if-no-files-found: ignore
