@@ -14,7 +14,7 @@ Rascunho → Em revisão → Aprovada → Validada → Liberada
 | Task | T-20 (a mesma spec vale para a implementação, T-23) |
 | Autor(a) | @renatarsilva |
 | Revisor(a) | @CaiosAguiar |
-| Status | Em revisão |
+| Status | Liberada |
 | Regra crítica | Sim |
 | Requisitos | RF-04, RF-05 |
 | Característica ISO 25010 | Adequação funcional |
@@ -418,8 +418,8 @@ Considero atendidos os pontos necessários para a liberação da especificação
 
 Resultado de `./scripts/validar-spec.sh` (preenchido pelo autor após o script passar):
 
-- **Data:** _preencher_
-- **Resultado:** _preencher_
+- **Data:** 2026-11-07
+- **Resultado:** APROVADA na spec validation
 
 ## 11. Grill-with-docs
 
@@ -442,4 +442,4 @@ Resultado de `./scripts/validar-spec.sh` (preenchido pelo autor após o script p
 | 13 | Escopo da concorrência | A T-20 cobre a verificação da aplicação e o `EXCLUDE` com 409 genérico; o teste de concorrência é da T-37 | CA-04, TC-57 e TC-58 |
 | 14 | Alteração de recursos e contrato do `PUT` | Atômica; 401, 403 por perfil, 404 e 403 por dono; campo `aviso` no corpo | CA-17, CA-18, TC-59 a TC-67 |
 
-**Resultado:** Pendências (aguarda nova revisão do Caio sobre os CA-15 a CA-18) · 2026-11-07
+**Resultado:** Liberada · 2026-11-07
