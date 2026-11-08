@@ -15,6 +15,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,10 +25,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
@@ -40,7 +45,8 @@ public class SegurancaConfiguracao {
     @Order(1)
     SecurityFilterChain api(HttpSecurity http, AuthenticationEntryPoint entradaDaApi,
             AccessDeniedHandler acessoNegadoDaApi, JwtDecoder decodificador,
-            JwtAuthenticationConverter conversorDoToken, ObjectProvider<RegraDeAcesso> regras) throws Exception {
+            Converter<Jwt, AbstractAuthenticationToken> conversorDoToken, ObjectProvider<RegraDeAcesso> regras)
+            throws Exception {
         List<RegraDeAcesso> declaradas = regras.orderedStream().toList();
         http.securityMatcher("/api/**")
                 .csrf(AbstractHttpConfigurer::disable)
@@ -110,15 +116,27 @@ public class SegurancaConfiguracao {
         };
     }
 
-    /** O perfil gravado no token vira a permissão ROLE_<perfil> que as regras de acesso consultam. */
+    /**
+     * Confere o usuário no banco a cada chamada (CA-15): quem foi desativado ou não existe mais perde o acesso na hora,
+     * e o perfil que vale é o do banco, e não o que ficou gravado no token. O perfil vira a permissão ROLE_<perfil>.
+     */
     @Bean
-    JwtAuthenticationConverter conversorDoToken() {
-        JwtGrantedAuthoritiesConverter autoridades = new JwtGrantedAuthoritiesConverter();
-        autoridades.setAuthoritiesClaimName("perfil");
-        autoridades.setAuthorityPrefix("ROLE_");
-        JwtAuthenticationConverter conversor = new JwtAuthenticationConverter();
-        conversor.setJwtGrantedAuthoritiesConverter(autoridades);
-        return conversor;
+    Converter<Jwt, AbstractAuthenticationToken> conversorDoToken(UsuarioRepository usuarios) {
+        return jwt -> {
+            Usuario usuario = buscaUsuarioAtivo(usuarios, jwt.getSubject());
+            List<GrantedAuthority> permissoes = List.of(new SimpleGrantedAuthority("ROLE_" + usuario.getPerfil().name()));
+            return new JwtAuthenticationToken(jwt, permissoes, String.valueOf(usuario.getId()));
+        };
+    }
+
+    private Usuario buscaUsuarioAtivo(UsuarioRepository usuarios, String subject) {
+        try {
+            return usuarios.findById(Long.parseLong(subject))
+                    .filter(Usuario::isAtivo)
+                    .orElseThrow(() -> new InvalidBearerTokenException("usuário inexistente ou desativado"));
+        } catch (NumberFormatException erro) {
+            throw new InvalidBearerTokenException("token sem usuário válido");
+        }
     }
 
     /** Resposta 403 da API: usuário autenticado sem permissão. Não revela nenhum detalhe interno. */
