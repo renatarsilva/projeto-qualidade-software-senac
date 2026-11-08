@@ -48,11 +48,14 @@ public class SegurancaConfiguracao {
                 .authorizeHttpRequests(autorizacao -> {
                     autorizacao.requestMatchers("/api/auth/login").permitAll();
                     for (RegraDeAcesso regra : declaradas) {
+                        var alvo = regra.metodo() == null
+                                ? autorizacao.requestMatchers(regra.padrao())
+                                : autorizacao.requestMatchers(regra.metodo(), regra.padrao());
                         if (regra.perfis().isEmpty()) {
-                            autorizacao.requestMatchers(regra.padrao()).authenticated();
+                            alvo.authenticated();
                         } else {
                             String[] papeis = regra.perfis().stream().map(Perfil::name).toArray(String[]::new);
-                            autorizacao.requestMatchers(regra.padrao()).hasAnyRole(papeis);
+                            alvo.hasAnyRole(papeis);
                         }
                     }
                     // Negado por padrão: o que nenhuma regra liberou é recusado (spec T-15, CA-08).

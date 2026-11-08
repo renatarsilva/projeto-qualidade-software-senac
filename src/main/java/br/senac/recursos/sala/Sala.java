@@ -32,6 +32,13 @@ public class Sala extends Recurso {
         this.tipoSala = tipoSala;
     }
 
+    public void atualiza(String nome, boolean restrito, int capacidade, String localizacao, String tipoSala) {
+        atualizaBase(nome, restrito);
+        this.capacidade = capacidade;
+        this.localizacao = localizacao;
+        this.tipoSala = tipoSala;
+    }
+
     public int getCapacidade() {
         return capacidade;
     }

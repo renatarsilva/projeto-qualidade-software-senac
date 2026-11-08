@@ -36,6 +36,11 @@ public abstract class Recurso {
         this.restrito = restrito;
     }
 
+    protected void atualizaBase(String nome, boolean restrito) {
+        this.nome = nome;
+        this.restrito = restrito;
+    }
+
     public Long getId() {
         return id;
     }
