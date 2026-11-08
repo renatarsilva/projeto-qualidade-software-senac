@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
- * Página de erro amigável nas telas (spec T-22, CA-05 e CA-14; casos TC-10, TC-12, TC-13, TC-14 e TC-38).
+ * Página de erro amigável nas telas (spec T-22, CA-05 e CA-14; casos TC-10, TC-12, TC-13 e TC-38; o TC-14 está em FalhaEmFiltroTest).
  * Em português, com um link de volta para a página inicial, nunca em JSON e sem nenhum termo da lista única.
  */
 @TesteDeApiComBanco
@@ -54,11 +54,6 @@ class ErrosDasTelasTest {
     @Test
     void tc13_conflitoNaTelaMostraPaginaAmigavelENuncaJson() throws Exception {
         confereQueEUmaPaginaAmigavel(acessa(get("/teste-web/conflito").accept(MediaType.TEXT_HTML)), 409);
-    }
-
-    @Test
-    void tc14_falhaDuranteARenderizacaoMostraPaginaAmigavel() throws Exception {
-        confereQueEUmaPaginaAmigavel(acessa(get("/teste-web/renderizacao").accept(MediaType.TEXT_HTML)), 500);
     }
 
     @Test

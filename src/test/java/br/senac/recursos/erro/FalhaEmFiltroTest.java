@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 /**
- * Falha em filtro (spec T-22, CA-14; casos TC-39 e TC-40). Só um contêiner de verdade encaminha a falha para /error,
+ * Falha em filtro (spec T-22, CA-14; casos TC-39, TC-40 e TC-14). Só um contêiner de verdade encaminha a falha para /error,
  * por isso este teste sobe o servidor em uma porta (o MockMvc não faz esse encaminhamento).
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -49,6 +49,20 @@ class FalhaEmFiltroTest {
     @Test
     void tc40_falhaEmFiltroForaDaApiMostraPaginaAmigavel() {
         ResponseEntity<String> resposta = chama("/teste-web/falha-no-filtro", MediaType.TEXT_HTML);
+
+        assertThat(resposta.getStatusCode().value()).isEqualTo(500);
+        assertThat(resposta.getHeaders().getContentType().toString()).startsWith("text/html");
+        assertThat(resposta.getBody()).contains("href=\"/\"");
+        TermosProibidos.naoTem(resposta.getBody());
+    }
+
+    /**
+     * TC-14: o modelo da página falha durante a renderização. Esse erro acontece depois dos tratadores do Spring MVC,
+     * então quem responde é o /error, e só um servidor de verdade o encaminha.
+     */
+    @Test
+    void tc14_falhaDuranteARenderizacaoMostraPaginaAmigavel() {
+        ResponseEntity<String> resposta = chama("/teste-web/renderizacao", MediaType.TEXT_HTML);
 
         assertThat(resposta.getStatusCode().value()).isEqualTo(500);
         assertThat(resposta.getHeaders().getContentType().toString()).startsWith("text/html");

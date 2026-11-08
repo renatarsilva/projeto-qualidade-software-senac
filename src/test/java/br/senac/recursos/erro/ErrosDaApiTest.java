@@ -171,7 +171,8 @@ class ErrosDaApiTest {
 
     @Test
     void tc18_rotaQueNaoExisteNaApiDa404() throws Exception {
-        erroEsperado(get("/api/rota-que-nao-existe-de-jeito-nenhum"), 404, "Recurso não encontrado");
+        // Dentro das rotas liberadas de teste: fora delas, a segurança nega por padrão antes de procurar a rota (401 ou 403).
+        erroEsperado(get(BASE + "/rota-que-nao-existe-de-jeito-nenhum"), 404, "Recurso não encontrado");
     }
 
     @ParameterizedTest(name = "{0} vira 409 com a mensagem fixa")
