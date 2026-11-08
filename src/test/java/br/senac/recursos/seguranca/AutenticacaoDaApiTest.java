@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-@Import(TestcontainersConfiguration.class)
+@Import({TestcontainersConfiguration.class, RegrasDeAcessoDeTeste.class})
 @TestPropertySource(properties = "app.seguranca.chave-assinatura=chave-de-teste-com-pelo-menos-32-caracteres-123")
 class AutenticacaoDaApiTest {
 
