@@ -5,7 +5,7 @@
 | Task | T-21 (a mesma spec vale para a implementação, T-24) |
 | Autor(a) | @renatarsilva |
 | Revisor(a) | @Samwel-Merces |
-| Status | Em revisão |
+| Status | Liberada |
 | Regra crítica | Sim |
 | Requisitos | RF-04, RF-07 |
 | Característica ISO 25010 | Adequação funcional |
@@ -409,8 +409,8 @@ Pontos para acompanhar na implementação, sem bloquear a aprovação:
 
 Resultado de `./scripts/validar-spec.sh` (preenchido pelo autor após o script passar):
 
-- **Data:** _preencher_
-- **Resultado:** _preencher_
+- **Data:** 2026-11-07
+- **Resultado:** APROVADA na spec validation
 
 ## 11. Grill-with-docs
 
@@ -437,4 +437,4 @@ Resultado de `./scripts/validar-spec.sh` (preenchido pelo autor após o script p
 | 17 | Ordem dos erros | 401, 403 por perfil, 404, 403 por dono, 400, 409 | CA-17, TC-75 a TC-78 |
 | 18 | Qual fonte vale | O PRD (RN-13 a RN-15); o plano TDD é atualizado em outro commit | Seção 3 |
 
-**Resultado:** Pendências (a spec mudou depois da última revisão e precisa de nova revisão do Samuel) · 2026-11-07
+**Resultado:** Liberada · 2026-11-07
