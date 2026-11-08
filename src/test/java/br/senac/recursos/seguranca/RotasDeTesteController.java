@@ -17,4 +17,16 @@ class RotasDeTesteController {
     String autenticado() {
         return "ok";
     }
+
+    /** Só o Administrador pode chamar. */
+    @GetMapping("/administrador")
+    String administrador() {
+        return "ok";
+    }
+
+    /** Ninguém declarou regra para esta rota: o padrão é negar (CA-08). */
+    @GetMapping("/sem-regra")
+    String semRegra() {
+        return "ok";
+    }
 }
