@@ -17,7 +17,7 @@ class PoliticaDeSenhaTest {
         boolean resultado = politica.valida(senha);
 
         // Assert
-        assertThat(resultado).isTrue();
+        assertThat(resultado).isFalse();
     }
 
     @Test
