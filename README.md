@@ -159,6 +159,26 @@ docker compose ps
 
 **Segurança no bootstrap.** A aplicação inicia em http://localhost:8080 com a segurança padrão do Spring Boot ativa. Por isso, acessar sem autenticação redireciona para `/login` (no navegador) ou devolve `401` (em clientes como o `curl`). Esse comportamento é esperado nesta fase: a autenticação e a autorização definitivas pertencem à task T-15.
 
+### Variáveis de ambiente
+
+Os segredos nunca ficam no repositório. A aplicação lê estas variáveis (os nomes valem para qualquer sistema; os valores são seus):
+
+| Variável | Para que serve | Obrigatória |
+|---|---|---|
+| `APP_JWT_CHAVE` | Chave que assina o token da API. Use um texto aleatório e longo. | Sim, quando a autenticação da T-15 estiver ativa |
+| `APP_ADMIN_EMAIL` | E-mail do primeiro administrador, criado na subida se o banco não tiver nenhum. | Só no primeiro uso |
+| `APP_ADMIN_SENHA` | Senha desse administrador (de 8 a 72 bytes). | Só no primeiro uso |
+
+Defina antes de subir a aplicação. Linux/macOS:
+
+```bash
+export APP_JWT_CHAVE='<texto aleatório e longo>'
+export APP_ADMIN_EMAIL='<seu e-mail>'
+export APP_ADMIN_SENHA='<uma senha>'
+```
+
+Windows PowerShell: `$env:APP_JWT_CHAVE = '<texto aleatório e longo>'` (e o mesmo para as outras). No IntelliJ, use **Run → Edit Configurations → Environment variables**. Não grave esses valores em arquivos do projeto.
+
 ### Abrir no IntelliJ
 
 1. **File → Open** e escolha a pasta do repositório (o IntelliJ reconhece o `pom.xml`).
