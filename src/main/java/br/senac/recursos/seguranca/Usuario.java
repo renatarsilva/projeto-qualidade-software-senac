@@ -47,6 +47,14 @@ public class Usuario {
         return usuario;
     }
 
+    public void trocaPerfil(Perfil novoPerfil) {
+        this.perfil = novoPerfil;
+    }
+
+    public void defineAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
     public Long getId() {
         return id;
     }
