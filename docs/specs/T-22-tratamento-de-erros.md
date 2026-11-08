@@ -14,7 +14,7 @@ Rascunho → Em revisão → Aprovada → Validada → Liberada
 | Task | T-22 |
 | Autor(a) | @renatarsilva |
 | Revisor(a) | @Samwel-Merces |
-| Status | Em revisão |
+| Status | Liberada |
 | Regra crítica | Não |
 | Requisitos | RF-13, RNF-07, RNF-08 |
 | Característica ISO 25010 | Segurança |
@@ -357,8 +357,8 @@ Pontos para acompanhar na implementação, sem bloquear a aprovação:
 
 Resultado de `./scripts/validar-spec.sh` (preenchido pelo autor após o script passar):
 
-- **Data:** _preencher_
-- **Resultado:** _preencher_
+- **Data:** 2026-11-07
+- **Resultado:** APROVADA na spec validation
 
 ## 11. Grill-with-docs
 
