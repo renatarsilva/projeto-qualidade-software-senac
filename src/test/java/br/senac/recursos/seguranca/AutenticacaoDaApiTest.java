@@ -1,7 +1,5 @@
 package br.senac.recursos.seguranca;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -58,12 +56,9 @@ class AutenticacaoDaApiTest {
     // Caso de controle (sem número na spec): prova que a rota abre quando o token é válido.
     @Test
     void controle_tokenValidoAcessaARotaProtegida() throws Exception {
-        Usuario usuario = mock(Usuario.class);
-        when(usuario.getId()).thenReturn(1L);
-        when(usuario.getPerfil()).thenReturn(Perfil.SOLICITANTE);
-        String token = tokens.emite(usuario).valor();
+        String token = IdentidadesDeTeste.bearerDe(tokens, Perfil.SOLICITANTE);
 
-        mockMvc.perform(get(ROTA_PROTEGIDA).header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+        mockMvc.perform(get(ROTA_PROTEGIDA).header(HttpHeaders.AUTHORIZATION, token))
                 .andExpect(status().isOk());
     }
 }

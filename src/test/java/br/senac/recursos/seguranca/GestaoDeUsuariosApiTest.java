@@ -92,8 +92,12 @@ class GestaoDeUsuariosApiTest {
     }
 
     private ResultActions patchDe(long id, String caminho, String corpo) throws Exception {
+        return patchComo(bearerDoAdministrador(), id, caminho, corpo);
+    }
+
+    private ResultActions patchComo(String bearer, long id, String caminho, String corpo) throws Exception {
         return executa(patch("/api/usuarios/" + id + "/" + caminho)
-                .header(HttpHeaders.AUTHORIZATION, bearerDoAdministrador())
+                .header(HttpHeaders.AUTHORIZATION, bearer)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(corpo));
     }
@@ -171,17 +175,18 @@ class GestaoDeUsuariosApiTest {
     @Test
     void tc28_desativarOuRebaixarOUnicoAdministradorAtivoDa409() throws Exception {
         long unico = insereAdministrador("unico-admin@exemplo.com", true);
+        String comoUnico = IdentidadesDeTeste.bearerDoUsuario(tokens, unico, Perfil.ADMINISTRADOR);
 
-        patchDe(unico, "ativo", "{\"ativo\":false}")
+        patchComo(comoUnico, unico, "ativo", "{\"ativo\":false}")
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.detail").value("O sistema precisa de pelo menos um administrador"));
-        patchDe(unico, "perfil", "{\"perfil\":\"SOLICITANTE\"}")
+        patchComo(comoUnico, unico, "perfil", "{\"perfil\":\"SOLICITANTE\"}")
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.detail").value("O sistema precisa de pelo menos um administrador"));
 
         // Com um segundo administrador ativo, desativar o primeiro é permitido.
         insereAdministrador("segundo-admin@exemplo.com", true);
-        patchDe(unico, "ativo", "{\"ativo\":false}").andExpect(status().isOk());
+        patchComo(comoUnico, unico, "ativo", "{\"ativo\":false}").andExpect(status().isOk());
     }
 
     @Test

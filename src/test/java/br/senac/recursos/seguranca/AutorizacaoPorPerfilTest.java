@@ -1,7 +1,5 @@
 package br.senac.recursos.seguranca;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -42,10 +40,8 @@ class AutorizacaoPorPerfilTest {
     private MockHttpServletRequestBuilder chamada(String rota, String identidade) {
         MockHttpServletRequestBuilder requisicao = get(rota);
         if (!"ANONIMO".equals(identidade)) {
-            Usuario usuario = mock(Usuario.class);
-            when(usuario.getId()).thenReturn(1L);
-            when(usuario.getPerfil()).thenReturn(Perfil.valueOf(identidade));
-            requisicao.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokens.emite(usuario).valor());
+            requisicao.header(HttpHeaders.AUTHORIZATION,
+                    IdentidadesDeTeste.bearerDe(tokens, Perfil.valueOf(identidade)));
         }
         return requisicao;
     }
