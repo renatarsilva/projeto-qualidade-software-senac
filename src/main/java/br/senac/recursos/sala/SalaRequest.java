@@ -8,4 +8,9 @@ public record SalaRequest(
         @Min(value = 1, message = "deve ser maior que zero") Integer capacidade,
         String localizacao,
         Boolean restrito) {
+
+    /** Remove espaços extras do tipo e da localização (P-05). Neutro por enquanto: devolve o pedido como veio. */
+    public SalaRequest limpo() {
+        return this;
+    }
 }
