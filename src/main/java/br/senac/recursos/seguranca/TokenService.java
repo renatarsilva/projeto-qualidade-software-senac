@@ -21,11 +21,20 @@ import org.springframework.stereotype.Service;
 public class TokenService {
 
     private static final Duration VALIDADE = Duration.ofMinutes(30);
+    private static final int CHAVE_MINIMA_BYTES = 32;
 
     private final JwtEncoder encoder;
     private final Clock clock;
 
     public TokenService(@Value("${app.seguranca.chave-assinatura}") String chave, Clock clock) {
+        if (chave == null || chave.isBlank()) {
+            throw new IllegalStateException(
+                    "A chave de assinatura do token não foi definida. Defina a variável de ambiente APP_JWT_CHAVE.");
+        }
+        if (chave.getBytes(StandardCharsets.UTF_8).length < CHAVE_MINIMA_BYTES) {
+            throw new IllegalStateException(
+                    "A chave de assinatura do token (APP_JWT_CHAVE) precisa ter pelo menos 32 caracteres.");
+        }
         SecretKey chaveSecreta = new SecretKeySpec(chave.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
         this.encoder = new NimbusJwtEncoder(new ImmutableSecret<>(chaveSecreta));
         this.clock = clock;

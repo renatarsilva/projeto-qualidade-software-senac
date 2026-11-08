@@ -27,7 +27,10 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import({TestcontainersConfiguration.class, RegrasDeAcessoDeTeste.class})
-@TestPropertySource(properties = "app.seguranca.chave-assinatura=chave-de-teste-com-pelo-menos-32-caracteres-123")
+@TestPropertySource(properties = {
+        "app.seguranca.chave-assinatura=chave-de-teste-com-pelo-menos-32-caracteres-123",
+        "app.admin-inicial.email=admin-de-teste@exemplo.com",
+        "app.admin-inicial.senha=senha-inicial-de-teste"})
 class AutorizacaoPorPerfilTest {
 
     @Autowired

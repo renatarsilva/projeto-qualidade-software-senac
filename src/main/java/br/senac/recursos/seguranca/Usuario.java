@@ -37,6 +37,16 @@ public class Usuario {
         // exigido pelo JPA
     }
 
+    public static Usuario novo(String nome, String email, String senhaHash, Perfil perfil) {
+        Usuario usuario = new Usuario();
+        usuario.nome = nome;
+        usuario.email = email;
+        usuario.senhaHash = senhaHash;
+        usuario.perfil = perfil;
+        usuario.ativo = true;
+        return usuario;
+    }
+
     public Long getId() {
         return id;
     }
