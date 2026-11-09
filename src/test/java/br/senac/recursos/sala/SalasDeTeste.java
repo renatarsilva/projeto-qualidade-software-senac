@@ -70,7 +70,8 @@ final class SalasDeTeste {
     }
 
     static void limpaBanco(JdbcTemplate jdbc) {
-        // Na ordem das dependências: outras classes de teste deixam professores no mesmo banco (a ordem das classes varia).
+        // Na ordem das dependências: outras classes de teste deixam professores e materiais no mesmo banco.
+        jdbc.update("DELETE FROM material");
         jdbc.update("DELETE FROM competencia");
         jdbc.update("DELETE FROM professor");
         jdbc.update("DELETE FROM sala");

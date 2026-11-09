@@ -73,6 +73,7 @@ final class ProfessoresDeTeste {
     }
 
     static void limpaBanco(JdbcTemplate jdbc) {
+        jdbc.update("DELETE FROM material");
         jdbc.update("DELETE FROM competencia");
         jdbc.update("DELETE FROM professor");
         jdbc.update("DELETE FROM sala");
