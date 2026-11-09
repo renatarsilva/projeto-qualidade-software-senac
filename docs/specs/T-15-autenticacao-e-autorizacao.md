@@ -226,11 +226,11 @@ A autorização é testada com um controller de teste (só em `src/test`) com um
 | TC-12 | CA-06 | Valor limite | Token usado 30 min depois de emitido | 401 (expirado) | Unitário |
 | TC-13 | CA-06 | Classe inválida | Token com uma letra alterada | 401 | Unitário |
 | TC-14 | CA-06 | Classe inválida | Token assinado com outra chave | 401 | Unitário |
-| TC-15 | CA-05 | Classe inválida | Requisição protegida sem o cabeçalho `Authorization` | 401 `ProblemDetail`, sem detalhe interno | Integração |
-| TC-16 | CA-05 | Classe inválida | Cabeçalho com formato errado (sem `Bearer`) | 401 `ProblemDetail` | Integração |
+| TC-15 | CA-05 | Classe inválida | Requisição protegida sem o cabeçalho `Authorization` | 401 `application/problem+json`, `title` "Autenticação necessária", `instance` com o caminho chamado e nenhum termo da lista proibida da T-22 | Integração |
+| TC-16 | CA-05 | Classe inválida | Cabeçalho com formato errado (sem `Bearer`) | 401 `application/problem+json`, `title` "Autenticação necessária" e `instance` com o caminho | Integração |
 | TC-17 | CA-07 | Tabela de decisão | Anônimo em `/api/usuarios` (só Administrador) | 401 | Integração |
-| TC-18 | CA-07 | Tabela de decisão | SOLICITANTE em `/api/usuarios` | 403 `ProblemDetail`, sem detalhe interno | Integração |
-| TC-19 | CA-07 | Tabela de decisão | RESPONSAVEL em `/api/usuarios` | 403 `ProblemDetail` | Integração |
+| TC-18 | CA-07 | Tabela de decisão | SOLICITANTE em `/api/usuarios` | 403 `application/problem+json`, `title` "Acesso negado", `instance` com o caminho e nenhum termo da lista proibida da T-22 | Integração |
+| TC-19 | CA-07 | Tabela de decisão | RESPONSAVEL em `/api/usuarios` | 403 `application/problem+json`, `title` "Acesso negado" e `instance` com o caminho | Integração |
 | TC-20 | CA-07 | Tabela de decisão | ADMINISTRADOR em `/api/usuarios` | 200 | Integração |
 | TC-21 | CA-07 | Tabela de decisão | Cada um dos 4 (anônimo e 3 perfis) em uma rota só de autenticados | Anônimo 401; os 3 perfis 200 | Integração |
 | TC-22 | CA-08 | Classe inválida | Rota criada sem nenhuma regra de perfil declarada | Recusada para todos os perfis (negar por padrão) | Integração |
