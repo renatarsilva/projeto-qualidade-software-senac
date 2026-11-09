@@ -177,7 +177,7 @@ A folha F3 (transições de estado) não tem RF específico: ela se liga às reg
 
 ### 4.4 Regras de negócio
 
-As 8 regras críticas da especificação viram 9 RNs: o bloco de estados foi separado em fluxo principal (RN-05) e estados alternativos (RN-06). A coluna "Texto da especificação" guarda a redação original.
+As 8 regras críticas da especificação viram 9 RNs: o bloco de estados foi separado em fluxo principal (RN-05) e estados alternativos (RN-06). As RN-13 a RN-17 são regras que o time acrescentou durante as specs da semana 36; elas não vêm da especificação e estão marcadas como "Regra do time". A coluna "Texto da especificação" guarda a redação original.
 
 | ID | Regra | Texto da especificação | RF relacionado | Utility tree e lacunas | Situação |
 |---|---|---|---|---|---|
@@ -190,6 +190,11 @@ As 8 regras críticas da especificação viram 9 RNs: o bloco de estados foi sep
 | RN-07 | Somente o perfil Responsável aprova recursos restritos. | "Somente responsáveis aprovam recursos restritos." | RF-07, RF-01 | F4 · L05 · DP-06 | Oficial |
 | RN-08 | Reservas iniciadas não podem ser apagadas. | "Reservas iniciadas não podem ser apagadas." | RF-04, RF-10 | L11 | Oficial |
 | RN-09 | Toda mudança de estado gera auditoria. | "Toda mudança de estado deve gerar auditoria." | RF-10 | F6 · L07 | Oficial |
+| RN-13 | O dono cancela a reserva até o instante do início (`CANCELADA`). Depois do início e antes do fim, com check-in (`EM_USO`) o cancelamento encerra a reserva (`CONCLUIDA`); sem check-in (`APROVADA`) ela vira `NAO_COMPARECEU`. | Regra do time (não consta da especificação). | RF-04, RF-07 | L11 | Regra do time |
+| RN-14 | O prazo de aprovação e o de alteração da reserva são 24 h antes do início. Se o pedido ou a alteração tem menos de 24 h de antecedência, o prazo é 1 h antes do início. Os limites são inclusivos. | Regra do time (não consta da especificação). | RF-04, RF-07 | L11 · A-05 | Regra do time |
+| RN-15 | O pedido de reserva precisa ter pelo menos 1 h de antecedência do início (no cadastro e na alteração). | Regra do time (não consta da especificação). | RF-04 | — | Regra do time |
+| RN-16 | O nome da sala segue o padrão `sala-NN` (minúsculas, 2 ou 3 dígitos), sem espaços nem outros caracteres. | Regra do time (não consta da especificação). | RF-02 | — | Regra do time |
+| RN-17 | O nome do professor segue o padrão `primeironome-ultimonome-matricula` (minúsculas, sem acento, matrícula de 5 dígitos). | Regra do time (não consta da especificação). | RF-02 | — | Regra do time |
 
 - RN-05 e RN-06 definem os estados. A especificação não lista todas as transições permitidas entre eles (por exemplo, de quais estados se chega a `CANCELADA`): elas serão detalhadas na spec do ciclo de vida (T-21), sem contradizer estas RNs. Ver L04.
 - Que o Solicitante altera e cancela **somente** as próprias reservas **não** é regra crítica da especificação: está registrado como necessidade candidata NC-01.
