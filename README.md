@@ -89,6 +89,15 @@ SOLICITADA → APROVADA → EM_USO → CONCLUÍDA
 
 Cobertura alta, sozinha, não garante qualidade. Cada teste precisa ter asserções que falhariam se a regra quebrasse.
 
+### Evidência do CI (T-25)
+
+O workflow `qualidade` (GitHub Actions) roda `./mvnw verify` a cada pull request e publica os relatórios de teste e de cobertura como artefatos.
+
+- Run vermelho intencional (asserção do `tc03` da `PoliticaDeSenhaTest` invertida): https://github.com/renatarsilva/projeto-qualidade-software-senac/actions/runs/42518673377 — 08/11/2026
+- Recuperação após o revert: https://github.com/renatarsilva/projeto-qualidade-software-senac/actions/runs/42542405648 — 08/11/2026
+
+No run vermelho, só o artefato `relatorios-de-teste` é publicado: o relatório do JaCoCo é gerado depois dos testes e não existe quando um teste falha.
+
 ## Tecnologias
 
 - Java 21 e Spring Boot 3.5 (Web, Security, Data JPA, Validation)
