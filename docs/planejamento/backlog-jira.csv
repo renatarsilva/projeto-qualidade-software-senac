@@ -252,7 +252,7 @@ h3. Rastreabilidade
 * Arquivos: docs/defeitos/, .github/ISSUE_TEMPLATE/bug.md
 * Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-documentacao,sem-spec,qualidade-senac
 [T-15] S36 · Backend · Autenticação e autorização por perfil,Task,Highest,Renata,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
-*Dono:* Renata  |  *Fluxo:* Regra crítica: spec + revisão + validação + grill-with-docs  |  *Depende de:* T-07, T-13
+*Dono:* Renata  |  *Fluxo:* Regra crítica: spec + revisão + validação + grill-with-docs  |  *Depende de:* T-07, T-13, T-22
 
 h3. O que fazer
 Spring Security com os perfis SOLICITANTE, RESPONSAVEL e ADMINISTRADOR; usuários em banco (migração Flyway) com senha em hash; login por formulário (sessão) para as telas e endpoint de login que devolve token para a API (MockMvc, Cucumber e JMeter usam token); gestão de usuários pelo Administrador; 401 sem autenticação e 403 para perfil sem permissão, sem vazar detalhes.
@@ -288,7 +288,7 @@ h3. Rastreabilidade
 * Arquivos: src/main/java/.../sala/
 * Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-backend,spec,qualidade-senac
 [T-17] S36 · Backend · Cadastro e consulta de professores e competências,Task,Medium,Renata,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
-*Dono:* Renata  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-15
+*Dono:* Renata  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-15, T-16
 
 h3. O que fazer
 CRUD de professores com suas competências, restrito ao Administrador para escrita.
@@ -305,7 +305,7 @@ h3. Rastreabilidade
 * Arquivos: src/main/java/.../professor/
 * Processo: docs/processo/ai-workflow.md",semana-36,sprint-2,area-backend,spec,qualidade-senac
 [T-18] S36 · Backend · Cadastro e consulta de materiais e equipamentos,Task,Medium,Renata,"*Área:* Backend  |  *Semana:* 36 (Aula 05 · Gestão de erros e bugs (TDD fase red))  |  *Sprint:* 2
-*Dono:* Renata  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-15
+*Dono:* Renata  |  *Fluxo:* Spec + revisão + validação  |  *Depende de:* T-15, T-16
 
 h3. O que fazer
 CRUD de materiais (tipo, patrimônio, restrito ou não, situação), restrito ao Administrador para escrita.
@@ -1039,3 +1039,55 @@ h3. Rastreabilidade
 * Requisitos: —
 * Arquivos: —
 * Processo: docs/processo/ai-workflow.md",semana-47,sprint-4,area-documentacao,sem-spec,qualidade-senac
+[T-59] S37 · Backend · Check-in da reserva (APROVADA para EM_USO),Task,High,Caio,"*Área:* Backend  |  *Semana:* 37 (Aula 06 · Testes automatizados em CI (fase green))  |  *Sprint:* 2
+*Dono:* Caio  |  *Fluxo:* Usa a spec da T-21  |  *Depende de:* T-24
+
+h3. O que fazer
+Endpoint POST /api/reservas/{id}/checkin: só o dono, só dentro do horário [início, fim), leva a reserva de APROVADA para EM_USO. Fora da janela ou em outro estado responde 409; quem não é o dono recebe 403.
+
+h3. Por que (explicação)
+A spec do ciclo de vida (T-21) depende do check-in para a reserva chegar a EM_USO e CONCLUIDA pela aplicação.
+
+h3. Critérios de aceite
+* Testes de janela (09:59, 10:00, 10:59 e 11:00)
+* 403 para quem não é o dono
+* Transição registrada para a auditoria
+
+h3. Rastreabilidade
+* Requisitos: RF-04
+* Arquivos: src/main/java/.../reserva/
+* Processo: docs/processo/ai-workflow.md",semana-37,sprint-2,area-backend,spec,qualidade-senac
+[T-60] S37 · Backend · Job periódico das mudanças por tempo,Task,High,Samuel,"*Área:* Backend  |  *Semana:* 37 (Aula 06 · Testes automatizados em CI (fase green))  |  *Sprint:* 2
+*Dono:* Samuel  |  *Fluxo:* Usa a spec da T-21  |  *Depende de:* T-24
+
+h3. O que fazer
+Job a cada minuto, com Clock injetado: cancela a SOLICITADA depois do prazo de aprovação, marca NAO_COMPARECEU a APROVADA sem check-in a partir do fim e conclui a EM_USO a partir do fim.
+
+h3. Por que (explicação)
+Sem o job, as mudanças por tempo da T-21 nunca acontecem.
+
+h3. Critérios de aceite
+* Testes com Clock fixo nos limites
+* Idempotência: rodar duas vezes não muda o resultado
+
+h3. Rastreabilidade
+* Requisitos: RF-04
+* Arquivos: src/main/java/.../reserva/
+* Processo: docs/processo/ai-workflow.md",semana-37,sprint-2,area-backend,spec,qualidade-senac
+[T-61] S44 · Testes · Testes da recusa de exclusão com vínculos,Task,Medium,Samuel,"*Área:* Testes  |  *Semana:* 44 (Aula 12 · Autorização, RTM e interface)  |  *Sprint:* 4
+*Dono:* Samuel  |  *Fluxo:* Sem spec (PR direto)  |  *Depende de:* T-23, T-35, T-42
+
+h3. O que fazer
+Testes de integração (Testcontainers) de que excluir sala, professor ou material com reserva, retirada ou período de manutenção responde 409 (SQLState 23503 traduzido pela T-22) e nada é apagado.
+
+h3. Por que (explicação)
+As specs T-16, T-17 e T-18 deixam esse teste para quando as tabelas de reserva, retirada e manutenção existirem.
+
+h3. Critérios de aceite
+* Um teste por tipo de vínculo
+* O recurso continua cadastrado depois da recusa
+
+h3. Rastreabilidade
+* Requisitos: RF-02
+* Arquivos: src/test/java/.../recurso/
+* Processo: docs/processo/ai-workflow.md",semana-44,sprint-4,area-testes,sem-spec,qualidade-senac

@@ -15,8 +15,8 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 | Pessoa | Tasks | Backend | Frontend | Testes | Infra | Documentação | Regras críticas |
 |---|---|---|---|---|---|---|---|
 | Renata (@renatarsilva) | 26 | 7 | 1 | 7 | 1 | 10 | T-15, T-20, T-21, T-40 |
-| Samuel (@Samwel-Merces) | 12 | 4 | 1 | 2 | 3 | 2 | T-35, T-37, T-49 |
-| Caio (@CaiosAguiar) | 17 | 4 | 1 | 1 | 4 | 7 | T-34 |
+| Samuel (@Samwel-Merces) | 14 | 5 | 1 | 3 | 3 | 2 | T-35, T-37, T-49 |
+| Caio (@CaiosAguiar) | 18 | 5 | 1 | 1 | 4 | 7 | T-34 |
 | Todos (time) | 3 | 0 | 0 | 0 | 1 | 2 | — |
 
 ## Sprint 1 · 15/10 a 21/10 · semanas 32 a 35
@@ -61,10 +61,10 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 | ID | Área | Task | Dono | Fluxo | Prioridade | Depende de |
 |---|---|---|---|---|---|---|
 | [T-14](#t-14) | Documentação | Processo e registro de defeitos | Renata | — | High | — |
-| [T-15](#t-15) | Backend | Autenticação e autorização por perfil | Renata | spec + grill | Highest | T-07, T-13 |
+| [T-15](#t-15) | Backend | Autenticação e autorização por perfil | Renata | spec + grill | Highest | T-07, T-13, T-22 |
 | [T-16](#t-16) | Backend | Cadastro e consulta de salas | Renata | spec | Medium | T-15 |
-| [T-17](#t-17) | Backend | Cadastro e consulta de professores e competências | Renata | spec | Medium | T-15 |
-| [T-18](#t-18) | Backend | Cadastro e consulta de materiais e equipamentos | Renata | spec | Medium | T-15 |
+| [T-17](#t-17) | Backend | Cadastro e consulta de professores e competências | Renata | spec | Medium | T-15, T-16 |
+| [T-18](#t-18) | Backend | Cadastro e consulta de materiais e equipamentos | Renata | spec | Medium | T-15, T-16 |
 | [T-19](#t-19) | Testes | Plano TDD: inventário de todas as regras de negócio | Renata | — | High | T-09 |
 | [T-20](#t-20) | Testes | Fase red: testes de intervalo e sobreposição de horários | Renata | spec + grill | Highest | T-16, T-17, T-18, T-19 |
 | [T-21](#t-21) | Testes | Fase red: testes do ciclo de vida da reserva | Renata | spec + grill | High | T-19 |
@@ -78,6 +78,8 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 | [T-24](#t-24) | Backend | Fase green: ciclo de vida, alteração e cancelamento | Caio | spec da T-21 | High | T-21, T-23 |
 | [T-25](#t-25) | Infra | Pipeline de CI no GitHub Actions | Samuel | — | Highest | T-07 |
 | [T-26](#t-26) | Documentação | Avaliação arquitetural: ciclo 01 | Caio | — | Medium | T-12, T-23 |
+| [T-59](#t-59) | Backend | Check-in da reserva (APROVADA para EM_USO) | Caio | spec da T-21 | High | T-24 |
+| [T-60](#t-60) | Backend | Job periódico das mudanças por tempo | Samuel | spec da T-21 | High | T-24 |
 
 ### Semana 38 · Aula 07 · JUnit 5, JaCoCo e SonarCloud
 
@@ -137,6 +139,7 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 | [T-49](#t-49) | Testes | Matriz de autorização como teste parametrizado | Samuel | spec + grill | Highest | T-48 |
 | [T-50](#t-50) | Testes | Mutação manual nas regras críticas e fechamento da RTM | Renata | — | Highest | T-37, T-40, T-49 |
 | [T-51](#t-51) | Documentação | Documentação da API com OpenAPI | Caio | — | Medium | T-41 |
+| [T-61](#t-61) | Testes | Testes da recusa de exclusão com vínculos | Samuel | — | Medium | T-23, T-35, T-42 |
 
 ### Semana 45 · Aula 13 · Preparação para a prova oral
 
@@ -363,7 +366,7 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 **Autenticação e autorização por perfil**
 
 - **Semana:** 36 (Aula 05 · Gestão de erros e bugs (TDD fase red)) · **Sprint:** 2 · **Área:** Backend · **Dono:** Renata
-- **Fluxo:** Regra crítica: spec + revisão + validação + grill-with-docs · **Prioridade:** Highest · **Requisitos:** RF-01 · **Depende de:** T-07, T-13
+- **Fluxo:** Regra crítica: spec + revisão + validação + grill-with-docs · **Prioridade:** Highest · **Requisitos:** RF-01 · **Depende de:** T-07, T-13, T-22
 - **O que fazer:** Spring Security com os perfis SOLICITANTE, RESPONSAVEL e ADMINISTRADOR; usuários em banco (migração Flyway) com senha em hash; login por formulário (sessão) para as telas e endpoint de login que devolve token para a API (MockMvc, Cucumber e JMeter usam token); gestão de usuários pelo Administrador; 401 sem autenticação e 403 para perfil sem permissão, sem vazar detalhes.
 - **Por quê:** RF01. Falha de autorização é limitador de nota. As Aulas 09, 10 e 12 dependem de tokens de cada perfil.
 - **Critérios de aceite:**
@@ -391,7 +394,7 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 **Cadastro e consulta de professores e competências**
 
 - **Semana:** 36 (Aula 05 · Gestão de erros e bugs (TDD fase red)) · **Sprint:** 2 · **Área:** Backend · **Dono:** Renata
-- **Fluxo:** Spec + revisão + validação · **Prioridade:** Medium · **Requisitos:** RF-02 · **Depende de:** T-15
+- **Fluxo:** Spec + revisão + validação · **Prioridade:** Medium · **Requisitos:** RF-02 · **Depende de:** T-15, T-16
 - **O que fazer:** CRUD de professores com suas competências, restrito ao Administrador para escrita.
 - **Por quê:** RF02. O professor também é recurso reservável: a agenda dele não pode ter sobreposição.
 - **Critérios de aceite:**
@@ -404,7 +407,7 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
 **Cadastro e consulta de materiais e equipamentos**
 
 - **Semana:** 36 (Aula 05 · Gestão de erros e bugs (TDD fase red)) · **Sprint:** 2 · **Área:** Backend · **Dono:** Renata
-- **Fluxo:** Spec + revisão + validação · **Prioridade:** Medium · **Requisitos:** RF-02 · **Depende de:** T-15
+- **Fluxo:** Spec + revisão + validação · **Prioridade:** Medium · **Requisitos:** RF-02 · **Depende de:** T-15, T-16
 - **O que fazer:** CRUD de materiais (tipo, patrimônio, restrito ou não, situação), restrito ao Administrador para escrita.
 - **Por quê:** RF02. Material é o terceiro tipo de recurso e a base da retirada e devolução (RF09).
 - **Critérios de aceite:**
@@ -969,3 +972,43 @@ Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commit
   - Os 3 presentes
   - Demonstração funcionando a partir da tag
 - **Arquivos:** —
+
+### T-59
+
+**Check-in da reserva (APROVADA para EM_USO)**
+
+- **Semana:** 37 (Aula 06 · Testes automatizados em CI (fase green)) · **Sprint:** 2 · **Área:** Backend · **Dono:** Caio
+- **Fluxo:** Usa a spec da T-21 · **Prioridade:** High · **Requisitos:** RF-04 · **Depende de:** T-24
+- **O que fazer:** Endpoint POST /api/reservas/{id}/checkin: só o dono, só dentro do horário [início, fim), leva a reserva de APROVADA para EM_USO. Fora da janela ou em outro estado responde 409; quem não é o dono recebe 403.
+- **Por quê:** A spec do ciclo de vida (T-21) depende do check-in para a reserva chegar a EM_USO e CONCLUIDA pela aplicação.
+- **Critérios de aceite:**
+  - Testes de janela (09:59, 10:00, 10:59 e 11:00)
+  - 403 para quem não é o dono
+  - Transição registrada para a auditoria
+- **Arquivos:** src/main/java/.../reserva/
+
+### T-60
+
+**Job periódico das mudanças por tempo**
+
+- **Semana:** 37 (Aula 06 · Testes automatizados em CI (fase green)) · **Sprint:** 2 · **Área:** Backend · **Dono:** Samuel
+- **Fluxo:** Usa a spec da T-21 · **Prioridade:** High · **Requisitos:** RF-04 · **Depende de:** T-24
+- **O que fazer:** Job a cada minuto, com Clock injetado: cancela a SOLICITADA depois do prazo de aprovação, marca NAO_COMPARECEU a APROVADA sem check-in a partir do fim e conclui a EM_USO a partir do fim.
+- **Por quê:** Sem o job, as mudanças por tempo da T-21 nunca acontecem.
+- **Critérios de aceite:**
+  - Testes com Clock fixo nos limites
+  - Idempotência: rodar duas vezes não muda o resultado
+- **Arquivos:** src/main/java/.../reserva/
+
+### T-61
+
+**Testes da recusa de exclusão com vínculos**
+
+- **Semana:** 44 (Aula 12 · Autorização, RTM e interface) · **Sprint:** 4 · **Área:** Testes · **Dono:** Samuel
+- **Fluxo:** Sem spec (PR direto) · **Prioridade:** Medium · **Requisitos:** RF-02 · **Depende de:** T-23, T-35, T-42
+- **O que fazer:** Testes de integração (Testcontainers) de que excluir sala, professor ou material com reserva, retirada ou período de manutenção responde 409 (SQLState 23503 traduzido pela T-22) e nada é apagado.
+- **Por quê:** As specs T-16, T-17 e T-18 deixam esse teste para quando as tabelas de reserva, retirada e manutenção existirem.
+- **Critérios de aceite:**
+  - Um teste por tipo de vínculo
+  - O recurso continua cadastrado depois da recusa
+- **Arquivos:** src/test/java/.../recurso/

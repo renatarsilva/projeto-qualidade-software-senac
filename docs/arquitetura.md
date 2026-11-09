@@ -68,7 +68,7 @@ Respostas provisórias às lacunas e decisões pendentes do PRD. **Nenhuma é re
 | S-03 | Todo recurso tem um indicador booleano `restrito`. Quando verdadeiro, a reserva exige aprovação do Responsável | L05 · RN-07, RF-07 | Coluna `restrito` na entidade de recurso | Validação pendente |
 | S-04 | Bloqueio e manutenção são o mesmo mecanismo: um período de indisponibilidade do recurso, com motivo | L13 · RN-04, RF-08 | Uma só entidade de período de manutenção, sem tabela separada de bloqueio | Validação pendente |
 | S-05 | Criar uma manutenção **não** cancela as reservas existentes: ela impede novas reservas e lista as reservas afetadas para o Administrador tratar | L14 · RN-04, FE-03 | Consulta de reservas afetadas; nenhum cancelamento em lote | Validação pendente |
-| S-06 | Um job diário, no fim do dia, marca `NAO_COMPARECEU` nas reservas ainda `APROVADA` cujo horário de início já passou, e conclui as `EM_USO` vencidas | DP-01 · RN-06 | Fluxo batch com perfil de sistema; a sequência fica na seção 2 | Validação pendente |
+| S-06 | Um job periódico, a cada minuto (T-21, P-02), marca `NAO_COMPARECEU` nas reservas `APROVADA` sem check-in a partir do fim do horário, conclui as `EM_USO` a partir do fim e cancela as `SOLICITADA` depois do prazo de aprovação | DP-01 · RN-06 | Fluxo batch com perfil de sistema; a sequência fica na seção 2 | Validação pendente |
 
 ### 1.7 Decisões
 
@@ -121,7 +121,7 @@ Termos usados neste documento, com o sentido que têm no sistema. Quando o termo
 | Reserva afetada | Reserva já existente cujo intervalo cruza um período de manutenção. É listada para o Administrador (S-05) |
 | Retirada e devolução | Registro de que um material ou equipamento saiu e voltou (RF-09) |
 | Auditoria | Registro gravado a cada mudança de estado de uma reserva (RN-09) |
-| Job diário | Processo agendado que marca `NAO_COMPARECEU` e conclui reservas vencidas (S-06) |
+| Job periódico | Processo agendado que marca `NAO_COMPARECEU` e conclui reservas vencidas (S-06) |
 | Perfil | Papel de acesso de um usuário: Solicitante, Responsável ou Administrador (RF-01) |
 | Solicitante | Perfil de quem cria, altera e cancela as próprias reservas. Professores e coordenadores são do mesmo perfil (FE-02) |
 | Responsável | Único perfil que aprova recursos restritos (RN-07) |
@@ -164,7 +164,7 @@ C4Context
 
 - Os três perfis falam com o sistema pelo navegador (telas Thymeleaf) ou diretamente pela API. A autenticação por perfil vale nos dois caminhos (RF-01).
 - A única dependência externa é a API de notificações. Ela é isolada do fluxo da reserva (RNF-10) e, nos testes, é simulada com WireMock.
-- O banco de dados e o job diário não aparecem aqui porque estão dentro do sistema. Eles entram no nível de contêineres (2.2).
+- O banco de dados e o job periódico não aparecem aqui porque estão dentro do sistema. Eles entram no nível de contêineres (2.2).
 
 ### 2.2 Nível 2: contêineres
 
@@ -176,7 +176,7 @@ flowchart LR
 
     subgraph sistema["Organização de Recursos [Sistema]"]
         direction LR
-        app["<b>Aplicação Spring Boot</b><br/>[Contêiner: Java 21, Spring Boot 3.5]<br/>Telas Thymeleaf, API REST em JSON, regras de reserva, autorização por perfil e job diário"]
+        app["<b>Aplicação Spring Boot</b><br/>[Contêiner: Java 21, Spring Boot 3.5]<br/>Telas Thymeleaf, API REST em JSON, regras de reserva, autorização por perfil e job periódico"]
         db[("<b>PostgreSQL 16</b><br/>[Contêiner: banco de dados]<br/>Recursos, reservas, manutenção, retiradas, auditoria e usuários")]
     end
 
@@ -199,7 +199,7 @@ flowchart LR
 - **Dois contêineres próprios.** Telas e API ficam no mesmo projeto Spring Boot (ver 1.1): não há um front-end separado. A decisão de autenticação (sessão nas telas e token na API) será formalizada em ADR na T-13.
 - **O banco é a última linha de defesa.** A restrição anti-conflito (D-02, S-01 e S-02) vive no PostgreSQL, não no código da aplicação. É isso que garante uma única reserva aceita sob solicitações simultâneas (driver 1).
 - **Migrações pela aplicação.** O Flyway aplica as migrações quando a aplicação sobe (F-03). O Hibernate só valida o esquema.
-- **O job diário não é um contêiner à parte.** Ele roda como tarefa agendada dentro do mesmo processo da aplicação (S-06) e aparece como componente no nível 3.
+- **O job periódico não é um contêiner à parte.** Ele roda como tarefa agendada dentro do mesmo processo da aplicação (S-06) e aparece como componente no nível 3.
 - **Notificação isolada.** A chamada à API externa acontece depois da reserva gravada, com timeouts configuráveis (RNF-10, DP-08). Nos testes, ela é simulada com WireMock.
 
 ### 2.3 Nível 3: componentes
@@ -219,7 +219,7 @@ flowchart TB
         relatorios["<b>Relatórios</b>"]
         auditoria["<b>Auditoria</b>"]
         notificacao["<b>Notificação</b>"]
-        job["<b>Job diário</b>"]
+        job["<b>Job periódico</b>"]
         repos["<b>Repositórios</b><br/>Spring Data JPA"]
     end
 
@@ -262,7 +262,7 @@ flowchart TB
 | Relatórios | Utilização, carga horária alocada e conflitos evitados | RF-12 |
 | Auditoria | Registro a cada mudança de estado | RF-10, RN-09 |
 | Notificação | Avisos à API externa, sem desfazer a reserva se falhar | RF-11, RNF-10 |
-| Job diário | Marca `NAO_COMPARECEU` e conclui reservas vencidas | S-06 |
+| Job periódico | Marca `NAO_COMPARECEU` e conclui reservas vencidas | S-06 |
 | Repositórios | Acesso ao PostgreSQL; a restrição anti-conflito vive no banco | RNF-05, D-02 |
 
 Como toda mudança de estado passa pelo Ciclo de vida, é ele que aciona a Auditoria e a Notificação, e a RN-09 não depende de cada chamador.
@@ -393,14 +393,14 @@ sequenceDiagram
 - Sem a restrição no banco, uma checagem "existe conflito?" antes do INSERT deixaria as duas passarem. Por isso o teste de concorrência (T-37) é obrigatório.
 - A forma da resposta recusada (código e mensagem) continua em aberto (L03).
 
-#### 2.4.4 Job diário
+#### 2.4.4 Job periódico
 
 Fluxo batch da S-06, disparado pelo agendador no fim do dia, dentro da própria aplicação.
 
 ```mermaid
 sequenceDiagram
     participant AG as Agendador
-    participant J as Job diário
+    participant J as Job periódico
     participant CV as Ciclo de vida
     participant A as Auditoria
     participant DB as PostgreSQL
@@ -477,6 +477,7 @@ erDiagram
     }
     PROFESSOR {
         bigint recurso_id PK, FK
+        varchar matricula "5 digitos, unica"
     }
     COMPETENCIA {
         bigint id PK
@@ -486,6 +487,7 @@ erDiagram
     MATERIAL {
         bigint recurso_id PK, FK
         varchar tipo_material
+        varchar patrimonio "unico, sem diferenciar maiusculas"
     }
     RESERVA {
         bigint id PK
@@ -493,7 +495,8 @@ erDiagram
         timestamptz inicio
         timestamptz fim
         varchar estado "SOLICITADA, APROVADA, EM_USO, CONCLUIDA, REJEITADA, CANCELADA ou NAO_COMPARECEU"
-        timestamptz criada_em
+        timestamptz criada_em "instante em que o pedido e aceito (Clock); imutavel"
+        timestamptz prazo_aprovacao_em "limite para aprovar; recalculado na alteracao"
     }
     RESERVA_RECURSO {
         bigint id PK
@@ -550,10 +553,16 @@ O banco é a última linha de defesa: as regras que protegem os limitadores de n
 | 2 | Término posterior ao início: `CHECK (fim > inicio)` | `RESERVA` | RN-01 |
 | 3 | Estado, perfil e tipo só aceitam os valores válidos: `CHECK (... IN (...))` | `RESERVA`, `USUARIO`, `RECURSO` | RN-05, RN-06 |
 | 4 | Manutenções do mesmo recurso não se sobrepõem: `EXCLUDE USING gist (recurso_id WITH =, periodo WITH &&)` | `PERIODO_MANUTENCAO` | RF-08 |
-| 5 | Nenhuma reserva é apagada: as chaves estrangeiras usam `ON DELETE RESTRICT`, e o cancelamento só muda o estado | `RESERVA` e tabelas filhas | RN-08 |
+| 5 | Nenhuma reserva é apagada: as chaves estrangeiras usam `ON DELETE RESTRICT`, e o cancelamento só muda o estado. Vale também para as chaves de `RESERVA_RECURSO`, `PERIODO_MANUTENCAO` e `RETIRADA` que apontam para `RECURSO`: um recurso com vínculo não pode ser excluído | `RESERVA`, `RESERVA_RECURSO`, `PERIODO_MANUTENCAO`, `RETIRADA` | RN-08 |
 | 6 | Auditoria só recebe inserções, sem alteração nem exclusão | `AUDITORIA` | RN-09 |
 | 7 | Uma retirada por recurso reservado, e a devolução não vem antes da retirada: `UNIQUE (reserva_recurso_id)` e `CHECK (devolvida_em IS NULL OR devolvida_em >= retirada_em)` | `RETIRADA` | RF-09 |
-| 8 | E-mail único por usuário e nome único por tipo de recurso: `UNIQUE (email)` e `UNIQUE (tipo, nome)` | `USUARIO`, `RECURSO` | RF-01, RF-02 |
+| 8 | E-mail único por usuário e nome único por tipo de recurso, sem diferenciar maiúsculas: `UNIQUE (email)` e um **índice único** sobre `(tipo, lower(nome))` (o PostgreSQL não aceita expressão em `UNIQUE` de tabela). O nome é guardado já sem espaços extras. Criado pela migração da T-16 | `USUARIO`, `RECURSO` | RF-01, RF-02 |
+| 9 | Patrimônio único entre os materiais, sem diferenciar maiúsculas: índice único sobre `lower(patrimonio)` | `MATERIAL` | RF-02 (T-18, P-01) |
+| 10 | Nome da sala no padrão `sala-NN`, só para o tipo `SALA`: `CHECK (tipo <> 'SALA' OR nome ~ '^sala-[0-9]{2,3}$')`. Criado pela migração da T-16 | `RECURSO` | RN-16 (T-16) |
+| 11 | Nome do professor no padrão `primeironome-ultimonome-matricula`, matrícula de 5 dígitos, só para o tipo `PROFESSOR`: `CHECK (tipo <> 'PROFESSOR' OR nome ~ '^[a-z]+-[a-z]+-[0-9]{5}$')`. Criado pela migração da T-16 | `RECURSO` | RN-17 (T-16 e T-17) |
+| 12 | Capacidade da sala maior que zero: `CHECK (capacidade > 0)` | `SALA` | RF-02 (T-16, CA-09) |
+| 13 | Matrícula única entre os professores: `UNIQUE (matricula)` | `PROFESSOR` | RN-17 (T-17) |
+| 14 | O nome do recurso cabe em `varchar(100)` | `RECURSO` | RF-02 (T-16) |
 
 **A restrição 1 em SQL** (a extensão `btree_gist` permite combinar igualdade e sobreposição no mesmo índice):
 
@@ -595,15 +604,15 @@ As decisões ficam em [`docs/adr/`](adr/). Os ADRs desta arquitetura:
 
 ### 5.1 Matriz requisito → decisão → componente → evidência
 
-Cobre os 14 requisitos funcionais. A evidência é a task que vai escrever o teste: ainda não há código.
+Cobre os 14 requisitos funcionais. A evidência é a task que vai escrever o teste (a fase red, como a T-20 e a T-21), e não a que implementa o código (a fase green, como a T-23 e a T-24): ainda não há código.
 
 | Requisito | Decisão | Componente | Evidência |
 |---|---|---|---|
 | RF-01 autenticação e perfil | ADR-0007, ADR-0009 | Segurança | T-15, T-49 |
 | RF-02 cadastro e consulta | ADR-0004 | Recursos | T-16, T-17, T-18 |
 | RF-03 pesquisa | nenhuma (índice em aberto, R-04) | Recursos | T-43 |
-| RF-04 reservas | D-02, S-01, S-02, ADR-0008 | Reservas, Ciclo de vida | T-23, T-24 |
-| RF-05 sobreposição | S-01, S-02, D-02 | Reservas, Repositórios | T-20, T-23 |
+| RF-04 reservas | D-02, S-01, S-02, ADR-0008 | Reservas, Ciclo de vida | T-20, T-21 |
+| RF-05 sobreposição | S-01, S-02, D-02 | Reservas, Repositórios | T-20 |
 | RF-06 dupla reserva | D-01, D-02, ADR-0004 | Repositórios (restrição de exclusão) | T-37 |
 | RF-07 aprovação de restrito | S-03, ADR-0007 | Ciclo de vida, Segurança | T-34 |
 | RF-08 manutenção | S-04, S-05 | Recursos (manutenção) | T-35 |
@@ -621,7 +630,7 @@ Cobre os 14 requisitos funcionais. A evidência é a task que vai escrever o tes
 **Decisões sem requisito de origem direto:**
 
 - ADR-0005 (Flyway): é infraestrutura. Sustenta as restrições do banco, mas nenhum requisito pede um versionador de esquema.
-- ADR-0008 (`Clock`): atende o job diário (S-06) e a auditoria (RF-10) de forma indireta.
+- ADR-0008 (`Clock`): atende o job periódico (S-06) e a auditoria (RF-10) de forma indireta.
 
 **Suposições, todas com validação pendente:** S-01 a S-06 (seção 1.6), mais as decisões D-01 e D-02 (seção 1.7).
 
@@ -659,14 +668,14 @@ Os IDs F1 a F8 são os da T-05. As origens agora usam os IDs do PRD, que não ex
 | F3 | Adequação funcional → correção | Transição de estado inválida (por exemplo, `SOLICITADA` direto para `EM_USO`) é recusada | RN-05, RN-06 | (A, M) | I: pular a aprovação corrompe o ciclo de vida. D: transições são finitas e verificáveis por tabela |
 | F4 | Segurança → integridade | Quem não é Responsável tenta aprovar recurso restrito: recusado, estado não muda | RN-07, RF-07 | (A, M) | I: falha de autorização é limitador de nota. D: a checagem precisa valer em todo ponto de aprovação |
 | F5 | Segurança → integridade | Solicitante tenta operação do Administrador: negada, nada é alterado | RF-01, RNF-06 | (A, M) | I: limitador de nota. D: cobrir toda operação administrativa sem esquecer nenhuma (L06) |
-| F6 | Segurança → responsabilização | Toda mudança de estado grava um registro de auditoria | RN-09, RF-10 | (A, M) | I: rastreabilidade. D: vale para todas as transições, inclusive as do job diário |
+| F6 | Segurança → responsabilização | Toda mudança de estado grava um registro de auditoria | RN-09, RF-10 | (A, M) | I: rastreabilidade. D: vale para todas as transições, inclusive as do job periódico |
 | F7 | Confiabilidade → tolerância a falhas | A API de notificações falha ou demora: a reserva se mantém e o erro não vaza | RNF-10, RF-11 | (A, A) | I: falha externa não pode derrubar a reserva. D: timeout e HTTP 500 só se reproduzem com simulação |
 | F8 | Confiabilidade → recuperabilidade | Notificações falhas são reenviadas sem duplicar | FE-05 (fora de escopo) | (M, A) | Mantida só como registro: o reenvio está fora do escopo, e não vira cenário |
 | F9 | Adequação funcional → correção | Reserva em recurso em manutenção é recusada, inclusive quando a manutenção e a reserva são criadas ao mesmo tempo | RN-04, RF-08 | (A, A) | I: regra crítica. D: envolve duas tabelas, então não cabe em restrição declarativa (seção 3.2) |
 | F10 | Adequação funcional → integridade de dados | O indicador `ocupa` acompanha o estado da reserva em toda mudança | D-02, RN-02 | (A, M) | I: se divergir, a restrição anti-conflito deixa de proteger. D: é uma cópia mantida pelo Ciclo de vida |
 | F11 | Eficiência de desempenho → comportamento temporal | Consulta de disponibilidade e criação de reserva sob 50 usuários simultâneos | RNF-09 (candidata) | (M, M) | I: meta ainda não aprovada (DP-07). D: depende de índices e do banco sob carga |
-| F12 | Confiabilidade → recuperabilidade | O job diário falha no meio: uma nova execução termina o trabalho sem duplicar | S-06 | (M, M) | I: o job não é regra crítica oficial. D: falha parcial e reexecução precisam de tratamento por reserva |
-| F13 | Eficiência de desempenho → capacidade | O job diário roda sem degradar as consultas online | S-06, RNF-09 | (M, M) | I: o job roda fora do horário de pico. D: disputa de banco entre batch e online |
+| F12 | Confiabilidade → recuperabilidade | O job periódico falha no meio: uma nova execução termina o trabalho sem duplicar | S-06 | (M, M) | I: o job não é regra crítica oficial. D: falha parcial e reexecução precisam de tratamento por reserva |
+| F13 | Eficiência de desempenho → capacidade | O job periódico roda sem degradar as consultas online | S-06, RNF-09 | (M, M) | I: o job roda a cada minuto e trata uma reserva por vez. D: disputa de banco entre batch e online |
 | F14 | Segurança → confidencialidade | Um erro interno não devolve stack trace, SQL, nome de classe nem caminho | RNF-08 | (M, B) | I: exigido pela especificação. D: tratamento central de erros, simples de aplicar |
 
 **Folhas (A, A), analisadas primeiro:** F1, F2, F7 e F9. F1, F2 e F7 já têm cenários na T-05 (CEN-01 a CEN-03). O F9 ganha o CEN-04 na seção 6.2.
@@ -680,8 +689,8 @@ Os cenários das folhas F1, F2 e F7 foram escritos na T-05 e continuam valendo: 
 | # | Parte | Conteúdo |
 |---|---|---|
 | 1 | Fonte do estímulo | Um Administrador e um Solicitante, autenticados, agindo ao mesmo tempo |
-| 2 | Estímulo | O Administrador cadastra uma manutenção da SALA-102 das 10h às 12h, e o Solicitante pede reserva da SALA-102 das 10h às 11h, no mesmo instante |
-| 3 | Ambiente | Operação normal. A SALA-102 não tem reserva ativa nem manutenção nesse intervalo |
+| 2 | Estímulo | O Administrador cadastra uma manutenção da sala-102 das 10h às 12h, e o Solicitante pede reserva da sala-102 das 10h às 11h, no mesmo instante |
+| 3 | Ambiente | Operação normal. A sala-102 não tem reserva ativa nem manutenção nesse intervalo |
 | 4 | Artefato | Componentes Reservas e Recursos (manutenção) e as tabelas `reserva_recurso` e `periodo_manutencao` no PostgreSQL |
 | 5 | Resposta | O resultado é consistente em qualquer ordem. Se a manutenção confirma primeiro, a reserva é recusada (RN-04). Se a reserva confirma primeiro, ela fica gravada e aparece na lista de reservas afetadas pela manutenção, sem ser cancelada (S-05). Nenhuma reserva é gravada depois da manutenção confirmada |
 | 6 | Medida da resposta | Em 20 execuções concorrentes, 0 reservas gravadas depois da confirmação da manutenção, e 100% das reservas confirmadas antes aparecem na lista de afetadas. Sem concorrência, uma reserva pedida depois da manutenção confirmada é recusada e nada é gravado. **Métrica candidata, validação pendente** |
@@ -704,7 +713,7 @@ A Aula 04 lista situações de falha a considerar. Algumas são do pipeline de t
 
 | Situação | Aplica? | O que pode acontecer no nosso sistema | Folha | Como o desenho responde |
 |---|---|---|---|---|
-| Falha parcial do job | Sim | O job diário cai no meio e deixa reservas sem marcar | F12 | Cada reserva é tratada em sua própria transação (seção 2.4.4); o que já foi marcado fica salvo |
+| Falha parcial do job | Sim | O job periódico cai no meio e deixa reservas sem marcar | F12 | Cada reserva é tratada em sua própria transação (seção 2.4.4); o que já foi marcado fica salvo |
 | Reexecução | Sim | O job roda de novo depois de uma falha, ou por engano | F12 | O job só busca `APROVADA` e `EM_USO` vencidas; o que já mudou de estado não é buscado de novo |
 | Jobs sobrepostos | Sim | Duas execuções do job ao mesmo tempo tentam mudar a mesma reserva | F12, F3 | Depende de o Ciclo de vida recusar a transição quando o estado já mudou; não há bloqueio entre execuções (a avaliar) |
 | Dados duplicados | Sim | O mesmo usuário envia o mesmo pedido duas vezes (duplo clique) | F1 | A segunda reserva conflita com a primeira e é recusada (S-02) |
@@ -716,8 +725,8 @@ A Aula 04 lista situações de falha a considerar. Algumas são do pipeline de t
 | Condições de rollback | Sim | A auditoria falha ao gravar; a notificação falha ao enviar | F6, F7 | A falha da auditoria desfaz a transição; a falha da notificação não desfaz nada (RNF-10) |
 | Indisponibilidade do registro | Adaptada | O PostgreSQL fica indisponível | F14 | A aplicação não opera sem o banco; o erro devolvido não expõe detalhes internos (RNF-08) |
 | Vazamento ou uso indevido de dados | Sim | Usuários, e-mails e histórico de reservas expostos a quem não deve ver | F4, F5 | Autorização por perfil em toda entrada; senha guardada só como hash (`senha_hash`); quem consulta a auditoria ainda é decisão pendente (DP-02) |
-| Custo ou tempo acima da janela | Sim | O job diário demora mais do que o intervalo até a próxima execução | F13 | Sem medida ainda: o tamanho da janela e o volume esperado são lacunas |
-| Impacto do batch no online | Sim | O job disputa o banco com consultas e reservas | F13 | O job roda no fim do dia e trata uma reserva por vez; a medida depende do teste de carga (T-38) |
+| Custo ou tempo acima da janela | Sim | O job periódico demora mais do que o intervalo até a próxima execução | F13 | Sem medida ainda: o tamanho da janela e o volume esperado são lacunas |
+| Impacto do batch no online | Sim | O job disputa o banco com consultas e reservas | F13 | O job roda a cada minuto e trata uma reserva por vez; a medida depende do teste de carga (T-38) |
 
 ### 6.4 Táticas e métricas
 
@@ -725,14 +734,14 @@ Cada abordagem da arquitetura, com a tática do [catálogo](taticas-arquiteturai
 
 | Abordagem | Folha | Tática (Bass) | Métrica | Custo | Teste planejado |
 |---|---|---|---|---|---|
-| Restrição de exclusão no banco, na mesma transação que grava a reserva (2.4.3, 3.2) | F1, F2 | Transactions · Schedule Resources | 1 reserva ativa em 20 pedidos simultâneos (CEN-02); 21 de 21 verificações de sobreposição (CEN-01) | Contenção: a segunda transação espera a primeira, o que limita a vazão em pico | Concorrência (T-37) e sobreposição (T-23) |
+| Restrição de exclusão no banco, na mesma transação que grava a reserva (2.4.3, 3.2) | F1, F2 | Transactions · Schedule Resources | 1 reserva ativa em 20 pedidos simultâneos (CEN-02); 21 de 21 verificações de sobreposição (CEN-01) | Contenção: a segunda transação espera a primeira, o que limita a vazão em pico | Concorrência (T-37) e sobreposição (T-20) |
 | Ciclo de vida como ponto único de mudança de estado, com tabela de transições (2.3) | F3, F6 | Sanity Checking · Audit · Timestamp | 100% das transições inválidas recusadas; 1 registro de auditoria por mudança de estado | Um componente obrigatório no caminho; volume da tabela de auditoria | Ciclo de vida (T-21) e auditoria (T-40) |
 | Segurança na frente de todas as entradas, com matriz de perfil por operação (2.3) | F4, F5 | Authenticate Actors · Authorize Actors | 0 operações por perfil não autorizado; 100% das células da matriz com o resultado esperado (RNF-06) | Complexidade do modelo de permissões | Matriz parametrizada (T-49) |
 | Notificação depois da transação, com timeouts configuráveis (2.4.1) | F7 | Bound Execution Times · Exception Handling | 0 reversões de reserva com HTTP 500 ou timeout; timeouts de 500 ms e 1500 ms (candidatas, DP-08) | Notificação perdida, sem reenvio (FE-05) | WireMock (T-31) |
 | Verificação de manutenção na aplicação, antes de gravar (2.4.1) | F9 | Sanity Checking | 0 reservas gravadas depois da manutenção confirmada, em 20 execuções (CEN-04, candidata) | A verificação e a gravação não são atômicas: a corrida não está fechada | Concorrência de manutenção (T-35) |
 | Indicador `ocupa` atualizado pelo Ciclo de vida na mesma transação (3.2) | F10 | Transactions · Executable Assertions | 0 divergências entre `ocupa` e o estado da reserva após qualquer transição | Dado duplicado, que precisa ser mantido | Integração parametrizada por transição (T-21) |
-| Job diário com uma transação por reserva e busca só de estados vencidos (2.4.4) | F12 | Transactions · Retry | 0 reservas marcadas duas vezes e 0 auditorias duplicadas após reexecução | Mais transações curtas | Job com `Clock` injetado e falha forçada no meio |
-| Job rodando no fim do dia, uma reserva por vez (2.4.4) | F13 | Schedule Resources | p95 das consultas online com o job rodando dentro da meta de desempenho (candidata, MC-01) | Tempo total do job, ainda sem medida | Carga com o job em execução (T-38) |
+| Job periódico com uma transação por reserva e busca só de estados vencidos (2.4.4) | F12 | Transactions · Retry | 0 reservas marcadas duas vezes e 0 auditorias duplicadas após reexecução | Mais transações curtas | Job com `Clock` injetado e falha forçada no meio |
+| Job rodando a cada minuto, uma reserva por vez (2.4.4) | F13 | Schedule Resources | p95 das consultas online com o job rodando dentro da meta de desempenho (candidata, MC-01) | Tempo total do job, ainda sem medida | Carga com o job em execução (T-38) |
 | Tratamento central de erros nos controladores (2.3) | F14 | Exception Handling · Limit Exposure | 0 respostas de erro com stack trace, SQL, nome de classe ou caminho (RNF-08) | Mensagens menos detalhadas: o diagnóstico fica nos logs internos | Erros e entrada inválida (T-22, T-49) |
 | **Nenhuma definida** | F11 | — | p95 ≤ 300 ms com 50 usuários (candidata, MC-01) | — | Carga (T-38) |
 
@@ -748,7 +757,7 @@ Um parâmetro que decide sozinho a resposta de **um** atributo.
 |---|---|---|---|
 | PS-01 | Limites do intervalo, `[)` (S-01) | Adequação funcional | Decide se reservas adjacentes conflitam |
 | PS-02 | Timeouts de conexão e leitura da notificação (MC-04, MC-05) | Confiabilidade | Decidem quanto tempo uma chamada externa presa consome recursos antes de falhar |
-| PS-03 | Tamanho da janela e volume do job diário (sem medida) | Desempenho | Decidem se o job termina antes da próxima execução |
+| PS-03 | Tamanho da janela e volume do job periódico (sem medida) | Desempenho | Decidem se o job termina antes da próxima execução |
 
 #### Pontos de trade-off
 
@@ -771,7 +780,7 @@ Decisões que podem impedir um cenário de ser atendido.
 | R-03 | Duas execuções do job ao mesmo tempo podem tentar mudar a mesma reserva, sem bloqueio entre elas | S-06, 2.4.4 | F12 |
 | R-04 | Nenhuma tática de desempenho definida, e a meta ainda não foi aprovada | DP-07, RNF-09 | F11 |
 | R-05 | A auditoria só de inserção depende da aplicação, sem reforço no banco | 3.2, restrição 6 | F6 |
-| R-06 | O job diário não tem janela nem volume medidos | S-06, PS-03 | F13 |
+| R-06 | O job periódico não tem janela nem volume medidos | S-06, PS-03 | F13 |
 | R-07 | Notificação perdida não é reenviada. **Risco aceito**: o reenvio está fora de escopo (FE-05) | RNF-10 | F7 |
 | R-08 | O mesmo intervalo é guardado duas vezes: `inicio` e `fim` em `reserva`, `periodo` em `reserva_recurso`. Se um mudar sem o outro, a restrição anti-conflito protege um horário que não é o da reserva. Mitigação: gravar os dois na mesma transação, a partir dos mesmos valores | D-02 | F1, F2, F10 |
 
@@ -793,7 +802,7 @@ Padrões que se repetem em vários riscos.
 | ID | Tema | Riscos |
 |---|---|---|
 | TR-01 | Regras que atravessam duas tabelas ou dois componentes dependem da disciplina do código, sem garantia do banco | R-01, R-02, R-05, R-08 |
-| TR-02 | O job diário não tem medida nem proteção contra execução dupla | R-03, R-06 |
+| TR-02 | O job periódico não tem medida nem proteção contra execução dupla | R-03, R-06 |
 | TR-03 | Há cenário de desempenho e de job sem tática nem meta aprovada | R-04, R-06 |
 
 
@@ -824,13 +833,13 @@ Cada papel questiona a arquitetura das seções 1 a 6. As objeções não são d
 |---|---|---|
 | Analista | L12 ("validar a alocação de docentes") não tem task nem dono, e pode exigir uma aprovação que o modelo ainda não tem | Pergunta aberta |
 | Analista | DP-06 pode separar "solicitação especial" de "recurso restrito", o que quebraria o campo único `restrito` (S-03) | Pergunta ao professor; ADR da entidade Usuario e do recurso |
-| Arquiteto | O job diário roda dentro da aplicação: com duas instâncias, ele roda duas vezes (R-03) | R-03; ADR do job, se houver mais de uma instância |
+| Arquiteto | O job periódico roda dentro da aplicação: com duas instâncias, ele roda duas vezes (R-03) | R-03; ADR do job, se houver mais de uma instância |
 | Arquiteto | A verificação de manutenção não é atômica com a gravação da reserva (R-01) | R-01 |
 | Dados | `reserva` guarda `inicio` e `fim`, e `reserva_recurso` guarda `periodo`: são duas cópias do mesmo intervalo | Ação: definir qual é a fonte e sincronizar na mesma transação |
 | Dados | Não há índice definido para a pesquisa de disponibilidade, e o desempenho (F11) depende dele | R-04; ADR do PostgreSQL |
 | Segurança/LGPD | Nome e e-mail ficam em `usuario` e a auditoria guarda quem agiu: não há regra de retenção nem de quem consulta (DP-02) | Pergunta aberta; ADR da entidade Usuario |
 | Segurança/LGPD | Sessão nas telas exige proteção contra CSRF, e o token da API precisa de validade; nada disso está definido | ADR de autenticação |
 | Ops | Não há CI (F-08), e a extensão `btree_gist` precisa de permissão no banco para a migração rodar | ADR do Flyway; task do CI (T-25) |
-| Ops | Nada avisa se o job diário falhar ou demorar (R-06) | R-06; sem ADR por ora |
+| Ops | Nada avisa se o job periódico falhar ou demorar (R-06) | R-06; sem ADR por ora |
 | Custos | Não está definido onde a aplicação roda na entrega, e a API de notificações externa pode ter limite ou custo | Pergunta aberta |
 | Custos | A pilha escolhida (PostgreSQL, Spring Boot, Thymeleaf) não tem licença paga; o custo é o tempo do time | Registrado nos ADRs como consequência |
