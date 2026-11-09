@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * quando ela entrar, este arquivo sai.
  */
 @RestControllerAdvice(assignableTypes = {SalaController.class, br.senac.recursos.professor.ProfessorController.class,
-        br.senac.recursos.material.MaterialController.class})
+        br.senac.recursos.material.MaterialController.class,
+        br.senac.recursos.reserva.ReservaController.class})
 public class SalaErrosAdvice {
 
     @ExceptionHandler(EntradaInvalidaException.class)

@@ -1,6 +1,6 @@
 package br.senac.recursos.reserva;
 
-/** Estados da reserva (RN-05 e RN-06). Quais deles ocupam o horário é decisão da T-23 (S-02). */
+/** Estados da reserva (RN-05 e RN-06). Os três primeiros ocupam o horário (S-02). */
 public enum EstadoDaReserva {
     SOLICITADA,
     APROVADA,
@@ -8,5 +8,10 @@ public enum EstadoDaReserva {
     CONCLUIDA,
     REJEITADA,
     CANCELADA,
-    NAO_COMPARECEU
+    NAO_COMPARECEU;
+
+    /** Só {@code SOLICITADA}, {@code APROVADA} e {@code EM_USO} bloqueiam outro pedido (S-02). */
+    public boolean ocupaHorario() {
+        return this == SOLICITADA || this == APROVADA || this == EM_USO;
+    }
 }
