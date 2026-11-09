@@ -24,8 +24,8 @@
         <!-- SonarCloud (T-29). Preencher com os dados do projeto importado no SonarCloud.
              O token NUNCA vai aqui: ele vem do segredo SONAR_TOKEN do GitHub (ver docs/processo/ci.md). -->
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.organization>TODO-preencher</sonar.organization>
-        <sonar.projectKey>TODO-preencher</sonar.projectKey>
+        <sonar.organization>renatarsilva</sonar.organization>
+        <sonar.projectKey>renatarsilva_projeto-qualidade-software-senac</sonar.projectKey>
         <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <sonar.exclusions>**/OrganizacaoRecursosApplication.java</sonar.exclusions>
     </properties>
