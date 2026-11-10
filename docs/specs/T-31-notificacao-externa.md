@@ -215,24 +215,26 @@ A suíte usa o WireMock em processo, numa porta livre: roda offline e no CI, sem
 
 ## 9. Revisão por pares
 
-> Preenchida pelo revisor, com commit próprio. Nunca pelo autor.
+- [x] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
+- [x] As regras e premissas estão rastreadas nos documentos do projeto.
+- [x] Todo critério de aceite é verificável.
+- [x] Os casos de teste incluem sucesso, falhas do provedor, timeout e resposta inválida.
+- [x] O contrato impede que a indisponibilidade da notificação desfaça a reserva.
+- [x] Não há conflito com o PRD, a arquitetura ou os ADRs relacionados.
 
-- [ ] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
-- [ ] As regras citam RNs que existem no PRD.
-- [ ] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
-- [ ] Os casos de teste incluem valores limite e entradas inválidas.
-- [ ] O contrato da API cobre os erros (400, 401, 403, 409).
-- [ ] Não há conflito com outras specs nem com os ADRs.
+**Comentários:**
 
-**Pontos para o revisor decidir:**
+Revisei a spec da T-31, incluindo a porta `Notificador`, o adaptador HTTP, os critérios de aceite e a matriz de integração INT-01 a INT-05.
 
-- **P-01 (DP-03):** os eventos que notificam são `APROVADA`, `REJEITADA` e `CANCELADA`, como propõe o backlog. Confirmar.
-- **P-02 ("503 controlado"):** o backlog diz "INT-03 500 → 503 controlado". Como a falha da notificação não pode quebrar a reserva (RNF-10), esta spec traduz o 503 como a causa `INDISPONIVEL`, e **não** como uma resposta 503 da API do sistema: quem aprovou a reserva recebe a resposta normal da aprovação. Confirmar essa leitura.
-- **P-03 (contrato 400/401/403/409):** não se aplica, porque esta task não cria endpoint no sistema.
+Quanto à P-01, concordo que os eventos notificados nesta task sejam `APROVADA`, `REJEITADA` e `CANCELADA`. Esses eventos representam decisões ou mudanças relevantes para o solicitante, enquanto os demais estados permanecem fora do escopo desta integração.
 
-**Comentários:** _preencher_
+Quanto à P-02, interpreto o cenário “500 → 503 controlado” como uma indisponibilidade interna do provedor, representada pela causa `INDISPONIVEL`. Essa condição não deve ser devolvida como 503 ao usuário da operação principal, pois a falha da notificação não pode desfazer nem transformar em erro uma reserva já processada.
 
-**Parecer:** _preencher_ (Aprovada / Ajustes necessários) · @CaiosAguiar · AAAA-MM-DD
+Também conferi os timeouts de conexão e leitura, a configuração externa de URL e token, a execução offline com WireMock e os cenários de resposta válida, 404, 500, timeout e JSON inválido. O contrato também prevê que tokens, respostas brutas do provedor e detalhes internos não sejam expostos pela API ou pelos logs.
+
+Os critérios permitem verificar objetivamente o isolamento da dependência externa e a preservação da reserva diante de falhas de notificação. Não identifiquei inconsistências impeditivas para a implementação.
+
+**Parecer:** Aprovada · @CaiosAguiar · 2026-11-09
 
 ## 10. Spec validation
 
