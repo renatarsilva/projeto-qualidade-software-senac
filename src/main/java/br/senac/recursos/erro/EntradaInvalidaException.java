@@ -1,4 +1,4 @@
-package br.senac.recursos.sala;
+package br.senac.recursos.erro;
 
 import java.util.List;
 import java.util.Map;

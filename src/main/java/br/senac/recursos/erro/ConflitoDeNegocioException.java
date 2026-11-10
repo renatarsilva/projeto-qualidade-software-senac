@@ -1,4 +1,4 @@
-package br.senac.recursos.sala;
+package br.senac.recursos.erro;
 
 /** A operação conflita com outro registro (409). A mensagem está em linguagem de negócio. */
 public class ConflitoDeNegocioException extends RuntimeException {
