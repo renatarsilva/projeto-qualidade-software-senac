@@ -11,7 +11,7 @@ Rascunho → Em revisão → Aprovada → Validada → Liberada
 | Task | T-37 |
 | Autor(a) | @renatarsilva |
 | Revisor(a) | @Samwel-Merces |
-| Status | Em revisão |
+| Status | Liberada |
 | Regra crítica | Sim |
 | Requisitos | RF-06, RN-03, RNF-05 |
 | Característica ISO 25010 | Adequação funcional (correção sob concorrência) |
@@ -260,8 +260,8 @@ Pontos para acompanhar na implementação, sem bloquear a aprovação:
 
 Resultado de `./scripts/validar-spec.sh` (preenchido pelo autor após o script passar):
 
-- **Data:** _preencher_
-- **Resultado:** _preencher_
+- **Data:** 2026-11-09
+- **Resultado:** APROVADA na spec validation
 
 ## 11. Grill-with-docs
 
@@ -269,6 +269,15 @@ Resultado de `./scripts/validar-spec.sh` (preenchido pelo autor após o script p
 
 | # | Pergunta | Resposta / decisão | Documento afetado |
 |---|---|---|---|
-| 1 | _preencher_ | _preencher_ | _preencher_ |
+| 1 | O ADR repete a arquitetura 3.2, que já descartou lock e `SERIALIZABLE`? | Não rediscute: o ADR-0010 é curto, liga à 3.2, registra a ordenação por `recurso_id` contra deadlock e aponta as evidências de vermelho e verde | `docs/adr/0010`, arquitetura 3.2 |
+| 2 | O TC-17 (ordem invertida) reproduz o deadlock de forma determinística? | Não. O TC-17 prova o resultado (sem 500, sem gravação parcial) e o TC-18 simula o `40P01`; o teste não promete provar a causa | Seção 6 |
+| 3 | A mensagem do 409 vaza algo? | Diz o recurso e o fato, nunca o dono (TC-12). Dizer que o professor está ocupado é aceito (T-20, CA-05) | CA-03, TC-12 |
+| 4 | E se alguém cancela enquanto outro reserva o mesmo horário? | Fora desta spec: cancelar × criar é da T-21 e T-24; aprovar × cancelar é da T-34. A T-37 cobre criar e alterar | Seção 2 |
+| 5 | Quem pode criar a reserva disputada? (DP-05) | Só SOLICITANTE. O 403 dos outros perfis é da matriz de autorização (T-48) | Seção 2, T-48 |
+| 6 | O teste falharia se a regra quebrasse? | Sim: a contagem vem do banco e o CA-13 exige a evidência do vermelho sem o `EXCLUDE` e do verde com ele | CA-13, `docs/evidencias/` |
+| 7 | O teste é estável no CI, que é mais lento? (MC-03) | `@RepeatedTest(5)` com pool de 25 e limite de 30 s; se ficar instável, vira defeito em `docs/defeitos/` | CA-12 |
+| 8 | Qual linha da RTM isto preenche? | RN-03, RF-06 e RNF-05: de `sem teste` para `red` e `green`, com as duas evidências | `docs/RTM.md` |
 
-**Resultado:** _preencher_ (Liberada / Pendências) · AAAA-MM-DD
+Decisões confirmadas em bloco por @renatarsilva (dona da task) em 2026-11-10, a partir das respostas propostas na sessão do grill.
+
+**Resultado:** Liberada · 2026-11-10
