@@ -1,7 +1,9 @@
 package br.senac.recursos.seguranca;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.net.URI;
+import br.senac.recursos.erro.FabricaDeProblemas;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.util.List;
@@ -12,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.core.convert.converter.Converter;
@@ -80,7 +81,9 @@ public class SegurancaConfiguracao {
     @Bean
     @Order(2)
     SecurityFilterChain telas(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(regras -> regras.anyRequest().authenticated())
+        http.authorizeHttpRequests(regras -> regras
+                        .requestMatchers("/error").permitAll() // a página de erro é aberta, senão o erro viraria login
+                        .anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults());
         return http.build();
     }
@@ -99,21 +102,6 @@ public class SegurancaConfiguracao {
             return OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token", "token expirado", null));
         });
         return decodificador;
-    }
-
-    /** Resposta 401 da API: sem token, token inválido ou expirado. Não revela nenhum detalhe interno. */
-    @Bean
-    AuthenticationEntryPoint entradaDaApi(ObjectMapper mapeador) {
-        return (requisicao, resposta, erro) -> {
-            ProblemDetail problema = ProblemDetail.forStatusAndDetail(
-                    HttpStatus.UNAUTHORIZED, "É necessário estar autenticado para acessar este recurso.");
-            problema.setTitle("Autenticação necessária");
-            problema.setInstance(URI.create(requisicao.getRequestURI()));
-            resposta.setStatus(HttpStatus.UNAUTHORIZED.value());
-            resposta.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
-            resposta.setCharacterEncoding(StandardCharsets.UTF_8.name());
-            mapeador.writeValue(resposta.getWriter(), problema);
-        };
     }
 
     /**
@@ -139,18 +127,25 @@ public class SegurancaConfiguracao {
         }
     }
 
-    /** Resposta 403 da API: usuário autenticado sem permissão. Não revela nenhum detalhe interno. */
+    /** Resposta 401 da API: sem token, token inválido ou expirado. Usa a fábrica de erros da T-22. */
+    @Bean
+    AuthenticationEntryPoint entradaDaApi(ObjectMapper mapeador) {
+        return (requisicao, resposta, erro) -> escreve(mapeador, resposta,
+                FabricaDeProblemas.autenticacaoNecessaria(requisicao.getRequestURI()));
+    }
+
+    /** Resposta 403 da API: usuário autenticado sem permissão. Usa a fábrica de erros da T-22. */
     @Bean
     AccessDeniedHandler acessoNegadoDaApi(ObjectMapper mapeador) {
-        return (requisicao, resposta, erro) -> {
-            ProblemDetail problema = ProblemDetail.forStatusAndDetail(
-                    HttpStatus.FORBIDDEN, "Você não tem permissão para esta operação.");
-            problema.setTitle("Acesso negado");
-            problema.setInstance(URI.create(requisicao.getRequestURI()));
-            resposta.setStatus(HttpStatus.FORBIDDEN.value());
-            resposta.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
-            resposta.setCharacterEncoding(StandardCharsets.UTF_8.name());
-            mapeador.writeValue(resposta.getWriter(), problema);
-        };
+        return (requisicao, resposta, erro) -> escreve(mapeador, resposta,
+                FabricaDeProblemas.acessoNegado(requisicao.getRequestURI()));
+    }
+
+    private static void escreve(ObjectMapper mapeador, HttpServletResponse resposta, ProblemDetail problema)
+            throws IOException {
+        resposta.setStatus(problema.getStatus());
+        resposta.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
+        resposta.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        mapeador.writeValue(resposta.getWriter(), problema);
     }
 }

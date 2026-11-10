@@ -1,12 +1,12 @@
 package br.senac.recursos.reserva;
 
-import br.senac.recursos.sala.ConflitoDeNegocioException;
-import br.senac.recursos.sala.EntradaInvalidaException;
-import br.senac.recursos.sala.RecursoNaoEncontradoException;
+import br.senac.recursos.erro.AcessoNegadoException;
+import br.senac.recursos.erro.ConflitoDeNegocioException;
+import br.senac.recursos.erro.EntradaInvalidaException;
+import br.senac.recursos.erro.RecursoNaoEncontradoException;
 import java.util.List;
 import java.util.Map;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,7 +47,7 @@ public class ReservaService {
             case RESERVA_INEXISTENTE, RECURSO_INEXISTENTE:
                 throw new RecursoNaoEncontradoException();
             case NAO_DONO:
-                throw new AccessDeniedException("Acesso negado");
+                throw new AcessoNegadoException();
             case DADO_AUSENTE, INTERVALO_INVALIDO, SEM_RECURSO:
                 throw new EntradaInvalidaException(
                         List.of(Map.of("campo", decisao.campo(), "motivo", decisao.mensagem())));
