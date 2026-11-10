@@ -6,6 +6,8 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -34,6 +36,28 @@ public class ReservaController {
     ResponseEntity<ReservaResponse> altera(Authentication autenticacao, @PathVariable long id,
             @RequestBody ReservaRequest corpo) {
         return ResponseEntity.ok(reservas.altera(donoDe(autenticacao), id, pedidoDe(corpo)));
+    }
+
+    // Esqueletos da T-21: respondem 204 em tudo, para os testes de contrato falharem por asserção até a T-24.
+
+    @PatchMapping("/{id}/estado")
+    ResponseEntity<Void> mudaEstado(@PathVariable long id, @RequestBody String corpo) {
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/cancelamento")
+    ResponseEntity<Void> cancela(@PathVariable long id) {
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/checkin")
+    ResponseEntity<Void> checkin(@PathVariable long id) {
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    ResponseEntity<Void> apaga(@PathVariable long id) {
+        return ResponseEntity.noContent().build();
     }
 
     private static long donoDe(Authentication autenticacao) {

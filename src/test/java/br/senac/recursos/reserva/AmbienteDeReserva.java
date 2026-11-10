@@ -1,5 +1,7 @@
 package br.senac.recursos.reserva;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
@@ -42,6 +44,12 @@ final class AmbienteDeReserva {
     RecursoPedido sala(String nome) throws Exception {
         String corpo = "{\"nome\":\"" + nome + "\",\"tipoSala\":\"Laboratório\",\"capacidade\":30,"
                 + "\"localizacao\":\"Bloco B\",\"restrito\":false}";
+        return new RecursoPedido(TipoDeRecurso.SALA, cadastra("/api/salas", corpo));
+    }
+
+    RecursoPedido salaRestrita(String nome) throws Exception {
+        String corpo = "{\"nome\":\"" + nome + "\",\"tipoSala\":\"Laboratório\",\"capacidade\":30,"
+                + "\"localizacao\":\"Bloco B\",\"restrito\":true}";
         return new RecursoPedido(TipoDeRecurso.SALA, cadastra("/api/salas", corpo));
     }
 
@@ -94,12 +102,18 @@ final class AmbienteDeReserva {
 
     long reservaGravada(long donoId, EstadoDaReserva estado, Instant inicio, Instant fim, Instant criadaEm,
             RecursoPedido... recursos) {
+        return reservaComPrazo(donoId, estado, inicio, fim, criadaEm, inicio.minusSeconds(86400), recursos);
+    }
+
+    /** Como {@link #reservaGravada}, com o prazo de aprovação escolhido pelo teste. */
+    long reservaComPrazo(long donoId, EstadoDaReserva estado, Instant inicio, Instant fim, Instant criadaEm,
+            Instant prazo, RecursoPedido... recursos) {
         boolean ocupa = estado == EstadoDaReserva.SOLICITADA || estado == EstadoDaReserva.APROVADA
                 || estado == EstadoDaReserva.EM_USO;
         long id = jdbc.queryForObject(
                 "INSERT INTO reserva (solicitante_id, inicio, fim, estado, criada_em, prazo_aprovacao_em) "
                         + "VALUES (?, ?, ?, ?, ?, ?) RETURNING id",
-                Long.class, donoId, utc(inicio), utc(fim), estado.name(), utc(criadaEm), utc(inicio.minusSeconds(86400)));
+                Long.class, donoId, utc(inicio), utc(fim), estado.name(), utc(criadaEm), utc(prazo));
         for (RecursoPedido recurso : recursos) {
             jdbc.update("INSERT INTO reserva_recurso (reserva_id, recurso_id, periodo, ocupa) "
                     + "VALUES (?, ?, tstzrange(?::timestamptz, ?::timestamptz, '[)'), ?)",
@@ -183,6 +197,25 @@ final class AmbienteDeReserva {
         MockHttpServletRequestBuilder requisicao = put("/api/reservas/" + id)
                 .contentType(MediaType.APPLICATION_JSON).content(json);
         return executa(comAutorizacao(requisicao, bearer));
+    }
+
+    /** {@code PATCH /api/reservas/{id}/estado}; o destino entra no JSON como texto. */
+    ResultActions mudaEstado(String bearer, long id, String destino) throws Exception {
+        MockHttpServletRequestBuilder requisicao = patch("/api/reservas/" + id + "/estado")
+                .contentType(MediaType.APPLICATION_JSON).content("{\"estado\":\"" + destino + "\"}");
+        return executa(comAutorizacao(requisicao, bearer));
+    }
+
+    ResultActions cancela(String bearer, long id) throws Exception {
+        return executa(comAutorizacao(post("/api/reservas/" + id + "/cancelamento"), bearer));
+    }
+
+    ResultActions checkin(String bearer, long id) throws Exception {
+        return executa(comAutorizacao(post("/api/reservas/" + id + "/checkin"), bearer));
+    }
+
+    ResultActions apaga(String bearer, long id) throws Exception {
+        return executa(comAutorizacao(delete("/api/reservas/" + id), bearer));
     }
 
     private static MockHttpServletRequestBuilder comAutorizacao(MockHttpServletRequestBuilder requisicao,

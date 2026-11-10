@@ -16,6 +16,7 @@ final class CenarioDeReserva {
 
     final AgendaEmMemoria agenda = new AgendaEmMemoria();
     final RegraDeReserva regra;
+    final CicloDeVidaDaReserva ciclo;
 
     CenarioDeReserva() {
         this(HorariosDeTeste.AGORA);
@@ -24,6 +25,7 @@ final class CenarioDeReserva {
     CenarioDeReserva(Instant agora) {
         Clock clock = Clock.fixed(agora, ZoneOffset.UTC);
         this.regra = new RegraDeReserva(clock, agenda, new SobreposicaoPelaAgenda(agenda));
+        this.ciclo = new CicloDeVidaDaReserva(clock, agenda);
     }
 
     /** Recurso que existe no cadastro. */
@@ -52,6 +54,22 @@ final class CenarioDeReserva {
                 HorariosDeTeste.AGORA.minusSeconds(5 * 24 * 3600L), inicio.minusSeconds(24 * 3600L)));
     }
 
+    /** Reserva já gravada, com o prazo de aprovação escolhido pelo teste. */
+    ReservaNaAgenda reservaComPrazo(long donoId, EstadoDaReserva estado, Instant inicio, Instant termino,
+            Instant prazo, RecursoPedido... recursos) {
+        return agenda.grava(new ReservaNaAgenda(0, donoId, estado, inicio, termino, List.of(recursos),
+                HorariosDeTeste.AGORA.minusSeconds(5 * 24 * 3600L), prazo));
+    }
+
+    /** O recurso está ocupado neste período? Responde pela agenda, como a verificação de sobreposição. */
+    boolean ocupado(RecursoPedido recurso, Instant inicio, Instant termino) {
+        return new SobreposicaoPelaAgenda(agenda).ocupado(recurso, inicio, termino, null);
+    }
+
+    EstadoDaReserva estadoDe(ReservaNaAgenda reserva) {
+        return agenda.busca(reserva.id()).orElseThrow().estado();
+    }
+
     static PedidoDeReserva pedido(Instant inicio, Instant termino, RecursoPedido... recursos) {
         return new PedidoDeReserva(inicio, termino, List.of(recursos));
     }
@@ -73,6 +91,13 @@ final class CenarioDeReserva {
     static void assertRecusada(DecisaoDaReserva decisao, MotivoDeRecusa motivo) {
         assertThat(decisao.veredito()).as("veredito").isEqualTo(Veredito.RECUSADA);
         assertThat(decisao.motivo()).as("motivo da recusa").isEqualTo(motivo);
+    }
+
+    /** A reserva fica no estado esperado, tanto na decisão quanto na agenda. */
+    void assertMudouPara(DecisaoDaReserva decisao, ReservaNaAgenda reserva, EstadoDaReserva esperado) {
+        assertAceita(decisao);
+        assertThat(decisao.reserva().estado()).as("estado na decisão").isEqualTo(esperado);
+        assertThat(estadoDe(reserva)).as("estado na agenda").isEqualTo(esperado);
     }
 
     void assertNadaGravado(int reservasAntes) {
