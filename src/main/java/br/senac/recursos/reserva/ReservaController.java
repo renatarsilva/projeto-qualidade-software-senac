@@ -6,6 +6,8 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -34,6 +36,31 @@ public class ReservaController {
     ResponseEntity<ReservaResponse> altera(Authentication autenticacao, @PathVariable long id,
             @RequestBody ReservaRequest corpo) {
         return ResponseEntity.ok(reservas.altera(donoDe(autenticacao), id, pedidoDe(corpo)));
+    }
+
+    @PatchMapping("/{id}/estado")
+    ResponseEntity<ReservaResponse> mudaEstado(@PathVariable long id, @RequestBody EstadoRequest corpo) {
+        return ResponseEntity.ok(reservas.mudaEstado(id, corpo.estado()));
+    }
+
+    @PostMapping("/{id}/cancelamento")
+    ResponseEntity<ReservaResponse> cancela(Authentication autenticacao, @PathVariable long id) {
+        return ResponseEntity.ok(reservas.cancela(donoDe(autenticacao), id));
+    }
+
+    @PostMapping("/{id}/checkin")
+    ResponseEntity<ReservaResponse> checkin(Authentication autenticacao, @PathVariable long id) {
+        return ResponseEntity.ok(reservas.checkin(donoDe(autenticacao), id));
+    }
+
+    /** Existe só para recusar: o sistema nunca apaga reservas (RN-08). */
+    @DeleteMapping("/{id}")
+    ResponseEntity<ReservaResponse> apaga(@PathVariable long id) {
+        return ResponseEntity.ok(reservas.apaga(id));
+    }
+
+    /** Corpo do PATCH. */
+    record EstadoRequest(String estado) {
     }
 
     private static long donoDe(Authentication autenticacao) {

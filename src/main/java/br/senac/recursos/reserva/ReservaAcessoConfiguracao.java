@@ -19,4 +19,26 @@ public class ReservaAcessoConfiguracao {
     RegraDeAcesso alteracaoDeReservas() {
         return RegraDeAcesso.soPara(HttpMethod.PUT, "/api/reservas/**", Perfil.SOLICITANTE);
     }
+
+    // T-21: só o Responsável muda o estado pelo PATCH; cancelamento, check-in e o DELETE (que só recusa) são do dono.
+
+    @Bean
+    RegraDeAcesso mudancaDeEstado() {
+        return RegraDeAcesso.soPara(HttpMethod.PATCH, "/api/reservas/*/estado", Perfil.RESPONSAVEL);
+    }
+
+    @Bean
+    RegraDeAcesso cancelamentoDeReservas() {
+        return RegraDeAcesso.soPara(HttpMethod.POST, "/api/reservas/*/cancelamento", Perfil.SOLICITANTE);
+    }
+
+    @Bean
+    RegraDeAcesso checkinDeReservas() {
+        return RegraDeAcesso.soPara(HttpMethod.POST, "/api/reservas/*/checkin", Perfil.SOLICITANTE);
+    }
+
+    @Bean
+    RegraDeAcesso exclusaoDeReservas() {
+        return RegraDeAcesso.soPara(HttpMethod.DELETE, "/api/reservas/*", Perfil.SOLICITANTE);
+    }
 }
