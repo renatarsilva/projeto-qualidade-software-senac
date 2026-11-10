@@ -38,26 +38,29 @@ public class ReservaController {
         return ResponseEntity.ok(reservas.altera(donoDe(autenticacao), id, pedidoDe(corpo)));
     }
 
-    // Esqueletos da T-21: respondem 204 em tudo, para os testes de contrato falharem por asserção até a T-24.
-
     @PatchMapping("/{id}/estado")
-    ResponseEntity<Void> mudaEstado(@PathVariable long id, @RequestBody String corpo) {
-        return ResponseEntity.noContent().build();
+    ResponseEntity<ReservaResponse> mudaEstado(@PathVariable long id, @RequestBody EstadoRequest corpo) {
+        return ResponseEntity.ok(reservas.mudaEstado(id, corpo.estado()));
     }
 
     @PostMapping("/{id}/cancelamento")
-    ResponseEntity<Void> cancela(@PathVariable long id) {
-        return ResponseEntity.noContent().build();
+    ResponseEntity<ReservaResponse> cancela(Authentication autenticacao, @PathVariable long id) {
+        return ResponseEntity.ok(reservas.cancela(donoDe(autenticacao), id));
     }
 
     @PostMapping("/{id}/checkin")
-    ResponseEntity<Void> checkin(@PathVariable long id) {
-        return ResponseEntity.noContent().build();
+    ResponseEntity<ReservaResponse> checkin(Authentication autenticacao, @PathVariable long id) {
+        return ResponseEntity.ok(reservas.checkin(donoDe(autenticacao), id));
     }
 
+    /** Existe só para recusar: o sistema nunca apaga reservas (RN-08). */
     @DeleteMapping("/{id}")
-    ResponseEntity<Void> apaga(@PathVariable long id) {
-        return ResponseEntity.noContent().build();
+    ResponseEntity<ReservaResponse> apaga(@PathVariable long id) {
+        return ResponseEntity.ok(reservas.apaga(id));
+    }
+
+    /** Corpo do PATCH. */
+    record EstadoRequest(String estado) {
     }
 
     private static long donoDe(Authentication autenticacao) {

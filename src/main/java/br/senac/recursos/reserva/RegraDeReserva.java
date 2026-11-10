@@ -94,8 +94,11 @@ public class RegraDeReserva {
     }
 
     private Optional<DecisaoDaReserva> naoAlteravel(ReservaNaAgenda atual) {
-        boolean alteravel = atual.estado() == EstadoDaReserva.SOLICITADA || atual.estado() == EstadoDaReserva.APROVADA;
-        return alteravel ? Optional.empty()
+        boolean estadoAlteravel = atual.estado() == EstadoDaReserva.SOLICITADA
+                || atual.estado() == EstadoDaReserva.APROVADA;
+        // CA-13: o dono altera até prazo_aprovacao_em, inclusive.
+        boolean noPrazo = !clock.instant().isAfter(atual.prazoAprovacaoEm());
+        return estadoAlteravel && noPrazo ? Optional.empty()
                 : Optional.of(recusa(MotivoDeRecusa.NAO_ALTERAVEL, null, MENSAGEM_NAO_ALTERAVEL));
     }
 
@@ -134,10 +137,10 @@ public class RegraDeReserva {
     }
 
     private static DecisaoDaReserva recusa(MotivoDeRecusa motivo, String campo, String mensagem) {
-        return new DecisaoDaReserva(Veredito.RECUSADA, motivo, campo, mensagem, null, null);
+        return DecisaoDaReserva.recusada(motivo, campo, mensagem);
     }
 
     private static DecisaoDaReserva aceita(ReservaNaAgenda reserva, String aviso) {
-        return new DecisaoDaReserva(Veredito.ACEITA, MotivoDeRecusa.NENHUM, null, null, reserva, aviso);
+        return DecisaoDaReserva.aceita(reserva, aviso);
     }
 }
