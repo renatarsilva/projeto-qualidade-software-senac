@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${titulo}">Algo deu errado</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 0; background: #f6f7f9; color: #1f2933; }
+        main { max-width: 36rem; margin: 12vh auto; padding: 0 1rem; text-align: center; }
+        h1 { font-size: 1.6rem; }
+        a { display: inline-block; margin-top: 1.2rem; padding: .6rem 1.2rem; background: #2563eb; color: #fff;
+            border-radius: .4rem; text-decoration: none; }
+    </style>
+</head>
+<body>
+<main>
+    <h1 th:text="${titulo}">Algo deu errado</h1>
+    <p th:text="${mensagem}">Não foi possível concluir o que você pediu.</p>
+    <a href="/">Voltar para a página inicial</a>
+</main>
+</body>
+</html>

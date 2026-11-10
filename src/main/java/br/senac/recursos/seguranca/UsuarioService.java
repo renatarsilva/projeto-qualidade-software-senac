@@ -1,8 +1,8 @@
 package br.senac.recursos.seguranca;
 
-import br.senac.recursos.seguranca.GestaoDeUsuariosExceptions.Conflito;
-import br.senac.recursos.seguranca.GestaoDeUsuariosExceptions.EntradaInvalida;
-import br.senac.recursos.seguranca.GestaoDeUsuariosExceptions.NaoEncontrado;
+import br.senac.recursos.erro.ConflitoDeNegocioException;
+import br.senac.recursos.erro.EntradaInvalidaException;
+import br.senac.recursos.erro.RecursoNaoEncontradoException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.util.ArrayList;
@@ -37,10 +37,10 @@ public class UsuarioService {
             erros.add(Map.of("campo", "senha", "motivo", MENSAGEM_DA_SENHA));
         }
         if (!erros.isEmpty()) {
-            throw new EntradaInvalida(erros);
+            throw new EntradaInvalidaException(erros);
         }
         if (usuarios.existsByEmail(pedido.email())) {
-            throw new Conflito("Já existe um usuário com esse e-mail");
+            throw new ConflitoDeNegocioException("Já existe um usuário com esse e-mail");
         }
         return usuarios.save(Usuario.novo(pedido.nome(), pedido.email(), codificador.codifica(pedido.senha()),
                 pedido.perfil()));
@@ -53,7 +53,7 @@ public class UsuarioService {
 
     @Transactional
     public Usuario trocaPerfil(long id, PerfilRequest pedido) {
-        Usuario usuario = usuarios.findById(id).orElseThrow(NaoEncontrado::new);
+        Usuario usuario = usuarios.findById(id).orElseThrow(RecursoNaoEncontradoException::new);
         exigeValido(pedido);
         if (pedido.perfil() != Perfil.ADMINISTRADOR) {
             garanteOutroAdministradorAtivo(usuario);
@@ -64,7 +64,7 @@ public class UsuarioService {
 
     @Transactional
     public Usuario defineAtivo(long id, AtivoRequest pedido) {
-        Usuario usuario = usuarios.findById(id).orElseThrow(NaoEncontrado::new);
+        Usuario usuario = usuarios.findById(id).orElseThrow(RecursoNaoEncontradoException::new);
         exigeValido(pedido);
         if (!pedido.ativo()) {
             garanteOutroAdministradorAtivo(usuario);
@@ -77,14 +77,14 @@ public class UsuarioService {
     private void garanteOutroAdministradorAtivo(Usuario usuario) {
         boolean eAdministradorAtivo = usuario.getPerfil() == Perfil.ADMINISTRADOR && usuario.isAtivo();
         if (eAdministradorAtivo && usuarios.countByPerfilAndAtivoTrue(Perfil.ADMINISTRADOR) <= 1) {
-            throw new Conflito(SEM_ADMINISTRADOR);
+            throw new ConflitoDeNegocioException(SEM_ADMINISTRADOR);
         }
     }
 
     private void exigeValido(Object pedido) {
         List<Map<String, String>> erros = errosDe(pedido);
         if (!erros.isEmpty()) {
-            throw new EntradaInvalida(erros);
+            throw new EntradaInvalidaException(erros);
         }
     }
 

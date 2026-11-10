@@ -1,6 +1,6 @@
 package br.senac.recursos.reserva;
 
-import br.senac.recursos.sala.EntradaInvalidaException;
+import br.senac.recursos.erro.EntradaInvalidaException;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
