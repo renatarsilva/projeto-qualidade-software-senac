@@ -238,26 +238,23 @@ Em cada ciclo, se o teste revelar defeito real, ele é registrado em `docs/defei
 
 - [x] O objetivo e o escopo estão claros, e o "fora do escopo" está justificado.
 - [x] As regras citam RNs que existem no PRD.
-- [ ] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
-- [ ] Os casos de teste incluem valores limite e entradas inválidas.
-- [ ] O contrato da API cobre os erros (400, 401, 403, 409).
+- [x] Todo critério de aceite é verificável (dá para dizer "passou" ou "falhou").
+- [x] Os casos de teste incluem valores limite e entradas inválidas.
+- [x] O contrato da API cobre os erros (400, 401, 403, 409).
 - [x] Não há conflito com outras specs nem com os ADRs.
 
 **Comentários:**
 
-A contagem sempre pelo banco, o teste direto no PostgreSQL contra falso verde, o `CountDownLatch`, o duplo clique, os `PUT` simultâneos e o tudo ou nada com vários recursos estão bem cobertos, e o "fora do escopo" está bem justificado. Os pontos abaixo precisam de ajuste antes da aprovação.
+Reli a versão atual (commit `1452cd8`) e os pontos da revisão anterior foram tratados: o 409 agora cobre as mensagens de sala, professor e material, além da genérica do banco; os vínculos são gravados ordenados por `recurso_id`, com o 40P01 traduzido para 409 como rede de segurança e o CA-14 (TC-17 e TC-18); o vermelho tem procedimento concreto, só no banco descartável e nunca por migration, com restauração e evidências em `T-37-vermelho.md` e `T-37-verde.md`; o TC-14 confere o SQLState 23P01; as 5 execuções da MC-03 ficaram dentro da mesma execução (`@RepeatedTest(5)`); o pool do teste sobe para 25 conexões; a diferença entre UTC e UTC-03:00 está explicada; e a ordem do TC-15 e do TC-16 foi corrigida. A spec está pronta para seguir.
 
-Contrato: o CA-03 e a seção 4 aceitam só duas mensagens de 409, mas a T-23 também responde "O professor já está ocupado neste horário" e "O material já está reservado neste horário". Com isso, o TC-10 e o TC-07 contradizem o CA-03. O contrato precisa listar as mensagens de sala, professor e material.
+Pontos para acompanhar na implementação, sem bloquear a aprovação:
 
-Testes: o escopo cita vários recursos em ordem diferente, mas não há caso para isso. Os vínculos são gravados na ordem do pedido; com os mesmos recursos em ordem invertida, o PostgreSQL pode detectar deadlock (40P01), que não é traduzido e vira 500. Falta um caso de teste e a decisão entre ordenar os recursos por id antes de gravar ou traduzir o 40P01 para 409, conferindo que não há gravação parcial. O TC-14 também deve conferir o SQLState 23P01 nas 19 recusas, para garantir que a falha veio do EXCLUDE.
+- A spec diz que a diferença de fuso é anotada na RTM e que a T-50 pode reaproveitar a evidência do vermelho, mas a RTM e o `docs/plano-de-teste.md` (que ainda fala em "mutação da T-50") não foram atualizados. Vale ajustar no PR de implementação.
+- O 40P01 não chega como `DataIntegrityViolationException`: o Spring o traduz para `CannotAcquireLockException` ou `PessimisticLockingFailureException`. O tratamento do `ReservaService` precisa capturar a exceção que realmente é lançada para o deadlock virar 409.
+- O TC-18 fala em deadlock simulado, mas não diz como. Vale seguir o modelo da T-22, com uma rota de teste que provoque o SQLState, para o cenário ser reproduzível.
 
-Vermelho: o CA-13 não diz como o EXCLUDE é removido nem como é restaurado. O procedimento precisa ser feito só no banco descartável do teste, nunca por migration, e dizer quais evidências do vermelho e do verde vão para `docs/evidencias/`. O `docs/plano-de-teste.md` chama essa remoção de "mutação da T-50"; vale deixar claro que a evidência é produzida na T-37 e que a T-50 pode reaproveitá-la.
+**Parecer:** Aprovada · @Samwel-Merces · 2026-11-09
 
-Estabilidade: falta definir se as 5 execuções da MC-03 são dentro do mesmo teste ou 5 execuções no CI, como diz o plano de teste. O pool do Hikari usa o padrão de 10 conexões para 20 threads; vale dizer se isso basta ou se o teste aumenta o pool.
-
-Ajustes de texto: o CT-02 usa 10:00 em UTC-03:00 (13:00 UTC) e a spec usa 10:00 UTC; vale uma nota no CT-02 ou na RTM. Na seção 6, o TC-16 aparece antes do TC-15.
-
-**Parecer:** Ajustes necessários · @Samwel-Merces · 2026-11-09
 
 ## 10. Spec validation
 
