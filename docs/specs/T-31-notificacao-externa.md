@@ -14,7 +14,7 @@ Rascunho → Em revisão → Aprovada → Validada → Liberada
 | Task | T-31 |
 | Autor(a) | @Samwel-Merces |
 | Revisor(a) | @CaiosAguiar |
-| Status | Em revisão |
+| Status | Liberada |
 | Regra crítica | Não |
 | Requisitos | RF-11, RNF-10 |
 | Característica ISO 25010 | Confiabilidade |
