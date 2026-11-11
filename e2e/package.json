@@ -1,0 +1,7 @@
+{
+  "name": "e2e-organizacao-recursos",
+  "private": true,
+  "description": "Fluxo ponta a ponta no Chrome real (spec T-44). Não roda no CI.",
+  "scripts": { "fluxo": "node fluxo-no-navegador.js ../docs/entrega/capturas" },
+  "dependencies": { "puppeteer-core": "^24.0.0" }
+}

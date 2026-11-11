@@ -1,0 +1,131 @@
+{
+  "data": "2026-11-11T14:10:06.465Z",
+  "total": 31,
+  "falhas": 0,
+  "verificacoes": [
+    {
+      "ok": true,
+      "descricao": "login: sem rolagem horizontal em 375 px (375 <= 375)"
+    },
+    {
+      "ok": true,
+      "descricao": "login: tem a meta viewport"
+    },
+    {
+      "ok": true,
+      "descricao": "login com senha errada mostra a mensagem clara"
+    },
+    {
+      "ok": true,
+      "descricao": "administrador entra e vai para a página inicial"
+    },
+    {
+      "ok": true,
+      "descricao": "sala sala-887 cadastrada e listada"
+    },
+    {
+      "ok": true,
+      "descricao": "salas: sem rolagem horizontal em 375 px (375 <= 375)"
+    },
+    {
+      "ok": true,
+      "descricao": "material cadastrado e listado"
+    },
+    {
+      "ok": true,
+      "descricao": "materiais: sem rolagem horizontal em 375 px (375 <= 375)"
+    },
+    {
+      "ok": true,
+      "descricao": "professor cadastrado com competências"
+    },
+    {
+      "ok": true,
+      "descricao": "professores: sem rolagem horizontal em 375 px (375 <= 375)"
+    },
+    {
+      "ok": true,
+      "descricao": "usuário marina (SOLICITANTE) cadastrado"
+    },
+    {
+      "ok": true,
+      "descricao": "usuário carlos (RESPONSAVEL) cadastrado"
+    },
+    {
+      "ok": true,
+      "descricao": "usuarios: sem rolagem horizontal em 375 px (375 <= 375)"
+    },
+    {
+      "ok": true,
+      "descricao": "manutenção: sem rolagem horizontal em 375 px (375 <= 375)"
+    },
+    {
+      "ok": true,
+      "descricao": "a pesquisa por disponibilidade mostra a sala livre"
+    },
+    {
+      "ok": true,
+      "descricao": "pesquisa: sem rolagem horizontal em 375 px (375 <= 375)"
+    },
+    {
+      "ok": true,
+      "descricao": "o link Reservar leva o horário para o formulário"
+    },
+    {
+      "ok": true,
+      "descricao": "nova reserva: sem rolagem horizontal em 375 px (375 <= 375)"
+    },
+    {
+      "ok": true,
+      "descricao": "a reserva é criada como Solicitada"
+    },
+    {
+      "ok": true,
+      "descricao": "detalhe da reserva: sem rolagem horizontal em 375 px (375 <= 375)"
+    },
+    {
+      "ok": true,
+      "descricao": "o horário ocupado mostra a mensagem clara da regra"
+    },
+    {
+      "ok": true,
+      "descricao": "conflito: sem rolagem horizontal em 375 px (375 <= 375)"
+    },
+    {
+      "ok": true,
+      "descricao": "minhas reservas: sem rolagem horizontal em 375 px (375 <= 375)"
+    },
+    {
+      "ok": true,
+      "descricao": "o Solicitante não entra em /admin/salas (página de acesso negado)"
+    },
+    {
+      "ok": true,
+      "descricao": "a reserva aparece na fila de aprovação"
+    },
+    {
+      "ok": true,
+      "descricao": "fila de aprovação: sem rolagem horizontal em 375 px (375 <= 375)"
+    },
+    {
+      "ok": true,
+      "descricao": "o Responsável aprova a reserva"
+    },
+    {
+      "ok": true,
+      "descricao": "o histórico de mudanças mostra a aprovação"
+    },
+    {
+      "ok": true,
+      "descricao": "histórico: sem rolagem horizontal em 375 px (375 <= 375)"
+    },
+    {
+      "ok": true,
+      "descricao": "o relatório de utilização abre"
+    },
+    {
+      "ok": true,
+      "descricao": "relatório: sem rolagem horizontal em 375 px (375 <= 375)"
+    }
+  ]
+}
