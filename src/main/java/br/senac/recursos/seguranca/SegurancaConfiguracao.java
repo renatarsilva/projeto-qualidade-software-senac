@@ -83,6 +83,9 @@ public class SegurancaConfiguracao {
     SecurityFilterChain telas(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(regras -> regras
                         .requestMatchers("/error").permitAll() // a página de erro é aberta, senão o erro viraria login
+                        // A documentação da API (OpenAPI e Swagger UI) é pública (RF-14, T-51).
+                        .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**")
+                        .permitAll()
                         .anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults());
         return http.build();
