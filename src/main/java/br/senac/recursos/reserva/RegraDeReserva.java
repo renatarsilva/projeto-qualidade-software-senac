@@ -29,9 +29,11 @@ public class RegraDeReserva {
     private final VerificadorDeSobreposicao sobreposicao;
     private final AuditoriaDeReservas auditoria;
     private final VerificadorDeManutencao manutencao;
+    private final RegistroDeConflitos conflitos;
 
     public RegraDeReserva(Clock clock, AgendaDeReservas agenda, VerificadorDeSobreposicao sobreposicao,
-            AuditoriaDeReservas auditoria, VerificadorDeManutencao manutencao) {
+            AuditoriaDeReservas auditoria, VerificadorDeManutencao manutencao, RegistroDeConflitos conflitos) {
+        this.conflitos = conflitos;
         this.auditoria = auditoria;
         this.manutencao = manutencao;
         this.clock = clock;
@@ -150,7 +152,11 @@ public class RegraDeReserva {
         return recursosDe(pedido).stream()
                 .filter(r -> sobreposicao.ocupado(r, pedido.inicio(), pedido.termino(), reservaIgnorada))
                 .findFirst()
-                .map(r -> recusa(MotivoDeRecusa.SOBREPOSICAO, null, mensagemDeOcupado(r.tipo())));
+                .map(r -> {
+                    // O conflito evitado é registrado em transação própria: a recusa não pode apagá-lo (T-41).
+                    conflitos.registra(r, clock.instant());
+                    return recusa(MotivoDeRecusa.SOBREPOSICAO, null, mensagemDeOcupado(r.tipo()));
+                });
     }
 
     private static String mensagemDeOcupado(TipoDeRecurso tipo) {
