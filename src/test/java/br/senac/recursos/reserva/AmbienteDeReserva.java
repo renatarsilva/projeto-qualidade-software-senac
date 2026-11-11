@@ -314,6 +314,7 @@ final class AmbienteDeReserva {
 
     void limpa() {
         // TRUNCATE não dispara o gatilho de imutabilidade (a auditoria só recebe inserções).
+        jdbc.update("DELETE FROM retirada");
         jdbc.execute("TRUNCATE TABLE auditoria");
         jdbc.update("DELETE FROM periodo_manutencao");
         jdbc.update("DELETE FROM reserva_recurso");
