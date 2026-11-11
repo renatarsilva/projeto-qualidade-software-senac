@@ -1,6 +1,8 @@
 package br.senac.recursos.reserva;
 
+import br.senac.recursos.erro.AcessoNegadoException;
 import br.senac.recursos.erro.EntradaInvalidaException;
+import br.senac.recursos.seguranca.Perfil;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Contrato HTTP da reserva (spec T-20, seção 4). O dono é sempre o usuário autenticado. */
@@ -22,9 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReservaController {
 
     private final ReservaService reservas;
+    private final ConsultaDeReservasService consultas;
 
-    public ReservaController(ReservaService reservas) {
+    public ReservaController(ReservaService reservas, ConsultaDeReservasService consultas) {
         this.reservas = reservas;
+        this.consultas = consultas;
     }
 
     @PostMapping
@@ -39,16 +44,15 @@ public class ReservaController {
         return ResponseEntity.ok(reservas.altera(donoDe(autenticacao), id, pedidoDe(corpo)));
     }
 
-    // Esqueletos da T-43: respondem 204 em tudo, para os testes falharem por asserção até a implementação.
-
     @GetMapping
-    ResponseEntity<Void> lista() {
-        return ResponseEntity.noContent().build();
+    ResponseEntity<List<ReservaResponse>> lista(Authentication autenticacao,
+            @RequestParam(required = false) String estado) {
+        return ResponseEntity.ok(consultas.lista(donoDe(autenticacao), perfilDe(autenticacao), estado));
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<Void> consulta(@PathVariable long id) {
-        return ResponseEntity.noContent().build();
+    ResponseEntity<ReservaResponse> consulta(Authentication autenticacao, @PathVariable long id) {
+        return ResponseEntity.ok(consultas.consulta(donoDe(autenticacao), perfilDe(autenticacao), id));
     }
 
     @PatchMapping("/{id}/estado")
@@ -74,6 +78,13 @@ public class ReservaController {
 
     /** Corpo do PATCH. */
     record EstadoRequest(String estado) {
+    }
+
+    /** O perfil vem da permissão ROLE_<perfil>, montada com o perfil que o banco tem na hora (T-15). */
+    private static Perfil perfilDe(Authentication autenticacao) {
+        return autenticacao.getAuthorities().stream().map(a -> a.getAuthority())
+                .filter(a -> a.startsWith("ROLE_")).map(a -> Perfil.valueOf(a.substring(5))).findFirst()
+                .orElseThrow(AcessoNegadoException::new);
     }
 
     private static long donoDe(Authentication autenticacao) {
