@@ -40,6 +40,10 @@ public class ErroController implements ErrorController {
     private ProblemDetail problemaPara(Object codigo, Throwable falha, String caminho) {
         int status = codigo instanceof Integer inteiro ? inteiro : HttpStatus.INTERNAL_SERVER_ERROR.value();
         if (falha == null) {
+            // Nas telas, o 403 do Spring Security (perfil errado ou CSRF) chega aqui pelo sendError (spec T-44, CA-05).
+            if (status == HttpStatus.FORBIDDEN.value()) {
+                return FabricaDeProblemas.acessoNegado(caminho);
+            }
             if (status == HttpStatus.NOT_FOUND.value()) {
                 return FabricaDeProblemas.naoEncontrado(caminho);
             }
