@@ -23,6 +23,9 @@ final class MatrizDeAutorizacao {
     private static final String MATERIAL_VALIDO = "{\"nome\":\"%s\",\"tipoMaterial\":\"Projetor\","
             + "\"patrimonio\":\"%s\",\"restrito\":false}";
 
+    private static final String MANUTENCAO_VALIDA = "{\"inicio\":\"2026-11-10T10:00:00Z\","
+            + "\"termino\":\"2026-11-10T12:00:00Z\",\"motivo\":\"Troca do ar-condicionado\"}";
+
     /** As rotas que não são da matriz de negócio e não contam na completude. */
     static final String LOGIN = "/api/auth/login";
 
@@ -92,6 +95,22 @@ final class MatrizDeAutorizacao {
                     null),
             new Operacao("R-07", DELETE, "/api/reservas/{id}", null, 401, 409, 403, 403,
                     c -> chama(c, DELETE, "/api/reservas/" + c.reservaDoDono(EstadoDaReserva.SOLICITADA), null)),
+            // Manutenção (T-35): só o Administrador
+            new Operacao("MT-01", POST, "/api/recursos/{recursoId}/manutencoes", "{}", 401, 403, 403, 201,
+                    c -> chama(c, POST, "/api/recursos/" + c.sala.id() + "/manutencoes", MANUTENCAO_VALIDA)),
+            new Operacao("MT-02", GET, "/api/recursos/{recursoId}/manutencoes", null, 401, 403, 403, 200,
+                    c -> chama(c, GET, "/api/recursos/" + c.sala.id() + "/manutencoes", null)),
+            new Operacao("MT-03", DELETE, "/api/recursos/{recursoId}/manutencoes/{manutencaoId}", null, 401, 403, 403,
+                    204, c -> {
+                        try {
+                            String resposta = chama(c, POST, "/api/recursos/" + c.sala.id() + "/manutencoes",
+                                    MANUTENCAO_VALIDA).andReturn().getResponse().getContentAsString();
+                            long id = ((Number) com.jayway.jsonpath.JsonPath.read(resposta, "$.id")).longValue();
+                            return chama(c, DELETE, "/api/recursos/" + c.sala.id() + "/manutencoes/" + id, null);
+                        } catch (Exception erro) {
+                            throw new AssertionError("Não foi possível preparar a manutenção: " + erro, erro);
+                        }
+                    }),
             // Auditoria (T-40): só leitura, só Responsável e Administrador
             new Operacao("R-10", GET, "/api/reservas/{id}/auditoria", null, 401, 403, 200, 200,
                     c -> chama(c, GET, "/api/reservas/" + c.reservaDoDono(EstadoDaReserva.SOLICITADA) + "/auditoria",

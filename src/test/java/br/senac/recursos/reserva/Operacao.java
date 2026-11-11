@@ -22,7 +22,7 @@ record Operacao(String id, HttpMethod metodo, String modelo, String corpoFictici
 
     /** O caminho com um id qualquer: a autorização (401 e 403) vem antes de qualquer outra verificação. */
     String caminhoFicticio() {
-        return modelo.replace("{id}", "1");
+        return modelo.replaceAll("\\{[^}]+\\}", "1");
     }
 
     @Override

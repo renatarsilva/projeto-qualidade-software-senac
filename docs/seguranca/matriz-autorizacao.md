@@ -34,6 +34,9 @@
 | M-04 | `PUT /api/materiais/{id}` | 401 | 403 | 403 | 200 | idem |
 | M-05 | `DELETE /api/materiais/{id}` | 401 | 403 | 403 | 204 (409 se há vínculo) | idem |
 | G-01 | `GET /api/recursos` (pesquisa por tipo, capacidade, localização, competência e disponibilidade) | 401 | 200 | 200 | 200 | `PesquisaAcessoConfiguracao` (T-43) |
+| MT-01 | `POST /api/recursos/{recursoId}/manutencoes` | 401 | 403 | 403 | 201 | `ManutencaoAcessoConfiguracao` (T-35); só o Administrador registra |
+| MT-02 | `GET /api/recursos/{recursoId}/manutencoes` | 401 | 403 | 403 | 200 | idem |
+| MT-03 | `DELETE /api/recursos/{recursoId}/manutencoes/{manutencaoId}` | 401 | 403 | 403 | 204 | idem; encerrar a manutenção libera o recurso |
 | R-01 | `POST /api/reservas` | 401 | 201 | 403 | 403 | `ReservaAcessoConfiguracao` |
 | R-02 | `PUT /api/reservas/{id}` | 401 | 200 ★ | 403 | 403 | idem; o dono vem do token |
 | R-03 | `POST /api/reservas/{id}/cancelamento` | 401 | 200 ★ | 403 | 403 | idem |
@@ -70,7 +73,7 @@ Para as rotas de reserva: **401** (sem autenticação), **403** por perfil, **40
 | D-01 | **Resolvida na T-43:** `GET /api/reservas`, `GET /api/reservas/{id}` e `GET /api/recursos` existem (R-08, R-09 e G-01). O histórico de mudanças de estado (RF-10) segue pendente | Baixo | T-40 (histórico) |
 | D-02 | Sala não tem `DELETE`; professor e material têm. A tentativa recebe 403 (negado por padrão), e não 405 | Baixo: decisão da T-16, só precisa estar clara | Decidir se o contrato deve dizer 405 |
 | D-03 | O Responsável e o Administrador não criam nem alteram reservas (DP-05, "o Administrador cria reservas?", segue em aberto) | Médio | T-48/T-49 com a decisão da DP-05 |
-| D-04 | Manutenção (RN-04), retirada e devolução (RF-09) e relatório (RF-12) ainda não têm rotas, então não estão na matriz | Médio: a matriz precisa ser estendida quando entrarem | T-35, T-42 e T-41 |
+| D-04 | Manutenção (RN-04) ganhou rotas na T-35 (MT-01 a MT-03). Retirada e devolução (RF-09) e relatório (RF-12) ainda não têm rotas, então não estão na matriz | Médio: a matriz precisa ser estendida quando entrarem | T-35, T-42 e T-41 |
 
 ## 6. Rotas fora da matriz da API
 
