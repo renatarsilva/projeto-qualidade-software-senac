@@ -37,6 +37,9 @@
 | MT-01 | `POST /api/recursos/{recursoId}/manutencoes` | 401 | 403 | 403 | 201 | `ManutencaoAcessoConfiguracao` (T-35); só o Administrador registra |
 | MT-02 | `GET /api/recursos/{recursoId}/manutencoes` | 401 | 403 | 403 | 200 | idem |
 | MT-03 | `DELETE /api/recursos/{recursoId}/manutencoes/{manutencaoId}` | 401 | 403 | 403 | 204 | idem; encerrar a manutenção libera o recurso |
+| RT-01 | `POST /api/reservas/{reservaId}/retiradas` | 401 | 403 | 201 | 403 | `RetiradaAcessoConfiguracao` (T-42); só o Responsável registra (DP-04) |
+| RT-02 | `POST /api/reservas/{reservaId}/retiradas/{retiradaId}/devolucao` | 401 | 403 | 200 | 403 | idem |
+| RT-03 | `GET /api/reservas/{reservaId}/retiradas` | 401 | 403 | 200 | 200 | idem; o Administrador também consulta |
 | R-01 | `POST /api/reservas` | 401 | 201 | 403 | 403 | `ReservaAcessoConfiguracao` |
 | R-02 | `PUT /api/reservas/{id}` | 401 | 200 ★ | 403 | 403 | idem; o dono vem do token |
 | R-03 | `POST /api/reservas/{id}/cancelamento` | 401 | 200 ★ | 403 | 403 | idem |

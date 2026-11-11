@@ -306,6 +306,7 @@ final class AmbienteDeReserva {
 
     /** Apaga só as reservas e os vínculos, mantendo recursos e usuários (entre as rodadas de uma disputa). */
     void limpaReservas() {
+        jdbc.update("DELETE FROM retirada");
         jdbc.execute("TRUNCATE TABLE auditoria");
         jdbc.update("DELETE FROM reserva_recurso");
         jdbc.update("DELETE FROM reserva");
@@ -313,6 +314,7 @@ final class AmbienteDeReserva {
 
     void limpa() {
         // TRUNCATE não dispara o gatilho de imutabilidade (a auditoria só recebe inserções).
+        jdbc.update("DELETE FROM retirada");
         jdbc.execute("TRUNCATE TABLE auditoria");
         jdbc.update("DELETE FROM periodo_manutencao");
         jdbc.update("DELETE FROM reserva_recurso");

@@ -111,6 +111,29 @@ final class MatrizDeAutorizacao {
                             throw new AssertionError("Não foi possível preparar a manutenção: " + erro, erro);
                         }
                     }),
+            // Retirada e devolução de materiais (T-42): só o Responsável registra
+            new Operacao("RT-01", POST, "/api/reservas/{reservaId}/retiradas", "{}", 401, 403, 201, 403, c -> {
+                RecursoPedido material = materialDaRetirada(c);
+                long id = reservaComMaterial(c, material);
+                return chama(c, POST, "/api/reservas/" + id + "/retiradas", "{\"materialId\":" + material.id() + "}");
+            }),
+            new Operacao("RT-02", POST, "/api/reservas/{reservaId}/retiradas/{retiradaId}/devolucao", null, 401, 403,
+                    200, 403, c -> {
+                        try {
+                            RecursoPedido material = materialDaRetirada(c);
+                            long id = reservaComMaterial(c, material);
+                            String resposta = chama(c, POST, "/api/reservas/" + id + "/retiradas",
+                                    "{\"materialId\":" + material.id() + "}").andReturn().getResponse()
+                                    .getContentAsString();
+                            long retirada = ((Number) com.jayway.jsonpath.JsonPath.read(resposta, "$.id")).longValue();
+                            return chama(c, POST, "/api/reservas/" + id + "/retiradas/" + retirada + "/devolucao", null);
+                        } catch (Exception erro) {
+                            throw new AssertionError("Não foi possível preparar a retirada: " + erro, erro);
+                        }
+                    }),
+            new Operacao("RT-03", GET, "/api/reservas/{reservaId}/retiradas", null, 401, 403, 200, 200,
+                    c -> chama(c, GET, "/api/reservas/" + c.reservaDoDono(EstadoDaReserva.APROVADA) + "/retiradas",
+                            null)),
             // Auditoria (T-40): só leitura, só Responsável e Administrador
             new Operacao("R-10", GET, "/api/reservas/{id}/auditoria", null, 401, 403, 200, 200,
                     c -> chama(c, GET, "/api/reservas/" + c.reservaDoDono(EstadoDaReserva.SOLICITADA) + "/auditoria",
@@ -135,6 +158,20 @@ final class MatrizDeAutorizacao {
             return c.ambiente.chama(metodo, caminho, bearer, json);
         } catch (Exception erro) {
             throw new AssertionError("A chamada " + metodo + " " + caminho + " falhou: " + erro, erro);
+        }
+    }
+
+    /** Reserva APROVADA do dono, terça das 10:00 às 11:00, com a sala e o material. */
+    private static long reservaComMaterial(CenarioDeAutorizacao c, RecursoPedido material) {
+        return c.ambiente.reservaGravada(c.ambiente.solicitante(), EstadoDaReserva.APROVADA, terca(10, 0), terca(11, 0),
+                HorariosDeTeste.AGORA, c.sala, material);
+    }
+
+    private static RecursoPedido materialDaRetirada(CenarioDeAutorizacao c) {
+        try {
+            return c.ambiente.material("Projetor", "PAT-1");
+        } catch (Exception erro) {
+            throw new AssertionError("Não foi possível criar o material do cenário: " + erro, erro);
         }
     }
 
