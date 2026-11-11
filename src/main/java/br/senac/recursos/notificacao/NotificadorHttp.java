@@ -10,11 +10,9 @@ import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
@@ -24,8 +22,6 @@ import org.springframework.web.client.RestClient;
  * configuração. Nunca lança exceção: toda falha vira {@code FALHOU} com a causa, e o log de falha não traz o token, o
  * corpo de erro do provedor nem o rastro da biblioteca HTTP (CA-07).
  */
-@Component
-@ConditionalOnExpression("'${app.notificacao.url-base:}'.trim() != ''")
 public class NotificadorHttp implements Notificador {
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificadorHttp.class);
