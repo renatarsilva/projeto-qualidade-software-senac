@@ -50,3 +50,7 @@ node_modules/
 .env.local
 .claude/settings.local.json
 *.log
+
+# Relatório HTML do JMeter (T-38): fica fora do Git; os números ficam em docs/performance/resultado-01.md
+perf/relatorio-*/
+perf/sala-id.txt
