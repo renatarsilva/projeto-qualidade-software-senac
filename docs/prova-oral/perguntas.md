@@ -2,7 +2,7 @@
 
 Perguntas prováveis da semana 47, ligadas às decisões que o time já tomou. Na prova, o professor pergunta a **qualquer integrante, inclusive sobre partes que ele não escreveu**, e pede a **fonte de qualquer número**. Task T-53 (depende da T-52).
 
-> **Estado em 2026-11-07:** só as perguntas e a fonte onde a resposta está. **As respostas não estão escritas de propósito**: cada integrante escreve a sua com as próprias palavras, ensaia em voz alta e confere na fonte (task T-54).
+> **Estado em 2026-11-11:** as perguntas 16 a 26 foram acrescentadas com as tasks entregues depois. Só as perguntas e a fonte onde a resposta está. **As respostas não estão escritas de propósito**: cada integrante escreve a sua com as próprias palavras, ensaia em voz alta e confere na fonte (task T-54).
 
 **Roteiro de 8 minutos:** problema e risco, arquitetura, demonstração, testes e CI, RTM e relatório, limitações.
 
@@ -20,6 +20,17 @@ Perguntas prováveis da semana 47, ligadas às decisões que o time já tomou. N
 | 8 | Por que o `Clock` é injetado, e como isso aparece nos testes de prazo e de antecedência? | ADR-0008; specs T-20 e T-21 | A definir | A escrever |
 | 9 | Como vocês provam que nenhuma resposta de erro expõe stack trace, SQL ou nome de classe? De onde vem a lista de termos proibidos? | PRD RNF-08; spec T-22 (lista única de termos proibidos) | A definir | A escrever |
 | 10 | Mostre o commit vermelho de uma regra: onde está a evidência de TDD? Como o teste falha por asserção e não por erro de compilação? | `docs/testes/evidencia-tdd.md` (T-36); plano TDD; histórico de commits `test(red)` | A definir | A escrever |
+| 16 | O que acontece com o banco quando duas solicitações disputam a mesma sala? Por que o PostgreSQL pode dar *deadlock* e como o sistema responde? | [T-37-verde.md](../evidencias/T-37-verde.md); ADR-0010; defeito DEF-02 | A definir | A escrever |
+| 17 | Remova a proteção contra dupla reserva e rode o teste: qual teste falha e com que número? | [T-37-vermelho.md](../evidencias/T-37-vermelho.md); [mutacao-manual.md](../testes/mutacao-manual.md) (M4) | A definir | A escrever |
+| 18 | Uma manutenção é criada em cima de uma reserva já aprovada. O que acontece com a reserva? | Spec T-35 (S-05); `ManutencaoDeRecursosApiTest` (TC-11) | A definir | A escrever |
+| 19 | Por que a auditoria não pode ser alterada nem pela aplicação? Onde está a garantia? | Spec T-40; migração V11 (gatilho); `ImutabilidadeDaAuditoriaTest` | A definir | A escrever |
+| 20 | Por que o registro do conflito evitado é gravado em transação própria? | Spec T-41 (CA-07); `ConflitosEvitadosNoBanco` | A definir | A escrever |
+| 21 | A notificação falha (timeout ou 500). A aprovação é desfeita? Como o teste prova? | Spec T-31; `NotificacaoDasMudancasApiTest` (CT-03); `NotificadorHttpWireMockTest` | A definir | A escrever |
+| 22 | Como a matriz de autorização garante que nenhuma rota fique aberta sem querer? | [matriz](../seguranca/matriz-autorizacao.md); `CompletudeDaMatrizTest`; [T-49](../evidencias/T-49-matriz-de-autorizacao.md) | A definir | A escrever |
+| 23 | De onde vem o p95 do teste de carga e por que o 409 não conta como erro? | [rnf.md](../performance/rnf.md); [resultado-01.md](../performance/resultado-01.md); `perf/analisar.py` | A definir | A escrever |
+| 24 | O SonarCloud reprovava o Quality Gate. Quais eram as duas pendências e o que foi feito? | Defeito DEF-03 em `docs/defeitos/registro.md`; ADR-0007 | A definir | A escrever |
+| 25 | A devolução de um material é registrada exatamente no término da reserva. É atraso? E 1 segundo depois? | Spec T-42; `RetiradaDeMateriaisApiTest` (TC-08 e TC-09) | A definir | A escrever |
+| 26 | O que ficou de fora da entrega e por quê? | [decisão de qualidade](../decisao-qualidade.md), seção 2; [status-requisitos.md](../status-requisitos.md) | Todos | A escrever |
 
 ## Perguntas que o professor costuma fazer (sem fonte ainda)
 

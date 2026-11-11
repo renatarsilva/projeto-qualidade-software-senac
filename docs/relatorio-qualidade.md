@@ -1,16 +1,16 @@
 # Relatório de qualidade
 
-Resume o que o time fez para garantir a qualidade do sistema de Organização de Recursos, com a **fonte de cada número**. Na prova oral o professor pede a origem de qualquer número citado, então nenhum valor entra aqui sem arquivo ou run que o comprove. Task T-52 (depende da T-50).
+Resume o que o time fez para garantir a qualidade do sistema de Organização de Recursos, com a **fonte de cada número**. Na prova oral o professor pede a origem de qualquer número citado, então nenhum valor entra aqui sem arquivo ou run que o comprove. Task T-52.
 
-> **Estado em 2026-11-07:** esqueleto. As seções 1 a 3 e 8 usam o que já está no repositório. Resultados medidos (seções 4 e 5) ainda não existem e ficam `A preencher`.
+> **Estado em 2026-11-11 (entrega):** números medidos na `main` pelo `./mvnw verify` (940 testes) e pelo painel do SonarCloud.
 
 ## 1. Resumo
 
 | Item | Conteúdo |
 |---|---|
 | O sistema | Aplicação Java 21 e Spring Boot 3.5 que reserva salas, professores e materiais sem conflito de horário |
-| O que foi entregue | A preencher |
-| O que ficou fora | Ver [decisão de qualidade](decisao-qualidade.md), seção 2 |
+| O que foi entregue | A API completa dos 14 requisitos, menos a parte de interface do RF-13: cadastros, pesquisa, reservas com todo o ciclo de vida, dupla reserva impedida no banco, manutenção, retirada e devolução, auditoria imutável, notificação, relatório de utilização e documentação OpenAPI. Detalhe em [status dos requisitos](status-requisitos.md) |
+| O que ficou fora | **Telas responsivas** (RF-13 parcial e RNF-11), job periódico das mudanças por tempo (T-60), feature Cucumber (BDD) e teste ponta a ponta. Ver [decisão de qualidade](decisao-qualidade.md), seção 2 |
 | Equipe | Renata (@renatarsilva), Samuel (@Samwel-Merces), Caio (@CaiosAguiar) |
 
 ## 2. Problema e riscos
@@ -27,39 +27,42 @@ Resume o que o time fez para garantir a qualidade do sistema de Organização de
 | Item | Onde está |
 |---|---|
 | Diagramas C4 e sequências críticas | [Arquitetura](arquitetura.md) |
-| ADRs 0001 a 0009 | `docs/adr/` |
+| ADRs 0001 a 0010 (o 0010 é a proteção contra dupla reserva) | `docs/adr/` |
 | Decisões de qualidade | [Decisão de qualidade](decisao-qualidade.md) |
 
 ## 4. Estratégia de testes e resultados
 
 | Item | Resultado | Fonte | Task |
 |---|---|---|---|
-| Plano de teste | `docs/plano-de-teste.md` | arquivo | T-06 |
-| Plano TDD (casos por regra) | `docs/testes/plano-tdd.md` | arquivo | T-19 |
-| Testes unitários, de integração e de API | A preencher | relatório do CI | T-20, T-23, T-24, T-30 |
-| Testes com Testcontainers e WireMock | A preencher | relatório do CI | T-30, T-31 |
-| Cobertura de linhas e de branches | A preencher | relatório do JaCoCo | T-27 |
-| Análise estática (SonarCloud) | A preencher | painel do SonarCloud | T-29 |
-| Teste de concorrência (dupla reserva) | A preencher | teste e run do CI | T-37 |
-| Teste de carga (JMeter) | A preencher | `perf/reservas.jmx`; `docs/performance/resultado-01.md` | T-38 |
-| TDD ou BDD com evidência | A preencher | `docs/testes/evidencia-tdd.md` | T-34 a T-36 |
-| Mutação manual nas regras críticas | A preencher | `docs/testes/mutacao-manual.md` | T-50 |
+| Plano de teste | Existe | `docs/plano-de-teste.md` | T-06 |
+| Relatório de testes consolidado | 940 testes por tipo e por pacote, cobertura por pacote e o run do CI | [relatorio-de-testes.md](relatorio-de-testes.md) | T-52 |
+| Demonstração da aplicação | Roteiro de 8 minutos executado de verdade | [entrega/demonstracao.md](entrega/demonstracao.md) | T-54 |
+| Plano TDD (casos por regra) | Existe; todos os casos das regras críticas viraram testes | `docs/testes/plano-tdd.md` | T-19 |
+| Testes automatizados | **940 testes, 0 falhas, 0 erros**, entre unitários, parametrizados, de integração e de API caixa-preta | `./mvnw verify` em 2026-11-11; run verde do CI na `main` | T-20 a T-51 |
+| Testcontainers e WireMock | Toda a suíte de API roda com PostgreSQL real; a notificação externa é testada com WireMock (INT-01 a INT-05, timeouts, token que não vaza) | `TesteDeApiComBanco`; `NotificadorHttpWireMockTest` | T-30, T-31 |
+| Cobertura (JaCoCo) | **97,0 % de linhas** (1356/1398) e **86,0 % de branches** (467/543); o build falha abaixo de 80 % e 70 % | `target/site/jacoco` depois do `verify` | T-27 |
+| Análise estática (SonarCloud) | **0 bugs, 0 vulnerabilidades, 0 code smells, 0 hotspots**, duplicação 0,0 %, cobertura 93,9 % (medida do Sonar), **Quality Gate aprovado** | Painel do SonarCloud da `main` | T-29 |
+| Teste de concorrência (dupla reserva) | 20 solicitantes simultâneos: 1 aceita e 19 recusadas (409), 1 reserva ativa no banco, estável em 5 repetições e 8 execuções seguidas; sem a proteção, 20 inserções passam (vermelho provado) | [T-37-vermelho.md](evidencias/T-37-vermelho.md), [T-37-verde.md](evidencias/T-37-verde.md) | T-37 |
+| Teste de carga (JMeter) | 50 usuários, p95 de **2 a 7 ms** (meta 300 ms), **0 erro real**, 409 separado do erro, banco com 1 reserva ativa por intervalo | [resultado-01.md](performance/resultado-01.md) | T-38 |
+| TDD com evidência | 21 pares `test(red)` → `feat(green)` | [evidencia-tdd.md](testes/evidencia-tdd.md) | T-15 a T-51 |
+| Mutação manual nas regras críticas | 5 mutações, todas pegas pelos testes | [mutacao-manual.md](testes/mutacao-manual.md) | T-50 |
 
 ## 5. Segurança e robustez
 
 | Item | Resultado | Fonte | Task |
 |---|---|---|---|
-| Matriz de autorização (perfil × operação) | A preencher | `docs/seguranca/matriz-autorizacao.md` | T-48, T-49 |
-| Validação de entrada | A preencher | testes das specs T-16 a T-18, T-20, T-22 | T-22 |
-| Tratamento seguro de erros (nenhum detalhe interno) | A preencher | testes da spec T-22 | T-22 |
-| Senhas em hash e segredos fora do repositório | A preencher | testes da spec T-15 | T-15 |
+| Matriz de autorização (perfil × operação) | 36 endpoints; `MatrizDeAutorizacaoApiTest` percorre cada célula com tokens reais (176 casos), mais posse, ordem dos erros, rotas fora da matriz e completude; 0 falhas | [matriz](seguranca/matriz-autorizacao.md); [T-49](evidencias/T-49-matriz-de-autorizacao.md) | T-48, T-49 |
+| Validação de entrada | 400 com campo e motivo; restrições `CHECK`, `UNIQUE` e `EXCLUDE` no banco como última defesa | `EntradaInvalidaSemVazamentoApiTest`; testes das specs T-16 a T-18, T-20 e T-22 | T-22 |
+| Tratamento seguro de erros | Nenhuma resposta traz stack trace, SQL, nome de classe ou caminho (lista única `TermosProibidos`) | `ErrosDaApiTest`, `ErrosDasTelasTest`, `MatrizDeAutorizacaoApiTest` | T-22 |
+| Senhas em hash e segredos fora do repositório | BCrypt com sal; chave de assinatura e primeiro administrador só por variável de ambiente; nenhuma senha em log | `CodificadorDeSenhaTest`, `AdministradorInicialTest`, `LoginApiTest` | T-15 |
+| Robustez sob concorrência | Deadlock do PostgreSQL traduzido para 409 (DEF-02) | [registro de defeitos](defeitos/registro.md) | T-37 |
 
 ## 6. Rastreabilidade
 
 | Item | Onde está |
 |---|---|
 | Matriz requisito → risco → teste → evidência | [RTM](RTM.md) |
-| Status dos requisitos | `docs/status-requisitos.md` (T-39) |
+| Status dos requisitos | [status-requisitos.md](status-requisitos.md) |
 | Índice de evidências | [Evidências](evidencias/README.md) |
 
 ## 7. Gestão de defeitos
@@ -67,18 +70,18 @@ Resume o que o time fez para garantir a qualidade do sistema de Organização de
 | Item | Onde está |
 |---|---|
 | Ciclo de vida do defeito, severidade e prioridade | [Defeitos](defeitos/README.md) |
-| Defeitos encontrados e fechados | [Registro](defeitos/registro.md) |
+| Defeitos encontrados | [Registro](defeitos/registro.md): **DEF-01** (documentação), **DEF-02** (deadlock virava 500, achado pelo teste de concorrência) e **DEF-03** (2 pendências críticas do SonarCloud), todos com causa raiz e correção |
 
 ## 8. Limitações e riscos aceitos
 
-Ver [decisão de qualidade](decisao-qualidade.md), seções 2 e 3. `A preencher` com o que mudou até a entrega.
+Ver [decisão de qualidade](decisao-qualidade.md), seções 2 e 3. Em resumo: as **telas responsivas** não foram entregues (RF-13 parcial, RNF-11 não atendido), o **job periódico** (T-60) e o **BDD com Cucumber** ficaram de fora, e o teste de carga foi **local** (aplicação, banco e JMeter na mesma máquina), então prova a folga em relação à meta e o comportamento sob disputa, e não a capacidade de produção.
 
 ## 9. Autoria
 
-Cada integrante explica o próprio código e os próprios testes na prova oral. A tabela abaixo diz quem é dono de quê (conforme o [backlog](planejamento/backlog.md)).
+Cada integrante explica o próprio código e os próprios testes na prova oral. A tabela diz quem fez o quê, **conforme o histórico do Git** (`git shortlog -sn`: Renata 257 commits com o apelido Maki, Samuel 42, Caio 25).
 
-| Integrante | Tasks principais | O que explica na prova oral |
+| Integrante | O que fez | O que explica na prova oral |
 |---|---|---|
-| Renata | A preencher | A preencher |
-| Samuel | A preencher | A preencher |
-| Caio | A preencher | A preencher |
+| Renata | Código e testes das tasks T-15 a T-24, T-31, T-35, T-37, T-40 a T-43, T-48, T-49 e T-51; CI, JaCoCo e SonarCloud; teste de carga (T-38); defeitos DEF-02 e DEF-03; este conjunto de documentos | Regras de reserva, ciclo de vida, dupla reserva e o `EXCLUDE`, autorização, auditoria, manutenção, relatório, carga |
+| Samuel | Specs e revisões da semana 36 (T-16, T-18, T-21, T-22), parecer da spec T-37, spec da T-31, run vermelho intencional do CI (T-25) | A spec de notificação externa e a revisão da proteção contra dupla reserva |
+| Caio | Diagnóstico, personas, PRD (T-04, T-09), instruções de execução (T-07), instalação do AIOX (T-08), revisões das specs T-15, T-17, T-20 e T-31 | O PRD, as personas e as revisões das specs |

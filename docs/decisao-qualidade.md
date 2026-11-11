@@ -1,8 +1,8 @@
 # Decisão de qualidade
 
-Registra as decisões de qualidade que o time tomou, o que ficou de fora e os riscos que aceitou. Cada decisão aponta a fonte (ADR, spec ou PRD). Onde a decisão depende de um resultado que ainda não existe, o texto diz `A preencher`.
+Registra as decisões de qualidade que o time tomou, o que ficou de fora e os riscos que aceitou. Cada decisão aponta a fonte (ADR, spec ou PRD). 
 
-> **Estado em 2026-11-07:** as decisões abaixo vêm das specs da semana 36 (ainda em revisão por pares) e dos ADRs. Os ADRs 0007 e 0009 estão com status "Proposta". Os resultados medidos (cobertura, carga, concorrência) ainda não existem. A task T-57 fecha este documento.
+> **Estado em 2026-11-11 (entrega):** fechado pela T-57. As decisões vêm das specs e dos ADRs; os resultados medidos estão na seção 4. Os ADRs 0007, 0009 e 0010 seguem com status "Proposta" (a aceitação formal é do time).
 
 ## 1. Decisões de qualidade tomadas
 
@@ -24,6 +24,11 @@ Registra as decisões de qualidade que o time tomou, o que ficou de fora e os ri
 | `Clock` injetado em toda regra que depende de horário | Testes com tempo fixo, sem depender do relógio real | ADR-0008 |
 | Sessão nas telas, token assinado de 30 minutos na API; autorização negada por padrão; senha só em hash BCrypt | Protege contra o limitador "falha de autorização" | ADR-0007 (Proposta); spec T-15 |
 | Cada usuário tem exatamente um perfil e nunca é apagado, só desativado | Simplifica a autorização e preserva o histórico | ADR-0009 (Proposta) |
+| A proteção contra dupla reserva é o `EXCLUDE` do banco, com os vínculos gravados em ordem de id e o deadlock (`40P01`) traduzido para 409 | A garantia vale mesmo que o código erre; o teste de concorrência achou o deadlock (DEF-02) | ADR-0010; [T-37](evidencias/T-37-verde.md) |
+| Manutenção e reserva do mesmo recurso se serializam pelo bloqueio da linha do recurso | Nenhuma reserva é gravada depois da manutenção confirmada | Spec T-35 |
+| A auditoria só recebe inserções, garantido por gatilho do banco, e é gravada na mesma transação da mudança | Imutável mesmo para quem acessa o banco; sem registro órfão | Spec T-40 |
+| O conflito evitado é registrado em transação própria | O registro da recusa não some com o rollback da reserva | Spec T-41 |
+| A notificação é enviada depois do commit e a falha dela não desfaz a mudança | RNF-10: 0 reservas desfeitas | Spec T-31 |
 
 ### 1.3 Regras que o time acrescentou à especificação
 
@@ -57,8 +62,12 @@ Registra as decisões de qualidade que o time tomou, o que ficou de fora e os ri
 | Janela de funcionamento, último horário e antecedência máxima (RN-10 a RN-12) | Propostas do time sem validação; precisam de spec própria | `docs/testes/plano-tdd.md`; spec T-20 |
 | Recuperação de senha, bloqueio por tentativas, dois fatores, SSO | Não estão nos requisitos | Spec T-15 |
 | Reenvio de notificação perdida | Fora de escopo (FE-05) | `docs/arquitetura.md` (R-07) |
-| Pesquisa com filtros, retirada, relatório, OpenAPI, telas completas | `A preencher` (depende do que o time conseguir entregar até 12/11) | `docs/planejamento/backlog.md` |
-| Lista exata das tasks do backlog cortadas | `A preencher` pela T-57 | — |
+| **Telas responsivas** (Thymeleaf e Bootstrap): RF-13 parcial e RNF-11 não atendido; teste ponta a ponta (T-44 a T-47) | Priorizamos a API, as regras críticas e a prova delas (concorrência, autorização, auditoria, carga) dentro do prazo; as telas dependiam de tudo isso pronto. A parte de erros compreensíveis do RF-13 está entregue | [status-requisitos.md](status-requisitos.md) |
+| Telas de login com sessão e CSRF (T-15, parte web) | Mesmo motivo; a autenticação da API está completa | Spec T-15 |
+| Job periódico das mudanças por tempo (T-60): `NAO_COMPARECEU`, conclusão pelo fim e cancelamento por prazo de aprovação | A regra aceita essas transições (testada com o `Clock`), mas nada as dispara sozinho | Spec T-21 |
+| Feature Cucumber e BDD (T-33, T-36) | A especificação aceita TDD **ou** BDD; o TDD tem evidência em todas as funcionalidades | [evidencia-tdd.md](testes/evidencia-tdd.md) |
+| Avaliação arquitetural em ciclo (T-26) | Não escrita; a arquitetura tem ATAM e ADRs | `docs/atam/` |
+| Tasks cortadas | T-26, T-33, T-36, T-44, T-45, T-46, T-47 e T-60 do backlog | `docs/planejamento/backlog.md` |
 
 ## 3. Riscos aceitos
 
@@ -67,16 +76,18 @@ Registra as decisões de qualidade que o time tomou, o que ficou de fora e os ri
 | Notificação perdida não é reenviada | Reenvio está fora de escopo | R-07 em `docs/arquitetura.md` |
 | Nomes parecidos (por exemplo, "Projetor Epson" e "Projetor Epsom") valem como materiais diferentes | O sistema compara só o texto limpo; o Administrador corrige pela alteração | Spec T-18 (riscos) |
 | O token não pode ser revogado antes de expirar | Compensado pela conferência no banco a cada chamada | Spec T-15 |
-| O job periódico não tem janela nem volume medidos | Depende do teste de carga | R-06 e PS-03 em `docs/arquitetura.md` |
-| Metas de desempenho (RNF-09, RNF-10, RNF-11) são candidatas | Valores de exemplo ainda não aprovados | `docs/prd.md` |
+| O job periódico não existe | Ficou fora; as transições por tempo só acontecem por chamada | Seção 2 |
+| O teste de carga foi local, com aplicação, banco e JMeter na mesma máquina | Os tempos são pessimistas, mas não provam capacidade de produção | [resultado-01.md](performance/resultado-01.md) |
+| A meta de 300 ms (RNF-09) veio do exemplo da Aula 10 | O grupo a validou na T-38 (DP-07) | [rnf.md](performance/rnf.md) |
+| A recusa do banco na disputa conta só o primeiro recurso do pedido como conflito evitado | O relatório conta tentativas, e não recursos | Spec T-41 |
 | Limite de 72 bytes da senha (BCrypt) | O sistema recusa acima disso, em vez de truncar | Spec T-15 (P-02) |
 
-## 4. Resultados que fecham este documento (`A preencher`)
+## 4. Resultados que fecham este documento
 
 | Item | Valor | Evidência | Task |
 |---|---|---|---|
-| Cobertura de linhas e de branches | A preencher | [Evidências](evidencias/README.md) | T-27 |
-| Vulnerabilidades críticas | A preencher | [Evidências](evidencias/README.md) | T-29 |
-| Resultado do teste de concorrência | A preencher | [Evidências](evidencias/README.md) | T-37 |
-| p95 do teste de carga | A preencher | [Evidências](evidencias/README.md) | T-38 |
-| Requisitos críticos na RTM | A preencher | [RTM](RTM.md) | T-50 |
+| Cobertura de linhas e de branches | **97,0 %** e **86,0 %** (metas 80 e 70) | JaCoCo no `./mvnw verify` de 2026-11-11; [Evidências](evidencias/README.md) | T-27 |
+| Vulnerabilidades críticas | **0** (e 0 bugs); Quality Gate aprovado | SonarCloud da `main`; DEF-03 corrigido | T-29 |
+| Resultado do teste de concorrência | 1 aceita e 19 recusadas (409); 0 duplicidades no banco | [T-37-verde.md](evidencias/T-37-verde.md) | T-37 |
+| p95 do teste de carga | **2 a 7 ms** (meta 300 ms), 0 erro real | [resultado-01.md](performance/resultado-01.md) | T-38 |
+| Requisitos críticos na RTM | **100 %** (RN-01 a RN-09 com evidência) | [RTM](RTM.md) | T-50 |
