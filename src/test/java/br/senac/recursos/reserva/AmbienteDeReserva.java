@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 final class AmbienteDeReserva {
 
     static final String EMAIL_DO_OUTRO = "outro-solicitante@exemplo.com";
+    static final String DOMINIO_DA_MATRIZ = "@matriz.test";
     static final String NOME_DO_OUTRO = "Fulana Reservista";
 
     private final MockMvc mvc;
@@ -196,6 +197,17 @@ final class AmbienteDeReserva {
     ResultActions altera(String bearer, long id, String json) throws Exception {
         MockHttpServletRequestBuilder requisicao = put("/api/reservas/" + id)
                 .contentType(MediaType.APPLICATION_JSON).content(json);
+        return executa(comAutorizacao(requisicao, bearer));
+    }
+
+    /** Chamada genérica de qualquer rota da API (matriz de autorização, T-49); {@code bearer} e {@code json} podem ser nulos. */
+    ResultActions chama(org.springframework.http.HttpMethod metodo, String caminho, String bearer, String json)
+            throws Exception {
+        MockHttpServletRequestBuilder requisicao =
+                org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request(metodo, caminho);
+        if (json != null) {
+            requisicao.contentType(MediaType.APPLICATION_JSON).content(json);
+        }
         return executa(comAutorizacao(requisicao, bearer));
     }
 

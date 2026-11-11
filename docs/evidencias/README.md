@@ -10,7 +10,7 @@ Aponta, para cada limitador de nota e para cada requisito crítico, **o arquivo 
 |---|---|---|---|---|
 | A aplicação executa | Clone limpo, seguir o README e abrir a aplicação | `README.md`; comando de subida descrito nele; run da tag `v1.0.0-rc1` | T-55, T-56 | sem evidência ainda |
 | CI presente | Pipeline roda em cada pull request e na tag | `.github/workflows/ci.yml`; run verde da tag; run vermelho intencional registrado | T-25, T-56 | sem evidência ainda |
-| Sem falha de autorização | Matriz perfil × operação com teste parametrizado | `docs/seguranca/matriz-autorizacao.md`; teste parametrizado; `docs/testes/mutacao-manual.md` | T-48, T-49, T-50 | sem evidência ainda |
+| Sem falha de autorização | Matriz perfil × operação com teste parametrizado | `docs/seguranca/matriz-autorizacao.md`; teste parametrizado; `docs/testes/mutacao-manual.md` | T-48, T-49, T-50 | [T-49-matriz-de-autorizacao.md](T-49-matriz-de-autorizacao.md) e a [matriz](../seguranca/matriz-autorizacao.md); mutação manual completa na T-50 |
 | Sem dupla reserva | Teste de 20 solicitações simultâneas e restrição do banco | Teste de concorrência; migração com `EXCLUDE`; ADR da proteção; `perf/reservas.jmx` | T-30, T-37, T-38 | sem evidência ainda |
 
 ## 2. Regras críticas (RN-01 a RN-09)
