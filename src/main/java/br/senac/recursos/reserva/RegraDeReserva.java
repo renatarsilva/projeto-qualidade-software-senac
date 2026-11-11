@@ -1,5 +1,6 @@
 package br.senac.recursos.reserva;
 
+import br.senac.recursos.auditoria.AuditoriaDeReservas;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -25,8 +26,11 @@ public class RegraDeReserva {
     private final Clock clock;
     private final AgendaDeReservas agenda;
     private final VerificadorDeSobreposicao sobreposicao;
+    private final AuditoriaDeReservas auditoria;
 
-    public RegraDeReserva(Clock clock, AgendaDeReservas agenda, VerificadorDeSobreposicao sobreposicao) {
+    public RegraDeReserva(Clock clock, AgendaDeReservas agenda, VerificadorDeSobreposicao sobreposicao,
+            AuditoriaDeReservas auditoria) {
+        this.auditoria = auditoria;
         this.clock = clock;
         this.agenda = agenda;
         this.sobreposicao = sobreposicao;

@@ -259,7 +259,19 @@ final class AmbienteDeReserva {
         }
     }
 
+    /** Registros de auditoria da reserva, do mais antigo ao mais novo (spec T-40). */
+    List<java.util.Map<String, Object>> auditoria(long reservaId) {
+        return jdbc.queryForList("SELECT usuario_id, estado_anterior, estado_novo, ocorrida_em, motivo "
+                + "FROM auditoria WHERE reserva_id = ? ORDER BY id", reservaId);
+    }
+
+    int totalDeAuditoria() {
+        return jdbc.queryForObject("SELECT count(*) FROM auditoria", Integer.class);
+    }
+
     void limpa() {
+        // TRUNCATE não dispara o gatilho de imutabilidade (a auditoria só recebe inserções).
+        jdbc.execute("TRUNCATE TABLE auditoria");
         jdbc.update("DELETE FROM reserva_recurso");
         jdbc.update("DELETE FROM reserva");
         jdbc.update("DELETE FROM usuario WHERE email = ?", EMAIL_DO_OUTRO);

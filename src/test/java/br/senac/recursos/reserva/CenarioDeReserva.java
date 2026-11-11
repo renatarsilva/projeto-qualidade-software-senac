@@ -17,6 +17,7 @@ final class CenarioDeReserva {
     final AgendaEmMemoria agenda = new AgendaEmMemoria();
     final RegraDeReserva regra;
     final CicloDeVidaDaReserva ciclo;
+    final AuditoriaEmMemoria auditoria;
 
     CenarioDeReserva() {
         this(HorariosDeTeste.AGORA);
@@ -24,8 +25,9 @@ final class CenarioDeReserva {
 
     CenarioDeReserva(Instant agora) {
         Clock clock = Clock.fixed(agora, ZoneOffset.UTC);
-        this.regra = new RegraDeReserva(clock, agenda, new SobreposicaoPelaAgenda(agenda));
-        this.ciclo = new CicloDeVidaDaReserva(clock, agenda);
+        this.auditoria = new AuditoriaEmMemoria(clock);
+        this.regra = new RegraDeReserva(clock, agenda, new SobreposicaoPelaAgenda(agenda), auditoria);
+        this.ciclo = new CicloDeVidaDaReserva(clock, agenda, auditoria);
     }
 
     /** Recurso que existe no cadastro. */

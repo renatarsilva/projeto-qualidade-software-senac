@@ -8,6 +8,7 @@ import static br.senac.recursos.reserva.EstadoDaReserva.NAO_COMPARECEU;
 import static br.senac.recursos.reserva.EstadoDaReserva.REJEITADA;
 import static br.senac.recursos.reserva.EstadoDaReserva.SOLICITADA;
 
+import br.senac.recursos.auditoria.AuditoriaDeReservas;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Map;
@@ -36,8 +37,10 @@ public class CicloDeVidaDaReserva {
 
     private final Clock clock;
     private final AgendaDeReservas agenda;
+    private final AuditoriaDeReservas auditoria;
 
-    public CicloDeVidaDaReserva(Clock clock, AgendaDeReservas agenda) {
+    public CicloDeVidaDaReserva(Clock clock, AgendaDeReservas agenda, AuditoriaDeReservas auditoria) {
+        this.auditoria = auditoria;
         this.clock = clock;
         this.agenda = agenda;
     }
@@ -82,6 +85,11 @@ public class CicloDeVidaDaReserva {
                 // EM_USO só pelo check-in do dono.
                 return transicaoProibida();
         }
+    }
+
+    /** Como {@link #muda(long, EstadoDaReserva)}, informando quem muda (o Responsável); vazio significa sistema. */
+    public DecisaoDaReserva muda(long reservaId, EstadoDaReserva destino, Long usuarioId) {
+        return muda(reservaId, destino);
     }
 
     /** Destino vindo do cliente como texto: um estado que não existe é recusado. */
