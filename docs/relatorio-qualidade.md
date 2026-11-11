@@ -78,10 +78,10 @@ Ver [decisão de qualidade](decisao-qualidade.md), seções 2 e 3. Em resumo: as
 
 ## 9. Autoria
 
-Cada integrante explica o próprio código e os próprios testes na prova oral. A tabela diz quem fez o quê, **conforme o histórico do Git** (`git shortlog -sn`: Renata 257 commits com o apelido Maki, Samuel 42, Caio 25).
+Cada integrante explica o próprio código e os próprios testes na prova oral. A tabela diz quem fez o quê **conforme o histórico do Git**, que qualquer pessoa pode conferir: `git shortlog -sn --no-merges` (Renata 206 commits, Samuel 27, Caio 20; **81 % dos commits e todo o código-fonte em `src/` são da Renata**) e `gh pr list --state all` (39 dos 54 PRs). A distribuição planejada e o realizado de cada sprint estão em [sprints.md](planejamento/sprints.md).
 
 | Integrante | O que fez | O que explica na prova oral |
 |---|---|---|
-| Renata | Código e testes das tasks T-15 a T-24, T-31, T-35, T-37, T-40 a T-43, T-48, T-49 e T-51; CI, JaCoCo e SonarCloud; teste de carga (T-38); defeitos DEF-02 e DEF-03; este conjunto de documentos | Regras de reserva, ciclo de vida, dupla reserva e o `EXCLUDE`, autorização, auditoria, manutenção, relatório, carga |
-| Samuel | Specs e revisões da semana 36 (T-16, T-18, T-21, T-22), parecer da spec T-37, spec da T-31, run vermelho intencional do CI (T-25) | A spec de notificação externa e a revisão da proteção contra dupla reserva |
-| Caio | Diagnóstico, personas, PRD (T-04, T-09), instruções de execução (T-07), instalação do AIOX (T-08), revisões das specs T-15, T-17, T-20 e T-31 | O PRD, as personas e as revisões das specs |
+| Renata | Código, testes e specs das tasks T-15 a T-24, T-31, T-35, T-37, T-40 a T-43, T-48, T-49 e T-51; o pipeline de CI, o gate do JaCoCo e o SonarCloud (T-25, T-27, T-29); o teste de carga (T-38); a arquitetura, o ATAM e os ADRs (T-10 a T-13); os defeitos DEF-02 e DEF-03; a RTM, as evidências e os documentos finais | Regras de reserva, ciclo de vida, dupla reserva e o `EXCLUDE`, autorização, auditoria, manutenção, relatório, carga, CI e qualidade |
+| Samuel | Plano de teste (T-06), spec da notificação externa (T-31), pareceres das specs T-16, T-18, T-21, T-22 e T-37, run vermelho intencional do CI (T-25) | O plano de teste, a spec de notificação externa e as revisões |
+| Caio | Diagnóstico (T-03), personas (T-04), utility tree (T-05), projeto Spring Boot (T-07), AIOX (T-08), PRD (T-09) e pareceres das specs T-15, T-17, T-20 e T-31 | O PRD, as personas, o diagnóstico e as revisões |
