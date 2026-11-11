@@ -81,7 +81,7 @@ Para as rotas de reserva: **401** (sem autenticação), **403** por perfil, **40
 
 ## 6. Rotas fora da matriz da API
 
-- **Telas (Thymeleaf):** usam a cadeia de segurança de formulário com sessão e CSRF (ADR-0007) e ainda não existem. Entram na matriz quando as telas forem feitas (T-15, parte das telas; T-44 a T-47).
+- **Telas (Thymeleaf):** usam a cadeia de segurança de formulário com sessão e CSRF (ADR-0007), negada por padrão. As regras repetem esta matriz e estão na tabela de rotas da [spec T-44](../specs/T-44-telas-do-sistema.md); o teste `AutorizacaoDasTelasTest` cruza as 29 rotas das telas com os 3 perfis e o anônimo. Cada rota nova precisa de uma linha nesse teste. O perfil vale o do banco a cada requisição (`ContaDaSessaoFilter`).
 - **`/error`:** resposta de erro do próprio sistema, pública para renderizar a página de erro; não expõe dados.
 
 ## 7. Ligação com os testes
