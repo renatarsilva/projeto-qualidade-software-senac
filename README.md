@@ -225,3 +225,14 @@ Detalhes em [sprints](docs/planejamento/sprints.md) e [backlog](docs/planejament
 | Renata | [@renatarsilva](https://github.com/renatarsilva) |
 | Samuel | [@Samwel-Merces](https://github.com/Samwel-Merces) |
 | Caio | [@CaiosAguiar](https://github.com/CaiosAguiar) |
+
+## Documentação da API
+
+Com a aplicação rodando (`./mvnw spring-boot:run`), a documentação fica em:
+
+- **Swagger UI:** http://localhost:8080/swagger-ui.html (abre sem token e permite testar com o botão *Authorize*).
+- **Documento OpenAPI (JSON):** http://localhost:8080/v3/api-docs.
+
+Todos os endpoints estão descritos com o resumo, os **perfis permitidos** (lidos das mesmas regras de acesso da segurança), as respostas de erro (400, 401, 403, 404 e 409) e o esquema do token Bearer. Os erros seguem o formato `ProblemDetail` (RFC 9457).
+
+**Fluxo público:** só `POST /api/auth/login` é público. Ele devolve o token (válido por 30 minutos) que as demais rotas exigem no cabeçalho `Authorization: Bearer <token>`. A [matriz de autorização](docs/seguranca/matriz-autorizacao.md) lista cada operação e o status esperado por perfil.
