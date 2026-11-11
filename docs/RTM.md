@@ -56,7 +56,7 @@ Não vêm da especificação oficial: foram decididas pelo time e registradas no
 | RF-09 retirada e devolução de materiais | — | sem casos escritos | T-42 | green | `RetiradaDeMateriaisApiTest` (TC-01 a TC-15), matriz de autorização (RT-01 a RT-03) |
 | RF-10 histórico auditável | F6 · R-05 | RN-09 | T-40 | green | `AuditoriaDasMudancasTest`, `AuditoriaApiTest`, `RollbackDaAuditoriaApiTest`, `ImutabilidadeDaAuditoriaTest`; histórico de uma reserva cancelada (TC-18) |
 | RF-11 notificação simulada ou API externa | F7 · F8 · CEN-03 · CT-03 · R-07 | INT-01 a INT-05 e TC-01 a TC-16 da spec T-31; CT-03 | T-31 | green | `NotificadorHttpWireMockTest`, `NotificacaoDasMudancasApiTest`, `NotificacaoAposOCommitTest` (WireMock, suíte offline) |
-| RF-12 relatório de utilização | — | sem casos escritos (oráculo calculado à mão) | T-41 | sem teste | sem evidência ainda (T-41) |
+| RF-12 relatório de utilização | — | sem casos escritos (oráculo calculado à mão) | T-41 | green | `RelatorioDeUtilizacaoApiTest` (TC-01 a TC-12, oráculo calculado à mão), matriz de autorização (RL-01) |
 | RF-13 interface responsiva e mensagens de erro compreensíveis | — | specs T-22 (TC-01 a TC-47) | T-22, T-44, T-45, T-46, T-47 | sem teste | sem evidência ainda (T-22) |
 | RF-14 documentação da API | — | sem casos | T-51 | sem teste | sem evidência ainda (T-51) |
 
