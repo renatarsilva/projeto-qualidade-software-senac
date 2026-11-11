@@ -155,11 +155,12 @@ A contribuição do Samuel e do Caio está na **qualidade do processo**: cada sp
 
 | Pessoa | Tasks entregues |
 |---|---|
-| Renata | T-48 matriz de autorização · T-49 teste da matriz · T-50 mutação manual e RTM · T-51 OpenAPI · T-52 relatório de qualidade · T-53 perguntas da prova oral · T-55 checklist e demonstração · T-56 evidências e `CHANGELOG` · T-57 decisão de qualidade · correção do DEF-03 (SonarCloud) |
+| Renata | T-44, T-45, T-46 telas dos três perfis · T-48 matriz de autorização · T-49 teste da matriz · T-50 mutação manual e RTM · T-51 OpenAPI · T-52 relatório de qualidade · T-53 perguntas da prova oral · T-55 checklist e demonstração · T-56 evidências e `CHANGELOG` · T-57 decisão de qualidade · correção do DEF-03 (SonarCloud) |
 | Samuel | Revisão e aprovação de PRs |
 | Caio | Revisão e aprovação de PRs |
 
-**Não realizadas:** T-45, T-46 e T-47 (telas e teste ponta a ponta), T-54 (ensaio da prova oral, que depende da equipe).
+**Também realizadas (na véspera da entrega):** T-44, T-45 e T-46, as telas dos três perfis (spec T-44, 83 testes, roteiro no Chrome real).
+**Não realizadas:** T-47 no CI (o roteiro do navegador roda à mão) e T-54 (ensaio da prova oral, que depende da equipe).
 **Falta para fechar a entrega:** tag `v1.0.0-rc1`, clone limpo e formulário.
 
-**Resultado:** Concluída quanto à API, às regras, às provas (autorização, concorrência, carga, mutação) e aos documentos. 940 testes, cobertura de 97,0 % de linhas e 86,0 % de branches, SonarCloud com Quality Gate aprovado. As telas responsivas não foram entregues (ver [decisão de qualidade](../decisao-qualidade.md)).
+**Resultado:** Concluída quanto à API, às regras, às provas (autorização, concorrência, carga, mutação) e aos documentos. 1023 testes, cobertura de 95,9 % de linhas e 85,1 % de branches, SonarCloud com Quality Gate aprovado. As telas responsivas dos três perfis foram entregues na véspera (RF-13 e RNF-11).

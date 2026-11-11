@@ -2,7 +2,7 @@
 
 Liga cada requisito ao risco que ele protege, aos casos de teste que o comprovam, à task responsável e à evidência. A meta do RNF-03 é **100 % dos requisitos críticos com evidência** (as linhas em **negrito**, RN-01 a RN-09).
 
-> **Estado em 2026-11-11 (entrega):** 940 testes automatizados passando; cada linha aponta a classe de teste ou o documento que a comprova. Quem escreve um teste atualiza a linha na mesma PR (task T-32 criou a estrutura; T-39 e T-50 fecham a matriz).
+> **Estado em 2026-11-11 (entrega):** 1023 testes automatizados passando; cada linha aponta a classe de teste ou o documento que a comprova. Quem escreve um teste atualiza a linha na mesma PR (task T-32 criou a estrutura; T-39 e T-50 fecham a matriz).
 
 ## Como ler
 
@@ -45,7 +45,7 @@ Não vêm da especificação oficial: foram decididas pelo time e registradas no
 
 | Requisito | Risco / cenário | Casos de teste | Task | Status | Evidência |
 |---|---|---|---|---|---|
-| RF-01 autenticação e autorização por perfil | F5 · limitador "falha de autorização" | specs T-15 (TC-01 a TC-43); matriz perfil × operação | T-15, T-48, T-49 | green | `LoginApiTest`, `AutenticacaoDaApiTest`, `AutorizacaoPorPerfilTest`, `GestaoDeUsuariosApiTest`, `MatrizDeAutorizacaoApiTest` (176 casos), [matriz](seguranca/matriz-autorizacao.md), [T-49](evidencias/T-49-matriz-de-autorizacao.md). As telas de login com sessão e CSRF ficaram pendentes |
+| RF-01 autenticação e autorização por perfil | F5 · limitador "falha de autorização" | specs T-15 (TC-01 a TC-43) e T-44 (TC-05 a TC-11); matriz perfil × operação, da API e das telas | T-15, T-44, T-48, T-49 | green | `LoginApiTest`, `AutenticacaoDaApiTest`, `AutorizacaoPorPerfilTest`, `GestaoDeUsuariosApiTest`, `MatrizDeAutorizacaoApiTest` (176 casos), [matriz](seguranca/matriz-autorizacao.md), [T-49](evidencias/T-49-matriz-de-autorizacao.md). As telas de login com sessão e CSRF ficaram pendentes |
 | RF-02 cadastro e consulta de salas, professores e materiais | — | specs T-16 (TC-01 a TC-41), T-17 (TC-01 a TC-42), T-18 (TC-01 a TC-33) | T-16, T-17, T-18 | green | `CadastroDeSalaApiTest`, `AlteracaoDeSalaApiTest`, `CadastroDeProfessorApiTest`, `CadastroDeMaterialApiTest`, `NomeUnicoDaSalaApiTest`, `NomeEPatrimonioUnicosApiTest` e as restrições do banco |
 | RF-03 pesquisa de recursos | — | TC-01 a TC-20 da spec T-43 | T-43, T-45 | green | `PesquisaDeRecursosApiTest` (TC-01 a TC-13), `ConsultaDeReservasApiTest` (TC-14 a TC-20), spec T-43 |
 | RF-04 criar, alterar e cancelar reservas | F3 | RN-01, RN-05, RN-06, RN-08, RN-13 a RN-15 | T-20, T-21, T-23, T-24 | green | `CriacaoDeReservaApiTest`, `AlteracaoDeReservaApiTest`, `CicloDeVidaApiTest`, `AlteracaoDeReservaTest`, `CancelamentoDaReservaTest` |
@@ -57,15 +57,15 @@ Não vêm da especificação oficial: foram decididas pelo time e registradas no
 | RF-10 histórico auditável | F6 · R-05 | RN-09 | T-40 | green | `AuditoriaDasMudancasTest`, `AuditoriaApiTest`, `RollbackDaAuditoriaApiTest`, `ImutabilidadeDaAuditoriaTest`; histórico de uma reserva cancelada (TC-18) |
 | RF-11 notificação simulada ou API externa | F7 · F8 · CEN-03 · CT-03 · R-07 | INT-01 a INT-05 e TC-01 a TC-16 da spec T-31; CT-03 | T-31 | green | `NotificadorHttpWireMockTest`, `NotificacaoDasMudancasApiTest`, `NotificacaoAposOCommitTest` (WireMock, suíte offline) |
 | RF-12 relatório de utilização | — | sem casos escritos (oráculo calculado à mão) | T-41 | green | `RelatorioDeUtilizacaoApiTest` (TC-01 a TC-12, oráculo calculado à mão), matriz de autorização (RL-01) |
-| RF-13 interface responsiva e mensagens de erro compreensíveis | — | specs T-22 (TC-01 a TC-47) | T-22, T-44, T-45, T-46, T-47 | parcial | Mensagens de erro compreensíveis: `ErrosDaApiTest`, `ErrosDasTelasTest`, `FabricaDeProblemasTest` (verde). A interface responsiva (T-44 a T-47) **não foi entregue**: ver [decisão de qualidade](decisao-qualidade.md) |
+| RF-13 interface responsiva e mensagens de erro compreensíveis | — | specs T-22 (TC-01 a TC-47) e T-44 (TC-01 a TC-33) | T-22, T-44, T-45, T-46 | green | Mensagens de erro: `ErrosDaApiTest`, `ErrosDasTelasTest`, `FabricaDeProblemasTest`. Telas: `LoginEMenuDasTelasTest`, `AutorizacaoDasTelasTest`, `TelasDoSolicitanteTest`, `TelasDoResponsavelTest`, `TelasDoAdministradorTest`, `FluxoCompletoPelasTelasTest`, `PaginaDeAcessoNegadoTest` (83 testes); navegador real em 375 px: [T-44-telas.md](evidencias/T-44-telas.md) |
 | RF-14 documentação da API | — | DocumentacaoDaApiTest; todos os endpoints da matriz de autorização | T-51 | green | `DocumentacaoDaApiTest` (40 casos: todos os endpoints da matriz descritos), Swagger UI e [README](../README.md) |
 
 ## Requisitos não funcionais (RNF-01 a RNF-11)
 
 | Requisito | Meta | Risco / cenário | Task | Status | Evidência |
 |---|---|---|---|---|---|
-| RNF-01 cobertura de linhas | ≥ 80 % | — | T-27 | green | JaCoCo no `./mvnw verify` em 2026-11-11: **97,0 %** de linhas (1356 de 1398); gate de 80 % no `pom.xml` |
-| RNF-02 cobertura de branches | ≥ 70 % | — | T-27, T-28 | green | JaCoCo no `./mvnw verify` em 2026-11-11: **86,0 %** de branches (467 de 543); gate de 70 % no `pom.xml` |
+| RNF-01 cobertura de linhas | ≥ 80 % | — | T-27 | green | JaCoCo no `./mvnw verify` em 2026-11-11: **95,9 %** de linhas (1733 de 1807); gate de 80 % no `pom.xml` |
+| RNF-02 cobertura de branches | ≥ 70 % | — | T-27, T-28 | green | JaCoCo no `./mvnw verify` em 2026-11-11: **85,1 %** de branches (594 de 698); gate de 70 % no `pom.xml` |
 | RNF-03 rastreabilidade | 100 % dos críticos na RTM | — | T-32, T-39, T-50 | green | Este arquivo: RN-01 a RN-09 todas com status `green` e evidência (RN-05 e RN-06 com o job T-60 pendente) |
 | RNF-04 defeitos críticos | 0 | — | T-29 | green | SonarCloud da `main` em 2026-11-11: 0 bugs, 0 vulnerabilidades, 0 code smells, Quality Gate aprovado; o DEF-03 (2 pendências críticas) foi corrigido ([registro](defeitos/registro.md)) |
 | RNF-05 dupla reserva | 1 aceita, 0 duplicidades | F2 · CEN-02 | T-37, T-38 | green | [T-37-verde.md](evidencias/T-37-verde.md): 20 solicitantes, 1 aceita e 19 recusadas (409); banco com 0 duplicidades; [resultado-01.md](performance/resultado-01.md) |
@@ -74,11 +74,11 @@ Não vêm da especificação oficial: foram decididas pelo time e registradas no
 | RNF-08 tratamento seguro de erros | 0 respostas com detalhe interno | F14 | T-22, T-49 | green | `TermosProibidos` aplicado em `ErrosDaApiTest`, `ErrosDasTelasTest`, `MatrizDeAutorizacaoApiTest` e `EntradaInvalidaSemVazamentoApiTest` |
 | RNF-09 desempenho | p95 ≤ 300 ms com 50 usuários (candidata) | p95 ≤ 300 ms com 50 usuários e erro real < 1 % (validada na T-38) | T-38 | green | [rnf.md](performance/rnf.md) → `perf/reservas.jmx` → [resultado-01.md](performance/resultado-01.md): **atende** (p95 de 2 a 7 ms, 0 erro real, 1 reserva ativa por intervalo) |
 | RNF-10 resiliência da notificação | 0 reservas desfeitas | F7 · F8 · R-07 | T-31 | green | `NotificacaoDasMudancasApiTest` (a notificação falha e a aprovação continua), `NotificacaoAposOCommitTest`, `NotificadorHttpWireMockTest` (INT-01 a INT-05) |
-| RNF-11 responsividade | utilizável a partir de 375 px (candidata) | — | T-44 | sem teste | A interface responsiva não foi entregue; sem evidência (ver [decisão de qualidade](decisao-qualidade.md)) |
+| RNF-11 responsividade | utilizável a partir de 375 px | — | T-44 | green | Roteiro no Chrome real em 375 px: 14 páginas sem rolagem horizontal e fluxo completo (31 verificações), `e2e/` e [T-44-telas.md](evidencias/T-44-telas.md), seção 5. Não roda no CI |
 
 ## Pendências desta matriz
 
 - As regras RN-10 a RN-12 (propostas) não têm task no backlog e por isso não entram na matriz.
 - RN-05, RN-06 e RN-14 estão `green` para as regras e os endpoints; o **job periódico** que dispara as mudanças por tempo (T-60) ficou pendente.
-- RF-13 está `parcial` e o RNF-11 está `sem teste`: a interface responsiva não foi entregue (ver [decisão de qualidade](decisao-qualidade.md)).
+- RF-13 e RNF-11 estão `green`: as telas dos três perfis foram entregues na véspera da entrega, com 83 testes no CI e o roteiro do navegador real (que roda à mão, e não no CI).
 - Os IDs `RN-xx-Tn` seguem o plano TDD; as specs em `docs/specs/` têm os casos `TC-nn` de cada task.
