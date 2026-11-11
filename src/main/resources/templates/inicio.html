@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/base :: base(~{::title}, ~{::main})}">
+<head><title>Início</title></head>
+<body>
+<main class="container py-4">
+    <h1 class="h3" th:text="'Olá, ' + ${conta != null ? conta.nome : ''}">Olá</h1>
+    <p class="text-secondary" sec:authorize="hasRole('SOLICITANTE')">
+        Pesquise salas, professores e materiais livres, peça uma reserva e acompanhe a aprovação em "Minhas reservas".</p>
+    <p class="text-secondary" sec:authorize="hasRole('RESPONSAVEL')">
+        Aprove ou rejeite os pedidos na fila de aprovação, registre a retirada e a devolução de materiais e consulte
+        o histórico de cada reserva.</p>
+    <p class="text-secondary" sec:authorize="hasRole('ADMINISTRADOR')">
+        Cadastre salas, materiais, professores e usuários, registre períodos de manutenção e consulte o relatório de
+        utilização.</p>
+</main>
+</body>
+</html>

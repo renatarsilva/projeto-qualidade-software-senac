@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/base :: base(~{::title}, ~{::main})}">
+<head><title>Reservas</title></head>
+<body>
+<main class="container pb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <h1 class="h3 mb-0"><span sec:authorize="hasRole('SOLICITANTE')">Minhas reservas</span>
+            <span sec:authorize="!hasRole('SOLICITANTE')">Reservas</span></h1>
+        <form th:action="@{/reservas}" method="get" class="d-flex gap-2">
+            <select class="form-select" name="estado" aria-label="Filtrar por estado">
+                <option value="">Todos os estados</option>
+                <option th:each="e : ${T(br.senac.recursos.reserva.EstadoDaReserva).values()}"
+                        th:value="${e.name()}" th:text="${@ap.estado(e)}" th:selected="${estado == e.name()}"></option>
+            </select>
+            <button class="btn btn-outline-primary" type="submit">Filtrar</button>
+        </form>
+    </div>
+    <p class="text-secondary" th:if="${#lists.isEmpty(reservas)}">Nenhuma reserva encontrada.</p>
+    <div class="tabela-rolavel" th:unless="${#lists.isEmpty(reservas)}">
+        <table class="table table-striped align-middle bg-white">
+            <thead><tr><th>#</th><th>Período</th><th>Recursos</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="r : ${reservas}" th:id="'reserva-' + ${r.id()}">
+                <td th:text="${r.id()}">1</td>
+                <td><span th:text="${@ap.data(r.inicio())}"></span> a <span th:text="${@ap.data(r.termino())}"></span></td>
+                <td><span th:each="x, s : ${r.recursos()}"
+                          th:text="${nomes[x.tipo() + ':' + x.id()]} + (${s.last} ? '' : ', ')"></span></td>
+                <td><span class="badge selo-estado" th:classappend="${@ap.selo(r.estado())}"
+                          th:text="${@ap.estado(r.estado())}">Solicitada</span></td>
+                <td><a class="btn btn-sm btn-outline-primary" th:href="@{/reservas/{id}(id=${r.id()})}">Abrir</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,6 @@
+/* Ajustes finos sobre o Bootstrap (spec T-44): tabelas largas rolam na horizontal em telas estreitas. */
+body { min-height: 100vh; }
+.tabela-rolavel { overflow-x: auto; }
+.card-formulario { max-width: 34rem; }
+.selo-estado { font-size: .85rem; }
+form.linha { display: inline; }
