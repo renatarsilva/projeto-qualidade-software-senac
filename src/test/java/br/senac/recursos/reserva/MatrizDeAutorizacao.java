@@ -67,6 +67,9 @@ final class MatrizDeAutorizacao {
                     c -> chama(c, PUT, "/api/materiais/" + material(c), String.format(MATERIAL_VALIDO, "Projetor", "PAT-1"))),
             new Operacao("M-05", DELETE, "/api/materiais/{id}", null, 401, 403, 403, 204,
                     c -> chama(c, DELETE, "/api/materiais/" + material(c), null)),
+            // Pesquisa de recursos (T-43)
+            new Operacao("G-01", GET, "/api/recursos", null, 401, 200, 200, 200,
+                    c -> chama(c, GET, "/api/recursos", null)),
             // Reservas
             new Operacao("R-01", POST, "/api/reservas", "{}", 401, 201, 403, 403,
                     c -> chama(c, POST, "/api/reservas", corpo(terca(10, 0), terca(11, 0), c.sala))),
@@ -88,7 +91,12 @@ final class MatrizDeAutorizacao {
             new Operacao("R-06", PATCH, "/api/reservas/{id}/estado", "{\"estado\":\"EM_USO\"}", 401, 403, 403, 403,
                     null),
             new Operacao("R-07", DELETE, "/api/reservas/{id}", null, 401, 409, 403, 403,
-                    c -> chama(c, DELETE, "/api/reservas/" + c.reservaDoDono(EstadoDaReserva.SOLICITADA), null)));
+                    c -> chama(c, DELETE, "/api/reservas/" + c.reservaDoDono(EstadoDaReserva.SOLICITADA), null)),
+            // Consulta de reservas (T-43): o Solicitante vê só as próprias
+            new Operacao("R-08", GET, "/api/reservas", null, 401, 200, 200, 200,
+                    c -> chama(c, GET, "/api/reservas", null)),
+            new Operacao("R-09", GET, "/api/reservas/{id}", null, 401, 200, 200, 200,
+                    c -> chama(c, GET, "/api/reservas/" + c.reservaDoDono(EstadoDaReserva.SOLICITADA), null)));
 
     private MatrizDeAutorizacao() {
     }

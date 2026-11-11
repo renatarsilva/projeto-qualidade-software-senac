@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.http.HttpMethod;
 
-/** O que não está na matriz é negado por padrão (spec T-49, CA-06; TC-07; matriz X-01 a X-03). */
+/** O que não está na matriz é negado por padrão (spec T-49, CA-06; TC-07; matriz X-01 e X-03). */
 @TesteDeReservaApi
 class RotasForaDaMatrizApiTest extends BaseDaApiDeReserva {
 
@@ -18,8 +18,6 @@ class RotasForaDaMatrizApiTest extends BaseDaApiDeReserva {
         Stream.Builder<Arguments> casos = Stream.builder();
         String[][] rotas = {
             {"X-01", "DELETE", "/api/salas/1"},
-            {"X-02", "GET", "/api/reservas"},
-            {"X-02", "GET", "/api/reservas/1"},
             {"X-03", "GET", "/api/relatorios"},
             {"X-03", "POST", "/api/manutencoes"},
             {"X-03", "GET", "/api/qualquer-coisa"}};
