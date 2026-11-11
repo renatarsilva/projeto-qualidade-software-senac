@@ -18,6 +18,7 @@ public class RegraDeReserva {
 
     static final String MENSAGEM_ANTECEDENCIA = "A reserva precisa ser pedida com pelo menos 1 hora de antecedência";
     static final String MENSAGEM_NAO_ALTERAVEL = "Esta reserva não pode mais ser alterada";
+    static final String MOTIVO_ALTERACAO_DE_APROVADA = "alteração da reserva aprovada";
     static final String AVISO_NOVA_APROVACAO = "A reserva precisa ser aprovada de novo";
 
     private static final Duration ANTECEDENCIA_MINIMA = Duration.ofHours(1);
@@ -48,7 +49,9 @@ public class RegraDeReserva {
         Instant agora = clock.instant();
         ReservaNaAgenda nova = new ReservaNaAgenda(0, donoId, EstadoDaReserva.SOLICITADA, pedido.inicio(),
                 pedido.termino(), pedido.recursos(), agora, prazoDeAprovacao(agora, pedido.inicio()));
-        return aceita(agenda.grava(nova), null);
+        ReservaNaAgenda gravada = agenda.grava(nova);
+        auditoria.registra(gravada.id(), donoId, null, EstadoDaReserva.SOLICITADA, null);
+        return aceita(gravada, null);
     }
 
     /** Altera a reserva do dono: o pedido substitui intervalo e recursos por inteiro. */
@@ -72,7 +75,12 @@ public class RegraDeReserva {
         ReservaNaAgenda alterada = new ReservaNaAgenda(atual.id(), atual.donoId(), EstadoDaReserva.SOLICITADA,
                 pedido.inicio(), pedido.termino(), pedido.recursos(), atual.criadaEm(),
                 prazoDeAprovacao(clock.instant(), pedido.inicio()));
-        return aceita(agenda.grava(alterada), voltaParaAprovacao ? AVISO_NOVA_APROVACAO : null);
+        ReservaNaAgenda gravada = agenda.grava(alterada);
+        if (voltaParaAprovacao) {
+            auditoria.registra(gravada.id(), donoId, EstadoDaReserva.APROVADA, EstadoDaReserva.SOLICITADA,
+                    MOTIVO_ALTERACAO_DE_APROVADA);
+        }
+        return aceita(gravada, voltaParaAprovacao ? AVISO_NOVA_APROVACAO : null);
     }
 
     private Optional<DecisaoDaReserva> recursosInexistentes(PedidoDeReserva pedido) {

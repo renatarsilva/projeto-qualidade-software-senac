@@ -56,8 +56,9 @@ public class ReservaController {
     }
 
     @PatchMapping("/{id}/estado")
-    ResponseEntity<ReservaResponse> mudaEstado(@PathVariable long id, @RequestBody EstadoRequest corpo) {
-        return ResponseEntity.ok(reservas.mudaEstado(id, corpo.estado()));
+    ResponseEntity<ReservaResponse> mudaEstado(Authentication autenticacao, @PathVariable long id,
+            @RequestBody EstadoRequest corpo) {
+        return ResponseEntity.ok(reservas.mudaEstado(donoDe(autenticacao), id, corpo.estado()));
     }
 
     @PostMapping("/{id}/cancelamento")
