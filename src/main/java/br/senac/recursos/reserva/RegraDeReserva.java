@@ -44,6 +44,7 @@ public class RegraDeReserva {
         Optional<DecisaoDaReserva> recusa = recursosInexistentes(pedido)
                 .or(() -> entradaInvalida(pedido))
                 .or(() -> antecedenciaInsuficiente(pedido))
+                .or(() -> emManutencao(pedido))
                 .or(() -> sobreposto(pedido, null));
         if (recusa.isPresent()) {
             return recusa.get();
@@ -69,6 +70,7 @@ public class RegraDeReserva {
                 .or(() -> entradaInvalida(pedido))
                 .or(() -> naoAlteravel(atual))
                 .or(() -> antecedenciaInsuficiente(pedido))
+                .or(() -> emManutencao(pedido))
                 .or(() -> sobreposto(pedido, reservaId));
         if (recusa.isPresent()) {
             return recusa.get();
@@ -122,6 +124,25 @@ public class RegraDeReserva {
         return pedido.inicio().isBefore(limite)
                 ? Optional.of(recusa(MotivoDeRecusa.ANTECEDENCIA_INSUFICIENTE, null, MENSAGEM_ANTECEDENCIA))
                 : Optional.empty();
+    }
+
+    /**
+     * RN-04: recurso em manutenção não pode ser reservado; basta um para recusar o pedido inteiro. Os recursos são
+     * verificados em ordem de id, para os bloqueios do banco serem pedidos sempre na mesma ordem (T-35, CEN-04).
+     */
+    private Optional<DecisaoDaReserva> emManutencao(PedidoDeReserva pedido) {
+        return recursosDe(pedido).stream().sorted(java.util.Comparator.comparingLong(RecursoPedido::id))
+                .filter(r -> manutencao.emManutencao(r, pedido.inicio(), pedido.termino()))
+                .findFirst()
+                .map(r -> recusa(MotivoDeRecusa.EM_MANUTENCAO, null, mensagemDeManutencao(r.tipo())));
+    }
+
+    private static String mensagemDeManutencao(TipoDeRecurso tipo) {
+        return switch (tipo) {
+            case SALA -> "A sala está em manutenção neste horário";
+            case PROFESSOR -> "O professor está em manutenção neste horário";
+            case MATERIAL -> "O material está em manutenção neste horário";
+        };
     }
 
     /** RN-02: basta um recurso ocupado para recusar o pedido inteiro; nada é gravado. */
