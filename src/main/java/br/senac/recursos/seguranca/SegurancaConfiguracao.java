@@ -50,7 +50,9 @@ public class SegurancaConfiguracao {
             throws Exception {
         List<RegraDeAcesso> declaradas = regras.orderedStream().toList();
         http.securityMatcher("/api/**")
-                .csrf(AbstractHttpConfigurer::disable)
+                // A API é sem estado e usa token Bearer no cabeçalho, sem cookie de sessão: não há o que forjar entre
+                // sites, então o CSRF não se aplica a ela. As telas (cadeia abaixo) mantêm o CSRF (ADR-0007).
+                .csrf(AbstractHttpConfigurer::disable) // NOSONAR java:S4502 revisado: API sem cookie, ver ADR-0007
                 .sessionManagement(sessao -> sessao.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(autorizacao -> {
                     autorizacao.requestMatchers("/api/auth/login").permitAll();
