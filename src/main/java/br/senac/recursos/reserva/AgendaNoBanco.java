@@ -56,7 +56,10 @@ public class AgendaNoBanco implements AgendaDeReservas {
                     utc(reserva.prazoAprovacaoEm()), id);
             jdbc.update("DELETE FROM reserva_recurso WHERE reserva_id = ?", id);
         }
-        for (RecursoPedido recurso : reserva.recursos()) {
+        // Sempre na mesma ordem (por id): pedidos com os mesmos recursos em ordem invertida não travam um ao outro (ADR-0010).
+        List<RecursoPedido> emOrdem = reserva.recursos().stream()
+                .sorted(java.util.Comparator.comparingLong(RecursoPedido::id)).toList();
+        for (RecursoPedido recurso : emOrdem) {
             jdbc.update("INSERT INTO reserva_recurso (reserva_id, recurso_id, periodo, ocupa) "
                     + "VALUES (?, ?, tstzrange(?::timestamptz, ?::timestamptz, '[)'), ?)",
                     id, recurso.id(), utc(reserva.inicio()).toString(), utc(reserva.termino()).toString(),

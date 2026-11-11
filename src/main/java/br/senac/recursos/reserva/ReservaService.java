@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,11 +77,15 @@ public class ReservaService {
         return resposta(ciclo.apaga(reservaId));
     }
 
-    /** Se a verificação da aplicação passou e o banco recusou (EXCLUDE, numa corrida), a resposta é o 409 genérico. */
+    /**
+     * Se a verificação da aplicação passou e o banco recusou, a resposta é o 409 genérico. O banco recusa de duas formas
+     * numa corrida: a violação do EXCLUDE ({@code 23P01}) ou, quando duas inserções conflitantes esperam uma pela outra,
+     * o deadlock ({@code 40P01}). Das duas formas nada fica gravado (DEF-02, ADR-0010).
+     */
     private DecisaoDaReserva gravando(java.util.function.Supplier<DecisaoDaReserva> operacao) {
         try {
             return operacao.get();
-        } catch (DataIntegrityViolationException erro) {
+        } catch (DataIntegrityViolationException | PessimisticLockingFailureException erro) {
             throw new ConflitoDeNegocioException(ConflitoDeNegocioException.MENSAGEM_DO_BANCO);
         }
     }
