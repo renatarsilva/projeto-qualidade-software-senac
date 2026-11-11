@@ -92,6 +92,10 @@ final class MatrizDeAutorizacao {
                     null),
             new Operacao("R-07", DELETE, "/api/reservas/{id}", null, 401, 409, 403, 403,
                     c -> chama(c, DELETE, "/api/reservas/" + c.reservaDoDono(EstadoDaReserva.SOLICITADA), null)),
+            // Auditoria (T-40): só leitura, só Responsável e Administrador
+            new Operacao("R-10", GET, "/api/reservas/{id}/auditoria", null, 401, 403, 200, 200,
+                    c -> chama(c, GET, "/api/reservas/" + c.reservaDoDono(EstadoDaReserva.SOLICITADA) + "/auditoria",
+                            null)),
             // Consulta de reservas (T-43): o Solicitante vê só as próprias
             new Operacao("R-08", GET, "/api/reservas", null, 401, 200, 200, 200,
                     c -> chama(c, GET, "/api/reservas", null)),

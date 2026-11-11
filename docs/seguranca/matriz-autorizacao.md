@@ -41,6 +41,7 @@
 | R-05 | `PATCH /api/reservas/{id}/estado` com `APROVADA` ou `REJEITADA` | 401 | 403 | 200 ou 409 | 403 | só o Responsável aprova e rejeita, em qualquer reserva (RN-07) |
 | R-06 | `PATCH /api/reservas/{id}/estado` com `EM_USO`, `CONCLUIDA`, `CANCELADA`, `NAO_COMPARECEU` ou `SOLICITADA` | 401 | 403 | 403 | 403 | destinos do sistema: 403 para **todos** os perfis (T-21, CA-14) |
 | R-07 | `DELETE /api/reservas/{id}` | 401 | 409 | 403 | 403 | existe só para recusar: o sistema nunca apaga reservas (RN-08) |
+| R-10 | `GET /api/reservas/{id}/auditoria` | 401 | 403 | 200 | 200 | T-40; só leitura, não há endpoint de escrita; o Solicitante (inclusive o dono) recebe 403 |
 | R-08 | `GET /api/reservas` | 401 | 200 (só as próprias) | 200 (todas) | 200 (todas) | T-43; a posse é conferida no serviço (NC-01) |
 | R-09 | `GET /api/reservas/{id}` | 401 | 200 ★ | 200 | 200 | T-43; outro Solicitante recebe 403 e id inexistente, 404 |
 

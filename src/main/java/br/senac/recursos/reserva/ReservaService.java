@@ -46,7 +46,7 @@ public class ReservaService {
      * (CA-17): 403 pelo destino, 404, 400 por estado inexistente e, por fim, o 409 da regra.
      */
     @Transactional
-    public ReservaResponse mudaEstado(long reservaId, String destino) {
+    public ReservaResponse mudaEstado(long usuarioId, long reservaId, String destino) {
         Optional<EstadoDaReserva> estado = CicloDeVidaDaReserva.estadoDe(destino);
         if (estado.isPresent() && DESTINOS_DO_SISTEMA.contains(estado.get())) {
             throw new AcessoNegadoException();
@@ -57,7 +57,7 @@ public class ReservaService {
         if (destino == null) {
             throw new EntradaInvalidaException(List.of(Map.of("campo", "estado", "motivo", "deve ser informado")));
         }
-        return resposta(gravando(() -> ciclo.muda(reservaId, destino)));
+        return resposta(gravando(() -> ciclo.muda(reservaId, destino, usuarioId)));
     }
 
     @Transactional

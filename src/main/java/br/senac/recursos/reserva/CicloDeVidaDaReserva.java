@@ -8,6 +8,7 @@ import static br.senac.recursos.reserva.EstadoDaReserva.NAO_COMPARECEU;
 import static br.senac.recursos.reserva.EstadoDaReserva.REJEITADA;
 import static br.senac.recursos.reserva.EstadoDaReserva.SOLICITADA;
 
+import br.senac.recursos.auditoria.AuditoriaDeReservas;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Map;
@@ -26,6 +27,9 @@ public class CicloDeVidaDaReserva {
     static final String MENSAGEM_PRAZO_DE_APROVACAO = "O prazo de aprovação desta reserva terminou";
     static final String MENSAGEM_NAO_CANCELAVEL = "Esta reserva não pode mais ser cancelada";
     static final String MENSAGEM_NAO_APAGAVEL = "Reservas não podem ser apagadas. Use o cancelamento.";
+    static final String MOTIVO_NAO_APROVADA = "não aprovada a tempo";
+    static final String MOTIVO_SEM_CHECKIN = "cancelamento sem check-in";
+    static final String MOTIVO_ENCERRAMENTO_ANTECIPADO = "encerramento antecipado pelo dono";
     static final String MENSAGEM_CHECKIN = "O check-in só pode ser feito durante o horário reservado";
 
     /** As 7 transições da tabela da spec (seção 3). Qualquer outra combinação é recusada. */
@@ -36,8 +40,10 @@ public class CicloDeVidaDaReserva {
 
     private final Clock clock;
     private final AgendaDeReservas agenda;
+    private final AuditoriaDeReservas auditoria;
 
-    public CicloDeVidaDaReserva(Clock clock, AgendaDeReservas agenda) {
+    public CicloDeVidaDaReserva(Clock clock, AgendaDeReservas agenda, AuditoriaDeReservas auditoria) {
+        this.auditoria = auditoria;
         this.clock = clock;
         this.agenda = agenda;
     }
@@ -53,6 +59,10 @@ public class CicloDeVidaDaReserva {
      * cancelamento do dono têm métodos próprios.
      */
     public DecisaoDaReserva muda(long reservaId, EstadoDaReserva destino) {
+        return aplica(reservaId, destino, null);
+    }
+
+    private DecisaoDaReserva aplica(long reservaId, EstadoDaReserva destino, Long usuarioId) {
         Optional<ReservaNaAgenda> existente = agenda.busca(reservaId);
         if (existente.isEmpty()) {
             return naoEncontrada();
@@ -68,29 +78,40 @@ public class CicloDeVidaDaReserva {
                     return DecisaoDaReserva.recusada(MotivoDeRecusa.PRAZO_DE_APROVACAO_VENCIDO, null,
                             MENSAGEM_PRAZO_DE_APROVACAO);
                 }
-                return grava(reserva, APROVADA);
+                return grava(reserva, APROVADA, usuarioId, null);
             case REJEITADA:
-                return grava(reserva, REJEITADA);
+                return grava(reserva, REJEITADA, usuarioId, null);
             case CANCELADA:
                 // O sistema só cancela depois do prazo (instante > prazo). O dono cancela por cancela().
                 return reserva.estado() == SOLICITADA && agora.isAfter(reserva.prazoAprovacaoEm())
-                        ? grava(reserva, CANCELADA) : transicaoProibida();
+                        ? grava(reserva, CANCELADA, usuarioId, MOTIVO_NAO_APROVADA) : transicaoProibida();
             case NAO_COMPARECEU, CONCLUIDA:
                 // O sistema só encerra a partir do fim do horário; antes disso o dono usa o cancelamento.
-                return !agora.isBefore(reserva.termino()) ? grava(reserva, destino) : transicaoProibida();
+                return !agora.isBefore(reserva.termino()) ? grava(reserva, destino, usuarioId, null)
+                        : transicaoProibida();
             default:
                 // EM_USO só pelo check-in do dono.
                 return transicaoProibida();
         }
     }
 
+    /** Como {@link #muda(long, EstadoDaReserva)}, informando quem muda (o Responsável); vazio significa sistema. */
+    public DecisaoDaReserva muda(long reservaId, EstadoDaReserva destino, Long usuarioId) {
+        return aplica(reservaId, destino, usuarioId);
+    }
+
     /** Destino vindo do cliente como texto: um estado que não existe é recusado. */
     public DecisaoDaReserva muda(long reservaId, String destino) {
+        return muda(reservaId, destino, null);
+    }
+
+    /** Destino como texto, informando quem muda (o Responsável pelo PATCH). */
+    public DecisaoDaReserva muda(long reservaId, String destino, Long usuarioId) {
         Optional<EstadoDaReserva> estado = estadoDe(destino);
         if (estado.isEmpty()) {
             return DecisaoDaReserva.recusada(MotivoDeRecusa.ESTADO_INEXISTENTE, "estado", "valor inválido");
         }
-        return muda(reservaId, estado.get());
+        return aplica(reservaId, estado.get(), usuarioId);
     }
 
     /** O destino é um estado que existe? */
@@ -124,7 +145,9 @@ public class CicloDeVidaDaReserva {
         if (resultado == null) {
             return DecisaoDaReserva.recusada(MotivoDeRecusa.NAO_CANCELAVEL, null, MENSAGEM_NAO_CANCELAVEL);
         }
-        return grava(reserva, resultado);
+        String motivo = resultado == NAO_COMPARECEU ? MOTIVO_SEM_CHECKIN
+                : resultado == CONCLUIDA ? MOTIVO_ENCERRAMENTO_ANTECIPADO : null;
+        return grava(reserva, resultado, donoId, motivo);
     }
 
     /** O dono registra a chegada: {@code APROVADA → EM_USO} em {@code [início, fim)}. */
@@ -142,7 +165,7 @@ public class CicloDeVidaDaReserva {
         if (reserva.estado() != APROVADA || !dentroDoHorario) {
             return DecisaoDaReserva.recusada(MotivoDeRecusa.FORA_DA_JANELA_DO_CHECKIN, null, MENSAGEM_CHECKIN);
         }
-        return grava(reserva, EM_USO);
+        return grava(reserva, EM_USO, donoId, null);
     }
 
     /** Reserva nunca é apagada (RN-08): sempre recusa. */
@@ -153,11 +176,14 @@ public class CicloDeVidaDaReserva {
         return DecisaoDaReserva.recusada(MotivoDeRecusa.NAO_APAGAVEL, null, MENSAGEM_NAO_APAGAVEL);
     }
 
-    /** Ponto único da mudança de estado: a auditoria (RN-09, T-40) se pluga aqui. */
-    private DecisaoDaReserva grava(ReservaNaAgenda reserva, EstadoDaReserva novoEstado) {
+    /** Ponto único da mudança de estado: grava a reserva e o registro de auditoria (RN-09), na mesma transação. */
+    private DecisaoDaReserva grava(ReservaNaAgenda reserva, EstadoDaReserva novoEstado, Long usuarioId,
+            String motivo) {
         ReservaNaAgenda nova = new ReservaNaAgenda(reserva.id(), reserva.donoId(), novoEstado, reserva.inicio(),
                 reserva.termino(), reserva.recursos(), reserva.criadaEm(), reserva.prazoAprovacaoEm());
-        return DecisaoDaReserva.aceita(agenda.grava(nova), null);
+        ReservaNaAgenda gravada = agenda.grava(nova);
+        auditoria.registra(gravada.id(), usuarioId, reserva.estado(), novoEstado, motivo);
+        return DecisaoDaReserva.aceita(gravada, null);
     }
 
     private static DecisaoDaReserva transicaoProibida() {

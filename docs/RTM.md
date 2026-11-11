@@ -27,7 +27,7 @@ Liga cada requisito ao risco que ele protege, aos casos de teste que o comprovam
 | **RN-06** estados alternativos | F3 · F6 | RN-06-T1 a T17; specs T-21 | T-21, T-24, T-60 (job) | sem teste | sem evidência ainda (T-21) |
 | **RN-07** só o Responsável aprova | F4 | RN-07-T1 a T15; specs T-21 | T-21, T-34, T-49 | sem teste | sem evidência ainda (T-34, T-49) |
 | **RN-08** reserva iniciada não se apaga | — | RN-08-T1 a T11 | T-21, T-30, T-61 | sem teste | sem evidência ainda (T-21, T-61) |
-| **RN-09** toda mudança de estado gera auditoria | F6 · R-05 | RN-09-T1 a T12 | T-40 | sem teste | sem evidência ainda (T-40) |
+| **RN-09** toda mudança de estado gera auditoria | F6 · R-05 | RN-09-T1 a T12 | T-40 | green | `AuditoriaDasMudancasTest`, `AuditoriaApiTest`, `RollbackDaAuditoriaApiTest`, `ImutabilidadeDaAuditoriaTest`; histórico de uma reserva cancelada (TC-18) |
 
 ## Regras do time (RN-13 a RN-17)
 
@@ -54,7 +54,7 @@ Não vêm da especificação oficial: foram decididas pelo time e registradas no
 | RF-07 aprovação de recurso restrito | F4 · CEN-03 · CT-03 | RN-07 | T-33, T-34, T-36 | sem teste | sem evidência ainda (T-34) |
 | RF-08 bloqueio por manutenção | F9 · R-01 | RN-04 | T-33, T-35, T-36 | sem teste | sem evidência ainda (T-35) |
 | RF-09 retirada e devolução de materiais | — | sem casos escritos | T-42 | sem teste | sem evidência ainda (T-42) |
-| RF-10 histórico auditável | F6 · R-05 | RN-09 | T-40 | sem teste | sem evidência ainda (T-40) |
+| RF-10 histórico auditável | F6 · R-05 | RN-09 | T-40 | green | `AuditoriaDasMudancasTest`, `AuditoriaApiTest`, `RollbackDaAuditoriaApiTest`, `ImutabilidadeDaAuditoriaTest`; histórico de uma reserva cancelada (TC-18) |
 | RF-11 notificação simulada ou API externa | F7 · F8 · CEN-03 · CT-03 · R-07 | sem casos escritos (INT-01 a INT-05 na semana 39) | T-31 | sem teste | sem evidência ainda (T-31) |
 | RF-12 relatório de utilização | — | sem casos escritos (oráculo calculado à mão) | T-41 | sem teste | sem evidência ainda (T-41) |
 | RF-13 interface responsiva e mensagens de erro compreensíveis | — | specs T-22 (TC-01 a TC-47) | T-22, T-44, T-45, T-46, T-47 | sem teste | sem evidência ainda (T-22) |
