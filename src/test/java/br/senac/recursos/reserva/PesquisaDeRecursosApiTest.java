@@ -56,7 +56,8 @@ class PesquisaDeRecursosApiTest extends BaseDaApiDeReserva {
         ambiente.salaCom("sala-202", 30, "Bloco B");
         ambiente.salaCom("sala-203", 31, "Bloco B");
 
-        assertThat(pesquisa("?capacidadeMinima=30")).containsExactly("sala-202", "sala-203");
+        // A sala-102 do cenário base tem 30 lugares e entra também (limite inclusivo).
+        assertThat(pesquisa("?capacidadeMinima=30")).containsExactly("sala-102", "sala-202", "sala-203");
     }
 
     @Test
