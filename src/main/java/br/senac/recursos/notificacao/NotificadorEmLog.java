@@ -1,15 +1,20 @@
 package br.senac.recursos.notificacao;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 
-/** Modo simulado: sem {@code app.notificacao.url-base}, só registra o aviso no log. Esqueleto da T-31. */
+/** Modo simulado: sem {@code app.notificacao.url-base}, só registra o aviso no log (RF-11 aceita "simulada"). */
 @Component
-@ConditionalOnProperty(prefix = "app.notificacao", name = "url-base", havingValue = "", matchIfMissing = true)
+@ConditionalOnExpression("'${app.notificacao.url-base:}'.trim() == ''")
 public class NotificadorEmLog implements Notificador {
+
+    private static final Logger LOG = LoggerFactory.getLogger(NotificadorEmLog.class);
 
     @Override
     public ResultadoDaNotificacao notifica(Notificacao notificacao) {
-        return ResultadoDaNotificacao.pendente();
+        LOG.info("Notificação simulada: reserva {}, evento {}", notificacao.reservaId(), notificacao.evento());
+        return ResultadoDaNotificacao.enviada("simulada");
     }
 }
