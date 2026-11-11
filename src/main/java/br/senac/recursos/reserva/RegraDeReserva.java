@@ -28,10 +28,12 @@ public class RegraDeReserva {
     private final AgendaDeReservas agenda;
     private final VerificadorDeSobreposicao sobreposicao;
     private final AuditoriaDeReservas auditoria;
+    private final VerificadorDeManutencao manutencao;
 
     public RegraDeReserva(Clock clock, AgendaDeReservas agenda, VerificadorDeSobreposicao sobreposicao,
-            AuditoriaDeReservas auditoria) {
+            AuditoriaDeReservas auditoria, VerificadorDeManutencao manutencao) {
         this.auditoria = auditoria;
+        this.manutencao = manutencao;
         this.clock = clock;
         this.agenda = agenda;
         this.sobreposicao = sobreposicao;
