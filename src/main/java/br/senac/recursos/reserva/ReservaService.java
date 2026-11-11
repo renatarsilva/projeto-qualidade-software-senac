@@ -34,9 +34,12 @@ public class ReservaService {
     private final ApplicationEventPublisher eventos;
     private final UsuarioRepository usuarios;
     private final Clock clock;
+    private final RegistroDeConflitos conflitos;
 
     public ReservaService(RegraDeReserva regra, CicloDeVidaDaReserva ciclo, AgendaDeReservas agenda,
-            ApplicationEventPublisher eventos, UsuarioRepository usuarios, Clock clock) {
+            ApplicationEventPublisher eventos, UsuarioRepository usuarios, Clock clock,
+            RegistroDeConflitos conflitos) {
+        this.conflitos = conflitos;
         this.regra = regra;
         this.ciclo = ciclo;
         this.agenda = agenda;
@@ -47,12 +50,12 @@ public class ReservaService {
 
     @Transactional
     public ReservaResponse cria(long donoId, PedidoDeReserva pedido) {
-        return resposta(gravando(() -> regra.cria(donoId, pedido)));
+        return resposta(gravando(() -> regra.cria(donoId, pedido), pedido));
     }
 
     @Transactional
     public ReservaResponse altera(long donoId, long reservaId, PedidoDeReserva pedido) {
-        return resposta(gravando(() -> regra.altera(donoId, reservaId, pedido)));
+        return resposta(gravando(() -> regra.altera(donoId, reservaId, pedido), pedido));
     }
 
     /**
@@ -115,9 +118,18 @@ public class ReservaService {
      * o deadlock ({@code 40P01}). Das duas formas nada fica gravado (DEF-02, ADR-0010).
      */
     private DecisaoDaReserva gravando(java.util.function.Supplier<DecisaoDaReserva> operacao) {
+        return gravando(operacao, null);
+    }
+
+    /** Com o pedido, a recusa do banco também vira conflito evitado, registrado em transação própria (T-41). */
+    private DecisaoDaReserva gravando(java.util.function.Supplier<DecisaoDaReserva> operacao, PedidoDeReserva pedido) {
         try {
             return operacao.get();
         } catch (DataIntegrityViolationException | PessimisticLockingFailureException erro) {
+            if (pedido != null && pedido.recursos() != null && !pedido.recursos().isEmpty()) {
+                conflitos.registra(pedido.recursos().stream()
+                        .min(java.util.Comparator.comparingLong(RecursoPedido::id)).orElseThrow(), clock.instant());
+            }
             throw new ConflitoDeNegocioException(ConflitoDeNegocioException.MENSAGEM_DO_BANCO);
         }
     }

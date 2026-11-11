@@ -134,6 +134,10 @@ final class MatrizDeAutorizacao {
             new Operacao("RT-03", GET, "/api/reservas/{reservaId}/retiradas", null, 401, 403, 200, 200,
                     c -> chama(c, GET, "/api/reservas/" + c.reservaDoDono(EstadoDaReserva.APROVADA) + "/retiradas",
                             null)),
+            // Relatório de utilização (T-41): Responsável e Administrador (NC-08)
+            new Operacao("RL-01", GET, "/api/relatorios/utilizacao", null, 401, 403, 200, 200,
+                    c -> chama(c, GET, "/api/relatorios/utilizacao?inicio=2026-11-09T00:00:00Z"
+                            + "&fim=2026-11-16T00:00:00Z", null)),
             // Auditoria (T-40): só leitura, só Responsável e Administrador
             new Operacao("R-10", GET, "/api/reservas/{id}/auditoria", null, 401, 403, 200, 200,
                     c -> chama(c, GET, "/api/reservas/" + c.reservaDoDono(EstadoDaReserva.SOLICITADA) + "/auditoria",
