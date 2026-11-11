@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  * A lista única de termos que nenhuma resposta de erro pode conter (spec T-22, RNF-08).
  * A busca ignora maiúsculas. Toda resposta de erro dos testes passa por aqui.
  */
-final class TermosProibidos {
+public final class TermosProibidos {
 
     private static final List<String> TERMOS = List.of("exception", "select", "insert", "update", "delete from",
             "org.postgresql", "org.springframework", "org.hibernate", "com.fasterxml", "br.senac.recursos", "java.",
@@ -21,7 +21,7 @@ final class TermosProibidos {
     private TermosProibidos() {
     }
 
-    static void naoTem(String corpo) {
+    public static void naoTem(String corpo) {
         String minusculo = corpo.toLowerCase();
         for (String termo : TERMOS) {
             assertThat(minusculo).as("a resposta não pode conter o termo \"%s\"", termo).doesNotContain(termo);
