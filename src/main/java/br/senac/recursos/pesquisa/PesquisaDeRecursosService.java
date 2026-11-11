@@ -80,6 +80,11 @@ public class PesquisaDeRecursosService {
                     + "AND rr.periodo && tstzrange(?::timestamptz, ?::timestamptz, '[)'))");
             parametros.add(utc(de).toString());
             parametros.add(utc(ate).toString());
+            // O recurso em manutenção também não está disponível (RN-04, T-35).
+            sql.append(" AND NOT EXISTS (SELECT 1 FROM periodo_manutencao pm WHERE pm.recurso_id = r.id "
+                    + "AND pm.periodo && tstzrange(?::timestamptz, ?::timestamptz, '[)'))");
+            parametros.add(utc(de).toString());
+            parametros.add(utc(ate).toString());
         }
         sql.append(" ORDER BY lower(r.nome), r.id");
 

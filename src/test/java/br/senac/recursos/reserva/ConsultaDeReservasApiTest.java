@@ -98,9 +98,15 @@ class ConsultaDeReservasApiTest extends BaseDaApiDeReserva {
     }
 
     @Test
-    @org.junit.jupiter.api.Disabled("T-35: a manutenção ainda não existe; este caso entra com ela (spec T-43, CA-06)")
-    @DisplayName("TC-20: recurso em manutenção no intervalo não aparece na disponibilidade")
-    void manutencaoTiraODisponivel() {
-        // Pendente da T-35.
+    @DisplayName("TC-20: recurso em manutenção no intervalo não aparece na disponibilidade (T-35)")
+    void manutencaoTiraODisponivel() throws Exception {
+        ambiente.manutencao(sala, terca(10, 0), terca(12, 0), "Manutenção").andExpect(
+                org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isCreated());
+
+        MockHttpServletResponse resposta = ambiente.chama(HttpMethod.GET, "/api/recursos?tipo=SALA&disponivelDe="
+                + terca(10, 30) + "&disponivelAte=" + terca(11, 30), ambiente.bearerDoSolicitante(), null)
+                .andReturn().getResponse();
+
+        assertThat((List<String>) JsonPath.read(resposta.getContentAsString(), "$[*].nome")).isEmpty();
     }
 }

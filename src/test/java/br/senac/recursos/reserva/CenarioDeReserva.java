@@ -26,7 +26,8 @@ final class CenarioDeReserva {
     CenarioDeReserva(Instant agora) {
         Clock clock = Clock.fixed(agora, ZoneOffset.UTC);
         this.auditoria = new AuditoriaEmMemoria(clock);
-        this.regra = new RegraDeReserva(clock, agenda, new SobreposicaoPelaAgenda(agenda), auditoria);
+        this.regra = new RegraDeReserva(clock, agenda, new SobreposicaoPelaAgenda(agenda), auditoria,
+                (recurso, inicio, termino) -> false);
         this.ciclo = new CicloDeVidaDaReserva(clock, agenda, auditoria);
     }
 
