@@ -33,6 +33,7 @@
 | M-03 | `POST /api/materiais` | 401 | 403 | 403 | 201 | idem |
 | M-04 | `PUT /api/materiais/{id}` | 401 | 403 | 403 | 200 | idem |
 | M-05 | `DELETE /api/materiais/{id}` | 401 | 403 | 403 | 204 (409 se há vínculo) | idem |
+| G-01 | `GET /api/recursos` (pesquisa por tipo, capacidade, localização, competência e disponibilidade) | 401 | 200 | 200 | 200 | `PesquisaAcessoConfiguracao` (T-43) |
 | R-01 | `POST /api/reservas` | 401 | 201 | 403 | 403 | `ReservaAcessoConfiguracao` |
 | R-02 | `PUT /api/reservas/{id}` | 401 | 200 ★ | 403 | 403 | idem; o dono vem do token |
 | R-03 | `POST /api/reservas/{id}/cancelamento` | 401 | 200 ★ | 403 | 403 | idem |
@@ -40,13 +41,14 @@
 | R-05 | `PATCH /api/reservas/{id}/estado` com `APROVADA` ou `REJEITADA` | 401 | 403 | 200 ou 409 | 403 | só o Responsável aprova e rejeita, em qualquer reserva (RN-07) |
 | R-06 | `PATCH /api/reservas/{id}/estado` com `EM_USO`, `CONCLUIDA`, `CANCELADA`, `NAO_COMPARECEU` ou `SOLICITADA` | 401 | 403 | 403 | 403 | destinos do sistema: 403 para **todos** os perfis (T-21, CA-14) |
 | R-07 | `DELETE /api/reservas/{id}` | 401 | 409 | 403 | 403 | existe só para recusar: o sistema nunca apaga reservas (RN-08) |
+| R-08 | `GET /api/reservas` | 401 | 200 (só as próprias) | 200 (todas) | 200 (todas) | T-43; a posse é conferida no serviço (NC-01) |
+| R-09 | `GET /api/reservas/{id}` | 401 | 200 ★ | 200 | 200 | T-43; outro Solicitante recebe 403 e id inexistente, 404 |
 
 **Rotas que não existem e são negadas por padrão** (esperado, a ser confirmado pelo teste da T-49):
 
 | ID | Rota | Anônimo | Solicitante | Responsável | Administrador | Observação |
 |---|---|---|---|---|---|---|
 | X-01 | `DELETE /api/salas/{id}` | 401 | 403 | 403 | 403 | A sala não tem exclusão, ao contrário de professor e material (divergência D-02) |
-| X-02 | `GET /api/reservas` e `GET /api/reservas/{id}` | 401 | 403 | 403 | 403 | Não há consulta de reservas na API (divergência D-01) |
 | X-03 | qualquer outra rota `/api/**` | 401 | 403 | 403 | 403 | Negado por padrão (T-15, CA-08) |
 
 ## 3. Regras de posse
@@ -64,7 +66,7 @@ Para as rotas de reserva: **401** (sem autenticação), **403** por perfil, **40
 
 | ID | Divergência | Impacto | Task que resolve |
 |---|---|---|---|
-| D-01 | Não existe `GET /api/reservas` nem `GET /api/reservas/{id}`: ninguém consulta reservas pela API. A consulta, o histórico (RF-10) e a pesquisa de disponibilidade (RF-03) dependem disso | Alto: sem a rota, também não há o que proteger por posse na leitura | T-43 (pesquisa) e T-40 (histórico) |
+| D-01 | **Resolvida na T-43:** `GET /api/reservas`, `GET /api/reservas/{id}` e `GET /api/recursos` existem (R-08, R-09 e G-01). O histórico de mudanças de estado (RF-10) segue pendente | Baixo | T-40 (histórico) |
 | D-02 | Sala não tem `DELETE`; professor e material têm. A tentativa recebe 403 (negado por padrão), e não 405 | Baixo: decisão da T-16, só precisa estar clara | Decidir se o contrato deve dizer 405 |
 | D-03 | O Responsável e o Administrador não criam nem alteram reservas (DP-05, "o Administrador cria reservas?", segue em aberto) | Médio | T-48/T-49 com a decisão da DP-05 |
 | D-04 | Manutenção (RN-04), retirada e devolução (RF-09) e relatório (RF-12) ainda não têm rotas, então não estão na matriz | Médio: a matriz precisa ser estendida quando entrarem | T-35, T-42 e T-41 |
