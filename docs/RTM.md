@@ -55,7 +55,7 @@ Não vêm da especificação oficial: foram decididas pelo time e registradas no
 | RF-08 bloqueio por manutenção | F9 · R-01 | RN-04 | T-33, T-35, T-36 | green | `ManutencaoDeRecursosApiTest`, matriz de autorização (MT-01 a MT-03) |
 | RF-09 retirada e devolução de materiais | — | sem casos escritos | T-42 | sem teste | sem evidência ainda (T-42) |
 | RF-10 histórico auditável | F6 · R-05 | RN-09 | T-40 | green | `AuditoriaDasMudancasTest`, `AuditoriaApiTest`, `RollbackDaAuditoriaApiTest`, `ImutabilidadeDaAuditoriaTest`; histórico de uma reserva cancelada (TC-18) |
-| RF-11 notificação simulada ou API externa | F7 · F8 · CEN-03 · CT-03 · R-07 | sem casos escritos (INT-01 a INT-05 na semana 39) | T-31 | sem teste | sem evidência ainda (T-31) |
+| RF-11 notificação simulada ou API externa | F7 · F8 · CEN-03 · CT-03 · R-07 | INT-01 a INT-05 e TC-01 a TC-16 da spec T-31; CT-03 | T-31 | green | `NotificadorHttpWireMockTest`, `NotificacaoDasMudancasApiTest`, `NotificacaoAposOCommitTest` (WireMock, suíte offline) |
 | RF-12 relatório de utilização | — | sem casos escritos (oráculo calculado à mão) | T-41 | sem teste | sem evidência ainda (T-41) |
 | RF-13 interface responsiva e mensagens de erro compreensíveis | — | specs T-22 (TC-01 a TC-47) | T-22, T-44, T-45, T-46, T-47 | sem teste | sem evidência ainda (T-22) |
 | RF-14 documentação da API | — | sem casos | T-51 | sem teste | sem evidência ainda (T-51) |

@@ -4,10 +4,16 @@ import br.senac.recursos.erro.AcessoNegadoException;
 import br.senac.recursos.erro.ConflitoDeNegocioException;
 import br.senac.recursos.erro.EntradaInvalidaException;
 import br.senac.recursos.erro.RecursoNaoEncontradoException;
+import br.senac.recursos.notificacao.EventoDeNotificacao;
+import br.senac.recursos.notificacao.ReservaNotificavel;
+import br.senac.recursos.seguranca.Usuario;
+import br.senac.recursos.seguranca.UsuarioRepository;
+import java.time.Clock;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -25,11 +31,18 @@ public class ReservaService {
     private final RegraDeReserva regra;
     private final CicloDeVidaDaReserva ciclo;
     private final AgendaDeReservas agenda;
+    private final ApplicationEventPublisher eventos;
+    private final UsuarioRepository usuarios;
+    private final Clock clock;
 
-    public ReservaService(RegraDeReserva regra, CicloDeVidaDaReserva ciclo, AgendaDeReservas agenda) {
+    public ReservaService(RegraDeReserva regra, CicloDeVidaDaReserva ciclo, AgendaDeReservas agenda,
+            ApplicationEventPublisher eventos, UsuarioRepository usuarios, Clock clock) {
         this.regra = regra;
         this.ciclo = ciclo;
         this.agenda = agenda;
+        this.eventos = eventos;
+        this.usuarios = usuarios;
+        this.clock = clock;
     }
 
     @Transactional
@@ -58,17 +71,36 @@ public class ReservaService {
         if (destino == null) {
             throw new EntradaInvalidaException(List.of(Map.of("campo", "estado", "motivo", "deve ser informado")));
         }
-        return resposta(gravando(() -> ciclo.muda(reservaId, destino, usuarioId)));
+        return notificando(resposta(gravando(() -> ciclo.muda(reservaId, destino, usuarioId))));
     }
 
     @Transactional
     public ReservaResponse cancela(long donoId, long reservaId) {
-        return resposta(gravando(() -> ciclo.cancela(donoId, reservaId)));
+        return notificando(resposta(gravando(() -> ciclo.cancela(donoId, reservaId))));
     }
 
     @Transactional
     public ReservaResponse checkin(long donoId, long reservaId) {
         return resposta(gravando(() -> ciclo.checkin(donoId, reservaId)));
+    }
+
+    /**
+     * Publica o aviso quando a reserva chega a um estado que notifica (aprovação, rejeição ou cancelamento, DP-03).
+     * O ouvinte só envia depois do commit, e a falha do aviso não desfaz a mudança (RNF-10, spec T-31).
+     */
+    private ReservaResponse notificando(ReservaResponse reserva) {
+        EventoDeNotificacao evento = switch (reserva.estado()) {
+            case APROVADA -> EventoDeNotificacao.APROVADA;
+            case REJEITADA -> EventoDeNotificacao.REJEITADA;
+            case CANCELADA -> EventoDeNotificacao.CANCELADA;
+            default -> null;
+        };
+        if (evento != null) {
+            long donoId = agenda.busca(reserva.id()).orElseThrow().donoId();
+            String email = usuarios.findById(donoId).map(Usuario::getEmail).orElse(null);
+            eventos.publishEvent(new ReservaNotificavel(reserva.id(), evento, email, clock.instant()));
+        }
+        return reserva;
     }
 
     /** Só recusa: reserva nunca é apagada. */
