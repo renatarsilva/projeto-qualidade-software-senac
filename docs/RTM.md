@@ -72,7 +72,7 @@ Não vêm da especificação oficial: foram decididas pelo time e registradas no
 | RNF-06 autorização por perfil | 0 operações não autorizadas | F5 | T-15, T-48, T-49 | sem teste | sem evidência ainda (T-49) |
 | RNF-07 validação de entrada | 0 gravações inválidas | — | T-16 a T-18, T-20, T-22 | sem teste | sem evidência ainda (T-22) |
 | RNF-08 tratamento seguro de erros | 0 respostas com detalhe interno | F14 | T-22, T-49 | sem teste | sem evidência ainda (T-22) |
-| RNF-09 desempenho | p95 ≤ 300 ms com 50 usuários (candidata) | F11 · R-04 | T-38 | sem teste | sem evidência ainda (T-38) |
+| RNF-09 desempenho | p95 ≤ 300 ms com 50 usuários (candidata) | p95 ≤ 300 ms com 50 usuários e erro real < 1 % (validada na T-38) | T-38 | green | [rnf.md](performance/rnf.md) → `perf/reservas.jmx` → [resultado-01.md](performance/resultado-01.md): **atende** (p95 de 2 a 7 ms, 0 erro real, 1 reserva ativa por intervalo) |
 | RNF-10 resiliência da notificação | 0 reservas desfeitas | F7 · F8 · R-07 | T-31 | sem teste | sem evidência ainda (T-31) |
 | RNF-11 responsividade | utilizável a partir de 375 px (candidata) | — | T-44 | sem teste | sem evidência ainda (T-44) |
 
