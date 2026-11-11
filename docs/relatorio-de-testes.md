@@ -6,25 +6,27 @@
 
 | Item | Valor |
 |---|---|
-| Testes executados | **940** (87 classes de teste) |
+| Testes executados | **1023** (94 classes de teste) |
 | Falhas / erros / ignorados | **0 / 0 / 0** |
 | Tempo da suíte | cerca de 81 s (o banco real sobe uma vez e é compartilhado) |
-| Cobertura de linhas (JaCoCo) | **97,0 %** (1356 de 1398); meta 80 % |
-| Cobertura de branches (JaCoCo) | **86,0 %** (467 de 543); meta 70 % |
+| Cobertura de linhas (JaCoCo) | **95,9 %** (1733 de 1807); meta 80 % |
+| Cobertura de branches (JaCoCo) | **85,1 %** (594 de 698); meta 70 % |
 | Gate no build | `./mvnw verify` falha abaixo de 80 % de linhas ou 70 % de branches (configurado no `pom.xml`) |
 | Análise estática (SonarCloud, `main`) | 0 bugs, 0 vulnerabilidades, 0 code smells, 0 hotspots, duplicação 0,0 %, **Quality Gate aprovado** |
 
-As 556 anotações de teste viram 940 execuções porque os testes **parametrizados** e **repetidos** rodam uma vez por caso (por exemplo, as 49 combinações da tabela de estados e as 5 repetições da disputa de 20 solicitantes).
+As 556 anotações de teste viram 1023 execuções porque os testes **parametrizados** e **repetidos** rodam uma vez por caso (por exemplo, as 49 combinações da tabela de estados e as 5 repetições da disputa de 20 solicitantes).
 
 ## 2. Por tipo de teste
 
 | Tipo | Execuções | O que é |
 |---|---|---|
-| API e integração com PostgreSQL real (Testcontainers) | 638 | Sobem a aplicação inteira, chamam a API com tokens reais de cada perfil e conferem o banco |
+| API e integração com PostgreSQL real (Testcontainers) | 721 (inclui os 83 das telas) | Sobem a aplicação inteira, chamam a API com tokens reais de cada perfil e conferem o banco |
 | Unitário e de regra pura | 302 | Regras sem HTTP nem banco, com o `Clock` fixo (intervalo, sobreposição, ciclo de vida, prazos, auditoria, política de senha) |
 | Com WireMock (integração externa) | 21 | A notificação contra uma API simulada: INT-01 a INT-05, timeouts, conexão recusada, token que não vaza |
 | Concorrência (threads de verdade) | 24 | 20 solicitantes simultâneos, duplo clique, `PUT` simultâneos, deadlock, manutenção e reserva em paralelo |
 | Parametrizados | dezenas de casos | Matriz de autorização (176 casos), tabela de transições (49 combinações), fronteiras de intervalo e de prazo |
+| Telas (sessão e CSRF reais, sem navegador) | 83 | Matriz rota × perfil das telas (29 rotas), menu por perfil, login e logout, reserva com erros claros, aprovação, retirada, cadastros, manutenção, relatório e o fluxo completo (TC-31) |
+| Navegador real (Chrome, 375 px, fora do `verify`) | 31 verificações | [`e2e/`](../e2e/README.md): fluxo completo, sem rolagem horizontal; resultado em `docs/entrega/capturas/resultado.json` |
 | Carga (JMeter, fora do `verify`) | 7100 amostras | [resultado-01.md](performance/resultado-01.md) |
 
 ## 3. Por pacote
@@ -32,6 +34,7 @@ As 556 anotações de teste viram 940 execuções porque os testes **parametriza
 | Pacote | Testes | Falhas | Cobertura de linhas | Cobertura de branches |
 |---|---|---|---|---|
 | `reserva` (regras, ciclo de vida, concorrência, autorização, relatório, auditoria na API) | 676 | 0 | 98,1 % | 90,9 % |
+| `web` (telas: login, menu, matriz das telas, fluxos dos três perfis, CSRF) | 83 | 0 | 90,5 % | 75,2 % |
 | `professor` | 58 | 0 | 98,3 % | 86,0 % |
 | `sala` | 54 | 0 | 98,8 % | 87,5 % |
 | `seguranca` | 46 | 0 | 98,2 % | 83,9 % |
@@ -42,7 +45,7 @@ As 556 anotações de teste viram 940 execuções porque os testes **parametriza
 
 Os pacotes `auditoria`, `manutencao`, `pesquisa`, `relatorio`, `retirada` e `documentacao` são exercitados pelos testes da pasta `reserva` (que testam a API de ponta a ponta) e têm de 90,4 % a 100 % das linhas cobertas.
 
-**Ponto mais fraco:** os *branches* do pacote `erro` (63,2 %), abaixo da meta de 70 % só nesse pacote. A meta é do projeto inteiro (86,0 %) e está atendida. Os ramos que faltam são caminhos de erro de infraestrutura (por exemplo, falha de renderização da página de erro) difíceis de provocar.
+**Ponto mais fraco:** os *branches* do pacote `erro` (63,2 %), abaixo da meta de 70 % só nesse pacote. A meta é do projeto inteiro (85,1 %) e está atendida. Os ramos que faltam são caminhos de erro de infraestrutura (por exemplo, falha de renderização da página de erro) difíceis de provocar.
 
 ## 4. Por requisito e regra
 
@@ -69,13 +72,14 @@ Detalhe em [registro de defeitos](defeitos/registro.md).
 ## 6. Como reproduzir
 
 ```bash
-./mvnw verify        # roda os 940 testes e confere o gate de cobertura (precisa do Docker ligado)
+./mvnw verify        # roda os 1023 testes e confere o gate de cobertura (precisa do Docker ligado)
 ```
 
 Os relatórios ficam em `target/surefire-reports` (resultado por classe) e `target/site/jacoco/index.html` (cobertura). A carga se repete com os comandos de [resultado-01.md](performance/resultado-01.md).
 
 ## 7. O que a suíte não cobre
 
-- **Interface responsiva e teste ponta a ponta**: as telas não foram entregues.
+- **Teste de navegador no CI**: o roteiro do Chrome real (`e2e/`) é executado à mão, porque o GitHub Actions do projeto não instala navegador. No CI, as telas são cobertas pelos testes de sessão e CSRF.
+- **Edição e exclusão de sala, material e professor pelas telas**: a API tem; a tela só lista e cadastra.
 - **BDD com Cucumber**: não foi feito; o TDD tem evidência ([evidencia-tdd.md](testes/evidencia-tdd.md)).
 - **O job periódico** das mudanças por tempo: a regra é testada com o `Clock`, mas nada a dispara sozinho.

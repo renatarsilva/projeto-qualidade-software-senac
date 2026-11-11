@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/base :: base(~{::title}, ~{::main})}">
+<head><title>Relatório de utilização</title></head>
+<body>
+<main class="container pb-4">
+    <h1 class="h3 mb-3">Relatório de utilização</h1>
+    <form th:action="@{/relatorio}" method="get" class="row g-3 mb-4">
+        <div class="col-6 col-md-4">
+            <label class="form-label" for="inicio">De</label>
+            <input class="form-control" type="date" id="inicio" name="inicio" th:value="${inicio}" required>
+        </div>
+        <div class="col-6 col-md-4">
+            <label class="form-label" for="fim">Até (inclusive)</label>
+            <input class="form-control" type="date" id="fim" name="fim" th:value="${fim}" required>
+        </div>
+        <div class="col-12 col-md-4 d-flex align-items-end">
+            <button class="btn btn-primary w-100" type="submit">Gerar relatório</button>
+        </div>
+    </form>
+    <div th:if="${resultado != null}">
+        <p class="fs-5" th:text="'Conflitos evitados: ' + ${resultado.conflitosEvitados()}">Conflitos evitados: 0</p>
+        <h2 class="h5">Horas reservadas por recurso</h2>
+        <p class="text-secondary" th:if="${#lists.isEmpty(resultado.recursos())}">Nenhuma reserva no período.</p>
+        <div class="tabela-rolavel" th:unless="${#lists.isEmpty(resultado.recursos())}">
+            <table class="table table-striped bg-white">
+                <thead><tr><th>Tipo</th><th>Recurso</th><th class="text-end">Horas</th></tr></thead>
+                <tbody>
+                <tr th:each="r : ${resultado.recursos()}">
+                    <td th:text="${@ap.tipo(r.tipo())}"></td>
+                    <td th:text="${r.nome()}"></td>
+                    <td class="text-end" th:text="${@ap.horas(r.horasReservadas())}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <h2 class="h5 mt-4">Carga horária dos professores</h2>
+        <p class="text-secondary" th:if="${#lists.isEmpty(resultado.professores())}">Nenhum professor alocado no período.</p>
+        <div class="tabela-rolavel" th:unless="${#lists.isEmpty(resultado.professores())}">
+            <table class="table table-striped bg-white">
+                <thead><tr><th>Professor</th><th class="text-end">Horas alocadas</th></tr></thead>
+                <tbody>
+                <tr th:each="p : ${resultado.professores()}">
+                    <td th:text="${p.nome()}"></td>
+                    <td class="text-end" th:text="${@ap.horas(p.horasAlocadas())}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="base(titulo, conteudo)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:replace="${titulo}">Organização de Recursos</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/telas.css}">
+</head>
+<body class="bg-body-tertiary">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary" sec:authorize="!isAuthenticated()">
+    <div class="container">
+        <span class="navbar-brand mb-0 h1">Organização de Recursos</span>
+    </div>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary" sec:authorize="isAuthenticated()">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">Organização de Recursos</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
+                aria-controls="menu" aria-expanded="false" aria-label="Abrir o menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="menu">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" th:href="@{/recursos}">Pesquisar</a></li>
+                <li class="nav-item" sec:authorize="hasRole('SOLICITANTE')">
+                    <a class="nav-link" th:href="@{/reservas}">Minhas reservas</a></li>
+                <li class="nav-item" sec:authorize="hasRole('SOLICITANTE')">
+                    <a class="nav-link" th:href="@{/reservas/nova}">Nova reserva</a></li>
+                <li class="nav-item" sec:authorize="hasAnyRole('RESPONSAVEL', 'ADMINISTRADOR')">
+                    <a class="nav-link" th:href="@{/reservas}">Reservas</a></li>
+                <li class="nav-item" sec:authorize="hasRole('RESPONSAVEL')">
+                    <a class="nav-link" th:href="@{/aprovacoes}">Aprovações</a></li>
+                <li class="nav-item" sec:authorize="hasAnyRole('RESPONSAVEL', 'ADMINISTRADOR')">
+                    <a class="nav-link" th:href="@{/relatorio}">Relatório</a></li>
+                <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+                    <a class="nav-link" th:href="@{/admin/salas}">Salas</a></li>
+                <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+                    <a class="nav-link" th:href="@{/admin/materiais}">Materiais</a></li>
+                <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+                    <a class="nav-link" th:href="@{/admin/professores}">Professores</a></li>
+                <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+                    <a class="nav-link" th:href="@{/admin/usuarios}">Usuários</a></li>
+                <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+                    <a class="nav-link" th:href="@{/admin/manutencoes}">Manutenção</a></li>
+            </ul>
+            <span class="navbar-text me-3" th:if="${conta != null}"
+                  th:text="${conta.nome + ' (' + @ap.perfil(conta.perfil) + ')'}">Nome</span>
+            <form th:action="@{/logout}" method="post" class="d-flex">
+                <button class="btn btn-outline-light btn-sm" type="submit">Sair</button>
+            </form>
+        </div>
+    </div>
+</nav>
+<div class="container pt-3">
+    <div class="alert alert-success" role="alert" th:if="${sucesso}" th:text="${sucesso}"></div>
+    <div class="alert alert-danger" role="alert" th:if="${erro}" th:text="${erro}"></div>
+</div>
+<div th:replace="${conteudo}"></div>
+<script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

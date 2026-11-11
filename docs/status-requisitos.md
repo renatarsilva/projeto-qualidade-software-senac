@@ -1,6 +1,6 @@
 # Status dos requisitos (entrega, 2026-11-11)
 
-> Task **T-39**. O estado de cada requisito oficial, com a evidência e o que ficou pendente. Fonte dos números: `./mvnw verify` na `main` (940 testes, 0 falhas) e [RTM](RTM.md). Escrito com franqueza: o que não foi entregue está dito.
+> Task **T-39**. O estado de cada requisito oficial, com a evidência e o que ficou pendente. Fonte dos números: `./mvnw verify` na `main` (1023 testes, 0 falhas) e [RTM](RTM.md). Escrito com franqueza: o que não foi entregue está dito.
 
 Legenda: **Entregue** (código, testes e evidência), **Parcial** (a parte funcional está entregue e uma parte não), **Não entregue**.
 
@@ -8,7 +8,7 @@ Legenda: **Entregue** (código, testes e evidência), **Parcial** (a parte funci
 
 | Requisito | Estado | O que está entregue | Pendência | Evidência |
 |---|---|---|---|---|
-| RF-01 Autenticação e perfis | **Entregue** (API) | Login com token de 30 min, BCrypt, 3 perfis, perfil conferido no banco a cada chamada, negado por padrão, matriz de autorização testada célula a célula | Telas de login com sessão e CSRF | [RTM](RTM.md), [matriz](seguranca/matriz-autorizacao.md) |
+| RF-01 Autenticação e perfis | **Entregue** (API e telas) | Login com token de 30 min, BCrypt, 3 perfis, perfil conferido no banco a cada chamada, negado por padrão, matriz de autorização testada célula a célula | Telas de login com sessão e CSRF | [RTM](RTM.md), [matriz](seguranca/matriz-autorizacao.md) |
 | RF-02 Cadastros | **Entregue** | Salas, professores (com competências) e materiais: cadastro, alteração, consulta e exclusão com 409 em caso de vínculo | | RTM, testes das specs T-16 a T-18 |
 | RF-03 Pesquisa | **Entregue** | Tipo, capacidade, localização, competência e disponibilidade (exclui reservas ativas e manutenção) | | `PesquisaDeRecursosApiTest` |
 | RF-04 Criar, alterar e cancelar reservas | **Entregue** | Intervalo válido, antecedência de 1 h, alteração com prazo, cancelamento em três formas, check-in | Job que aplica as mudanças por tempo (T-60) | `IntervaloDaReservaTest`, `CicloDeVidaApiTest` |
@@ -20,7 +20,7 @@ Legenda: **Entregue** (código, testes e evidência), **Parcial** (a parte funci
 | RF-10 Histórico auditável | **Entregue** | Registro por mudança de estado, na mesma transação, imutável no banco; consulta só para Responsável e Administrador | | `Auditoria*Test` |
 | RF-11 Notificação | **Entregue** | Aprovação, rejeição e cancelamento notificam o dono; adaptador HTTP com timeouts configuráveis e modo simulado; a falha não desfaz a reserva | | `NotificadorHttpWireMockTest` (INT-01 a INT-05) |
 | RF-12 Relatório de utilização | **Entregue** | Horas por recurso, carga horária por professor e conflitos evitados; oráculo calculado à mão | | `RelatorioDeUtilizacaoApiTest` |
-| RF-13 Interface responsiva e erros compreensíveis | **Parcial** | Erros compreensíveis e sem detalhe interno em toda a API e na página de erro | **Telas responsivas não foram entregues** | `ErrosDaApiTest`, `ErrosDasTelasTest` |
+| RF-13 Interface responsiva e erros compreensíveis | **Entregue** | Telas Thymeleaf e Bootstrap dos três perfis (login por sessão com CSRF, menu por perfil, pesquisa, reserva, aprovação, retirada, cadastros, manutenção e relatório); erros em linguagem clara, sem detalhe interno | Edição de sala, material e professor só pela API; o teste do navegador roda à mão, e não no CI | `LoginEMenuDasTelasTest`, `AutorizacaoDasTelasTest`, `FluxoCompletoPelasTelasTest`, `ErrosDaApiTest`; [T-44-telas.md](evidencias/T-44-telas.md) |
 | RF-14 Documentação da API | **Entregue** | OpenAPI com Swagger UI público, todos os endpoints com perfis permitidos e erros | | `DocumentacaoDaApiTest`, README |
 
 ## Regras críticas da especificação
@@ -40,8 +40,8 @@ Legenda: **Entregue** (código, testes e evidência), **Parcial** (a parte funci
 
 | Requisito | Meta | Resultado | Estado |
 |---|---|---|---|
-| RNF-01 Cobertura de linhas | ≥ 80 % | **97,0 %** (JaCoCo) | Atendido |
-| RNF-02 Cobertura de branches | ≥ 70 % | **86,0 %** (JaCoCo) | Atendido |
+| RNF-01 Cobertura de linhas | ≥ 80 % | **95,9 %** (JaCoCo) | Atendido |
+| RNF-02 Cobertura de branches | ≥ 70 % | **85,1 %** (JaCoCo) | Atendido |
 | RNF-03 Rastreabilidade | 100 % dos críticos | RN-01 a RN-09 todas com evidência na [RTM](RTM.md) | Atendido |
 | RNF-04 Defeitos críticos | 0 | SonarCloud da `main`: 0 bugs, 0 vulnerabilidades, Quality Gate aprovado | Atendido |
 | RNF-05 Dupla reserva | 1 aceita, 0 duplicidades | 1 aceita e 0 duplicidades, em teste e em carga | Atendido |
@@ -50,7 +50,7 @@ Legenda: **Entregue** (código, testes e evidência), **Parcial** (a parte funci
 | RNF-08 Erros seguros | 0 respostas com detalhe interno | Lista de termos proibidos em todos os testes de erro | Atendido |
 | RNF-09 Desempenho | p95 ≤ 300 ms, erro < 1 % | p95 de 2 a 7 ms, 0 erro real ([resultado](performance/resultado-01.md)) | Atendido |
 | RNF-10 Resiliência da notificação | 0 reservas desfeitas | A falha do aviso não desfaz a aprovação | Atendido |
-| RNF-11 Responsividade | utilizável a partir de 375 px | Interface não entregue | **Não atendido** |
+| RNF-11 Responsividade | utilizável a partir de 375 px | 14 páginas sem rolagem horizontal em 375 px no Chrome real | **Atendido** |
 
 ## Entregáveis de qualidade da especificação
 
@@ -63,4 +63,4 @@ Legenda: **Entregue** (código, testes e evidência), **Parcial** (a parte funci
 | GitHub Actions em PR, JaCoCo com gate 80/70, SonarCloud | Entregue (Quality Gate aprovado) |
 | TDD com evidência | Entregue ([evidencia-tdd.md](testes/evidencia-tdd.md)); BDD com Cucumber não |
 | Mutação manual nas regras críticas | Entregue ([mutacao-manual.md](testes/mutacao-manual.md)) |
-| Teste end-to-end da interface | **Não entregue** (depende das telas) |
+| Teste end-to-end da interface | **Entregue fora do CI**: `e2e/fluxo-no-navegador.js` (Chrome real, 31 verificações); no CI, `FluxoCompletoPelasTelasTest` com sessão e CSRF |

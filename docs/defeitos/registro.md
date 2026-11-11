@@ -6,7 +6,8 @@ Lista dos defeitos encontrados, priorizados e corrigidos. O processo está em [`
 |---|---|---|---|---|
 | DEF-01 | A arquitetura cita a task de código como evidência de teste | Baixa | P2 | Fechado |
 | DEF-02 | Deadlock do PostgreSQL sob concorrência vira 500 em vez de 409 | Crítica | P1 | Fechado |
-| DEF-03 | SonarCloud reprova o Quality Gate: 1 bug (S9352) e 1 vulnerabilidade (S4502) críticos | Crítica | P1 | Em verificação |
+| DEF-03 | SonarCloud reprova o Quality Gate: 1 bug (S9352) e 1 vulnerabilidade (S4502) críticos | Crítica | P1 | Fechado |
+| DEF-04 | Nas telas, o acesso negado (403) aparece como erro 500 | Alta | P1 | Fechado |
 
 ## DEF-01 · A arquitetura cita a task de código como evidência de teste
 
@@ -78,3 +79,26 @@ Lista dos defeitos encontrados, priorizados e corrigidos. O processo está em [`
 
 - Escolher implementações alternativas em um único `@Bean`, e não com `@Component` condicionais.
 - Toda exceção a uma regra do Sonar leva comentário com o motivo e a referência da decisão.
+
+## DEF-04 · Nas telas, o acesso negado (403) aparece como erro 500
+
+- **Encontrado em:** teste manual da aplicação no ar (2026-11-11), logo depois de criar as telas (T-44): o Solicitante abriu `/admin/salas` e um `POST` foi enviado sem o token CSRF
+- **Resultado obtido:** os dois casos devolveram **500** (erro interno), e não 403
+- **Resultado esperado:** 403 com a página amigável "Acesso negado" (spec T-44, CA-05 e CA-06)
+- **Severidade: Alta** (a recusa em si funcionava e nada foi executado, mas o status errado esconde o motivo e confunde quem usa). **Prioridade: P1**
+- **Análise:** o Spring Security recusa chamando `sendError(403)`, e o servidor encaminha para `/error`. O `ErroController` só conhecia 404, 405 e 415; todo outro status virava "erro inesperado" (500). Na API não aparecia, porque ela escreve a resposta do 403 por conta própria
+- **Correção:** o `ErroController` passou a reconhecer o 403 e devolver a página de acesso negado. Teste novo `PaginaDeAcessoNegadoTest` (TC-33)
+- **Verificação:** a aplicação no ar devolve 403 com a página amigável nos dois casos; `./mvnw verify` verde
+
+### Causa raiz (5 porquês)
+
+1. Por que apareceu? O navegador seguiu o `sendError` até `/error`, que respondeu 500.
+2. Por que os testes não pegaram? O MockMvc não faz o encaminhamento do `sendError`: o teste via 403 direto, sem passar pelo `/error`.
+3. Por que o `/error` não tratava 403? Foi escrito na T-22, quando só a API existia, e a API não usa esse caminho para 403.
+4. Por que só apareceu agora? Antes da T-44 nenhuma tela tinha autorização por perfil.
+5. O que muda no processo? Toda tela nova passa também por um teste com a aplicação no ar (o roteiro do navegador), além do MockMvc.
+
+### Prevenção
+
+- O teste `PaginaDeAcessoNegadoTest` simula o encaminhamento do `/error`.
+- O roteiro `e2e/fluxo-no-navegador.js` confere o acesso negado no Chrome de verdade.

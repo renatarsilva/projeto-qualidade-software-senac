@@ -31,6 +31,10 @@ Perguntas prováveis da semana 47, ligadas às decisões que o time já tomou. N
 | 24 | O SonarCloud reprovava o Quality Gate. Quais eram as duas pendências e o que foi feito? | Defeito DEF-03 em `docs/defeitos/registro.md`; ADR-0007 | A definir | A escrever |
 | 25 | A devolução de um material é registrada exatamente no término da reserva. É atraso? E 1 segundo depois? | Spec T-42; `RetiradaDeMateriaisApiTest` (TC-08 e TC-09) | A definir | A escrever |
 | 26 | O que ficou de fora da entrega e por quê? | [decisão de qualidade](../decisao-qualidade.md), seção 2; [status-requisitos.md](../status-requisitos.md) | Todos | A escrever |
+| 27 | As telas têm regra própria de reserva? Como uma reserva feita pela tela respeita o conflito e a antecedência? | Spec T-44, seção 3; `ReservasTelas` chama `ReservaService` | A definir |
+| 28 | Como o sistema impede o Solicitante de abrir `/admin/salas` pela barra de endereço? E uma rota que ninguém declarou? | [TelasSegurancaConfiguracao](../../src/main/java/br/senac/recursos/web/TelasSegurancaConfiguracao.java); `AutorizacaoDasTelasTest` (TC-08 e TC-10) | A definir |
+| 29 | Por que as telas usam sessão e CSRF e a API usa token? E se o usuário for desativado com a sessão aberta? | ADR-0007; `ContaDaSessaoFilter`; `LoginEMenuDasTelasTest` (TC-32) | A definir |
+| 30 | O 403 virava 500 nas telas. Por que o MockMvc não pegou e como vocês acharam? | DEF-04 em `docs/defeitos/registro.md`; `PaginaDeAcessoNegadoTest` | A definir |
 
 ## Perguntas que o professor costuma fazer (sem fonte ainda)
 

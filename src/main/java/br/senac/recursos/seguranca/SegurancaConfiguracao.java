@@ -18,7 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -37,7 +36,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
 
-/** Duas cadeias de segurança (ADR-0007): a API sem estado e sem CSRF, e as telas com formulário e sessão. */
+/** Cadeia de segurança da API (ADR-0007): sem estado, sem CSRF e com token. A das telas está em {@code web}. */
 @Configuration
 @EnableWebSecurity
 public class SegurancaConfiguracao {
@@ -77,19 +76,6 @@ public class SegurancaConfiguracao {
                         .jwt(jwt -> jwt.decoder(decodificador).jwtAuthenticationConverter(conversorDoToken))
                         .authenticationEntryPoint(entradaDaApi)
                         .accessDeniedHandler(acessoNegadoDaApi));
-        return http.build();
-    }
-
-    @Bean
-    @Order(2)
-    SecurityFilterChain telas(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(regras -> regras
-                        .requestMatchers("/error").permitAll() // a página de erro é aberta, senão o erro viraria login
-                        // A documentação da API (OpenAPI e Swagger UI) é pública (RF-14, T-51).
-                        .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**")
-                        .permitAll()
-                        .anyRequest().authenticated())
-                .formLogin(Customizer.withDefaults());
         return http.build();
     }
 

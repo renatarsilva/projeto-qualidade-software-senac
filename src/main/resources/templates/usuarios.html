@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/base :: base(~{::title}, ~{::main})}">
+<head><title>Usuários</title></head>
+<body>
+<main class="container pb-4">
+    <h1 class="h3 mb-3">Usuários</h1>
+    <form th:action="@{/admin/usuarios}" method="post" class="card card-body mb-4">
+        <h2 class="h6">Cadastrar usuário</h2>
+        <div class="row g-3">
+            <div class="col-12 col-md-3"><label class="form-label" for="nome">Nome</label>
+                <input class="form-control" id="nome" name="nome" th:value="${form['nome']}" required></div>
+            <div class="col-12 col-md-3"><label class="form-label" for="email">E-mail</label>
+                <input class="form-control" type="email" id="email" name="email" th:value="${form['email']}" required></div>
+            <div class="col-6 col-md-3"><label class="form-label" for="senha">Senha (8 a 72 caracteres)</label>
+                <input class="form-control" type="password" id="senha" name="senha" required></div>
+            <div class="col-6 col-md-3"><label class="form-label" for="perfil">Perfil</label>
+                <select class="form-select" id="perfil" name="perfil">
+                    <option th:each="p : ${perfis}" th:value="${p.name()}" th:text="${@ap.perfil(p.name())}"></option>
+                </select></div>
+        </div>
+        <button class="btn btn-primary mt-3 align-self-start" type="submit">Cadastrar</button>
+    </form>
+    <div class="tabela-rolavel">
+        <table class="table table-striped align-middle bg-white">
+            <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Situação</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="u : ${itens}">
+                <td th:text="${u.nome}"></td><td th:text="${u.email}"></td>
+                <td>
+                    <form class="d-flex gap-1" th:action="@{/admin/usuarios/{id}/perfil(id=${u.id})}" method="post">
+                        <select class="form-select form-select-sm" name="perfil" aria-label="Perfil">
+                            <option th:each="p : ${perfis}" th:value="${p.name()}" th:text="${@ap.perfil(p.name())}"
+                                    th:selected="${p == u.perfil}"></option>
+                        </select>
+                        <button class="btn btn-sm btn-outline-primary" type="submit">Trocar</button>
+                    </form>
+                </td>
+                <td th:text="${u.ativo ? 'Ativo' : 'Desativado'}"></td>
+                <td>
+                    <form th:action="@{/admin/usuarios/{id}/ativo(id=${u.id})}" method="post">
+                        <input type="hidden" name="ativo" th:value="${!u.ativo}">
+                        <button class="btn btn-sm btn-outline-secondary" type="submit"
+                                th:text="${u.ativo ? 'Desativar' : 'Ativar'}">Desativar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

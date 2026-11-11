@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/base :: base(~{::title}, ~{::main})}">
+<head><title>Entrar</title></head>
+<body>
+<main class="container py-4">
+    <div class="card card-formulario mx-auto">
+        <div class="card-body">
+            <h1 class="h4 mb-3">Entrar</h1>
+            <div class="alert alert-danger" role="alert" th:if="${param.containsKey('erro')}">
+                E-mail ou senha inválidos.</div>
+            <div class="alert alert-info" role="alert" th:if="${param.containsKey('saiu')}">Você saiu do sistema.</div>
+            <form th:action="@{/login}" method="post">
+                <div class="mb-3">
+                    <label class="form-label" for="username">E-mail</label>
+                    <input class="form-control" type="email" id="username" name="username" required autofocus>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="password">Senha</label>
+                    <input class="form-control" type="password" id="password" name="password" required>
+                </div>
+                <button class="btn btn-primary w-100" type="submit">Entrar</button>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>

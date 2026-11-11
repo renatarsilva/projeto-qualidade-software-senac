@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/base :: base(~{::title}, ~{::main})}">
+<head><title>Pesquisar recursos</title></head>
+<body>
+<main class="container pb-4">
+    <h1 class="h3 mb-3">Pesquisar recursos</h1>
+    <form th:action="@{/recursos}" method="get" class="row g-3 mb-4">
+        <div class="col-12 col-md-3">
+            <label class="form-label" for="tipo">Tipo</label>
+            <select class="form-select" id="tipo" name="tipo">
+                <option value="">Todos</option>
+                <option value="SALA" th:selected="${filtro['tipo'] == 'SALA'}">Sala</option>
+                <option value="PROFESSOR" th:selected="${filtro['tipo'] == 'PROFESSOR'}">Professor</option>
+                <option value="MATERIAL" th:selected="${filtro['tipo'] == 'MATERIAL'}">Material</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-3">
+            <label class="form-label" for="capacidadeMinima">Capacidade mínima</label>
+            <input class="form-control" type="number" min="1" id="capacidadeMinima" name="capacidadeMinima"
+                   th:value="${filtro['capacidadeMinima']}">
+        </div>
+        <div class="col-6 col-md-3">
+            <label class="form-label" for="localizacao">Localização</label>
+            <input class="form-control" type="text" id="localizacao" name="localizacao" th:value="${filtro['localizacao']}">
+        </div>
+        <div class="col-12 col-md-3">
+            <label class="form-label" for="competencia">Competência</label>
+            <input class="form-control" type="text" id="competencia" name="competencia" th:value="${filtro['competencia']}">
+        </div>
+        <div class="col-12 col-md-4">
+            <label class="form-label" for="de">Livre a partir de</label>
+            <input class="form-control" type="datetime-local" id="de" name="de" th:value="${filtro['de']}">
+        </div>
+        <div class="col-12 col-md-4">
+            <label class="form-label" for="ate">Livre até</label>
+            <input class="form-control" type="datetime-local" id="ate" name="ate" th:value="${filtro['ate']}">
+        </div>
+        <div class="col-12 col-md-4 d-flex align-items-end">
+            <button class="btn btn-primary w-100" type="submit">Pesquisar</button>
+        </div>
+    </form>
+    <p class="text-secondary" th:if="${#lists.isEmpty(resultado)}">Nenhum recurso encontrado com esses filtros.</p>
+    <div class="tabela-rolavel" th:unless="${#lists.isEmpty(resultado)}">
+        <table class="table table-striped align-middle bg-white">
+            <thead><tr><th>Tipo</th><th>Nome</th><th>Detalhes</th><th>Restrito</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="r : ${resultado}">
+                <td th:text="${@ap.tipo(r.tipo())}">Sala</td>
+                <td th:text="${r.nome()}">sala-102</td>
+                <td>
+                    <span th:if="${r.capacidade() != null}"
+                          th:text="${r.capacidade()} + ' lugares, ' + ${r.localizacao()}"></span>
+                    <span th:if="${r.competencias() != null}" th:text="${#strings.listJoin(r.competencias(), ', ')}"></span>
+                </td>
+                <td th:text="${r.restrito() ? 'Sim' : 'Não'}">Não</td>
+                <td sec:authorize="hasRole('SOLICITANTE')">
+                    <a class="btn btn-sm btn-outline-primary"
+                       th:href="@{/reservas/nova(recurso=${r.tipo() + ':' + r.id()}, inicio=${filtro['de']}, termino=${filtro['ate']})}">Reservar</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

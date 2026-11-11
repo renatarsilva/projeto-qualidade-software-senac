@@ -4,7 +4,7 @@ Projeto semestral da disciplina **Qualidade de Software** (TADS · Senac · 2026
 
 O sistema organiza a reserva de **salas, professores e materiais** de uma instituição de ensino, sem conflitos de horário. O foco da avaliação não é só fazer o sistema funcionar: é apresentar **evidências objetivas** de qualidade, segurança, rastreabilidade e desempenho.
 
-> **Status:** em construção, em quatro sprints até a entrega (ver [Roadmap](#roadmap)).
+> **Status:** versão `v1.0.0-rc1` entregue. API completa com as regras críticas provadas por **1023 testes** (95,9 % de linhas, 85,1 % de branches), CI e SonarCloud verdes. As **telas responsivas dos três perfis** (Thymeleaf e Bootstrap) estão entregues e foram conferidas no Chrome em 375 px; o que ficou de fora está dito em [status dos requisitos](docs/status-requisitos.md). Para ver o sistema funcionando, siga a [demonstração](docs/entrega/demonstracao.md).
 
 ## Como trabalhamos
 
@@ -166,7 +166,7 @@ mvnw.cmd spring-boot:run
 docker compose ps
 ```
 
-**Segurança no bootstrap.** A aplicação inicia em http://localhost:8080 com a segurança padrão do Spring Boot ativa. Por isso, acessar sem autenticação redireciona para `/login` (no navegador) ou devolve `401` (em clientes como o `curl`). Esse comportamento é esperado nesta fase: a autenticação e a autorização definitivas pertencem à task T-15.
+**Acesso.** A aplicação sobe em http://localhost:8080. **Telas:** abra o endereço e entre com o e-mail e a senha do administrador das variáveis abaixo (o menu muda conforme o perfil: Solicitante, Responsável ou Administrador). **API:** toda rota `/api/**` exige o token `Bearer` e devolve `401` sem ele; o token vem de `POST /api/auth/login` com `{"email":"...","senha":"..."}` e vale 30 minutos. O primeiro administrador é criado na subida a partir de `APP_ADMIN_EMAIL` e `APP_ADMIN_SENHA`. A documentação da API fica pública em http://localhost:8080/swagger-ui.html.
 
 ### Variáveis de ambiente
 
@@ -174,7 +174,7 @@ Os segredos nunca ficam no repositório. A aplicação lê estas variáveis (os 
 
 | Variável | Para que serve | Obrigatória |
 |---|---|---|
-| `APP_JWT_CHAVE` | Chave que assina o token da API. Use um texto aleatório e longo. | Sim, quando a autenticação da T-15 estiver ativa |
+| `APP_JWT_CHAVE` | Chave que assina o token da API. Use um texto aleatório e longo. | Sim |
 | `APP_ADMIN_EMAIL` | E-mail do primeiro administrador, criado na subida se o banco não tiver nenhum. | Só no primeiro uso |
 | `APP_ADMIN_SENHA` | Senha desse administrador (de 8 a 72 bytes). | Só no primeiro uso |
 
@@ -205,12 +205,12 @@ O índice completo, com a situação de cada documento, está em [`docs/README.m
 
 | Sprint | Período | Semanas do curso | Foco | Status |
 |---|---|---|---|---|
-| 1 | 15/10 a 21/10 | 32 a 35 | Ambiente, diagnóstico, PRD, plano de teste, arquitetura e ATAM | ⬜ |
-| 2 | 22/10 a 28/10 | 36 a 39 | Autenticação, cadastros, TDD das reservas, CI, JaCoCo, SonarCloud, Testcontainers e WireMock | ⬜ |
-| 3 | 29/10 a 04/11 | 41 a 43 | Aprovação e manutenção (BDD), dupla reserva, carga, auditoria e relatórios | ⬜ |
-| 4 | 05/11 a 11/11 | 44 a 46 | Interface, autorização, RTM, relatório de qualidade e release `v1.0.0-rc1` | ⬜ |
+| 1 | 15/10 a 21/10 | 32 a 35 | Ambiente, diagnóstico, PRD, plano de teste, arquitetura e ATAM | ✅ |
+| 2 | 22/10 a 28/10 | 36 a 39 | Autenticação, cadastros, TDD das reservas, CI, JaCoCo, SonarCloud, Testcontainers e WireMock | ✅ (menos a T-26) |
+| 3 | 29/10 a 04/11 | 41 a 43 | Aprovação e manutenção (BDD), dupla reserva, carga, auditoria e relatórios | ✅ (menos BDD e layout) |
+| 4 | 05/11 a 11/11 | 44 a 46 | Interface, autorização, RTM, relatório de qualidade e release `v1.0.0-rc1` | ✅ |
 
-Detalhes em [sprints](docs/planejamento/sprints.md) e [backlog](docs/planejamento/backlog.md). Entrega na semana 46 e prova oral na semana 47.
+Planejado e realizado de cada sprint em [sprints](docs/planejamento/sprints.md) e [backlog](docs/planejamento/backlog.md). Entrega na semana 46 e prova oral na semana 47.
 
 ## Referências
 

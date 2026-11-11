@@ -93,6 +93,19 @@ Todos rodam com `./mvnw verify` ([relatório de testes](../relatorio-de-testes.m
 
 Mostre `docs/evidencias/T-37-vermelho.md` e `T-37-verde.md`: **20 solicitantes simultâneos** geram 1 reserva e 19 recusas (409); sem o `EXCLUDE` do banco, 14 das 20 solicitações virariam reserva. E o teste de carga ([resultado-01.md](../performance/resultado-01.md)): 50 usuários, p95 de 2 a 7 ms.
 
+## As telas (a demonstração visual)
+
+Com a aplicação no ar, abra http://localhost:8080 e entre com o administrador. O mesmo fluxo da API, agora pelas telas (celular ou desktop):
+
+1. **Administrador:** em Salas, Materiais, Professores e Usuários, cadastre uma sala (`sala-NN`), um material e dois usuários (um Solicitante e um Responsável).
+2. **Solicitante:** em Pesquisar, escolha tipo Sala e um intervalo, clique em **Reservar** e salve. A reserva nasce **Solicitada**.
+3. **Conflito:** peça a mesma sala em um horário que se sobrepõe. A tela mostra "A sala já está reservada neste horário" e mantém o que foi digitado.
+4. **Perfil errado:** como Solicitante, digite `/admin/salas` na barra de endereço: página **Acesso negado** (403).
+5. **Responsável:** em Aprovações, aprove a reserva. Abra a reserva: o **Histórico de mudanças** mostra a aprovação.
+6. **Relatório:** em Relatório, escolha o período: horas por recurso e **conflitos evitados**.
+
+Para ver o fluxo rodando sozinho no Chrome, em 375 px: `cd e2e && npm install && npm run fluxo` ([e2e/README.md](../../e2e/README.md)).
+
 ## Capturas de tela
 
-Para a apresentação, tire estas capturas e guarde em `docs/entrega/capturas/`: (1) o Swagger UI com a lista de endpoints, (2) o painel do SonarCloud com o Quality Gate aprovado, (3) o run verde do CI e (4) o relatório do JaCoCo. As interfaces de tela do sistema (RF-13) não foram entregues, e isso está dito na [decisão de qualidade](../decisao-qualidade.md).
+As capturas das telas (celular em 375 px e desktop) já estão em [`capturas/`](capturas/), geradas pelo roteiro do Chrome, junto com o `resultado.json` (31 verificações). Faltam as capturas que dependem do seu login, para guardar na mesma pasta: (1) o painel do SonarCloud com o Quality Gate aprovado, (2) o run verde do CI e (3) o relatório do JaCoCo (`target/site/jacoco/index.html`, depois de um `./mvnw verify`).

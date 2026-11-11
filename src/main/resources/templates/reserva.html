@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/base :: base(~{::title}, ~{::main})}">
+<head><title th:text="'Reserva #' + ${reserva.id()}">Reserva</title></head>
+<body>
+<main class="container pb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <h1 class="h3 mb-0" th:text="'Reserva #' + ${reserva.id()}">Reserva</h1>
+        <span class="badge fs-6" th:classappend="${@ap.selo(reserva.estado())}"
+              th:text="${@ap.estado(reserva.estado())}">Solicitada</span>
+    </div>
+    <div class="card mb-3">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Período</dt>
+                <dd class="col-sm-9"><span th:text="${@ap.data(reserva.inicio())}"></span> a
+                    <span th:text="${@ap.data(reserva.termino())}"></span></dd>
+                <dt class="col-sm-3">Recursos</dt>
+                <dd class="col-sm-9"><span th:each="x, s : ${reserva.recursos()}"
+                          th:text="${nomes[x.tipo() + ':' + x.id()]} + (${s.last} ? '' : ', ')"></span></dd>
+                <dt class="col-sm-3">Pedida em</dt>
+                <dd class="col-sm-9" th:text="${@ap.data(reserva.criadaEm())}"></dd>
+                <dt class="col-sm-3">Aprovar até</dt>
+                <dd class="col-sm-9 mb-0" th:text="${@ap.data(reserva.prazoAprovacaoEm())}"></dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mb-4" sec:authorize="hasRole('SOLICITANTE')"
+         th:if="${reserva.estado().name() == 'SOLICITADA' or reserva.estado().name() == 'APROVADA'}">
+        <a class="btn btn-outline-primary" th:href="@{/reservas/{id}/editar(id=${reserva.id()})}">Alterar</a>
+        <form th:action="@{/reservas/{id}/cancelar(id=${reserva.id()})}" method="post">
+            <button class="btn btn-outline-danger" type="submit">Cancelar reserva</button>
+        </form>
+        <form th:if="${reserva.estado().name() == 'APROVADA'}"
+              th:action="@{/reservas/{id}/checkin(id=${reserva.id()})}" method="post">
+            <button class="btn btn-success" type="submit">Fazer check-in</button>
+        </form>
+    </div>
+
+    <section th:if="${gestor and not #lists.isEmpty(materiais)}" class="mb-4">
+        <h2 class="h5">Materiais</h2>
+        <div class="tabela-rolavel">
+            <table class="table bg-white align-middle">
+                <thead><tr><th>Material</th><th>Situação</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="m : ${materiais}">
+                    <td th:text="${m.nome()}">Projetor</td>
+                    <td>
+                        <span th:if="${m.retirada() == null}">Não retirado</span>
+                        <span th:if="${m.retirada() != null and m.retirada().devolvidaEm() == null}"
+                              th:text="'Retirado em ' + ${@ap.data(m.retirada().retiradaEm())}"></span>
+                        <span th:if="${m.retirada() != null and m.retirada().devolvidaEm() != null}"
+                              th:text="'Devolvido em ' + ${@ap.data(m.retirada().devolvidaEm())}"></span>
+                        <span class="badge text-bg-danger ms-1"
+                              th:if="${m.retirada() != null and m.retirada().atrasada()}">Atrasada</span>
+                    </td>
+                    <td sec:authorize="hasRole('RESPONSAVEL')">
+                        <form th:if="${m.retirada() == null and (reserva.estado().name() == 'APROVADA' or reserva.estado().name() == 'EM_USO')}"
+                              th:action="@{/reservas/{id}/retiradas(id=${reserva.id()})}" method="post">
+                            <input type="hidden" name="materialId" th:value="${m.materialId()}">
+                            <button class="btn btn-sm btn-primary" type="submit">Registrar retirada</button>
+                        </form>
+                        <form th:if="${m.retirada() != null and m.retirada().devolvidaEm() == null}"
+                              th:action="@{/reservas/{id}/retiradas/{r}/devolucao(id=${reserva.id()}, r=${m.retirada().id()})}"
+                              method="post">
+                            <button class="btn btn-sm btn-outline-primary" type="submit">Devolver</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section th:if="${gestor}">
+        <h2 class="h5">Histórico de mudanças</h2>
+        <div class="tabela-rolavel">
+            <table class="table table-sm bg-white">
+                <thead><tr><th>Quando</th><th>De</th><th>Para</th><th>Quem</th><th>Motivo</th></tr></thead>
+                <tbody>
+                <tr th:each="h : ${historico}">
+                    <td th:text="${@ap.data(h.ocorridaEm())}"></td>
+                    <td th:text="${@ap.estado(h.estadoAnterior())}"></td>
+                    <td th:text="${@ap.estado(h.estadoNovo())}"></td>
+                    <td th:text="${h.usuarioId() == null ? 'Sistema' : 'Usuário #' + h.usuarioId()}"></td>
+                    <td th:text="${h.motivo()}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <a class="btn btn-link mt-3" th:href="@{/reservas}">Voltar para a lista</a>
+</main>
+</body>
+</html>

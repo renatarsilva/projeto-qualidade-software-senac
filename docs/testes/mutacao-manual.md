@@ -11,6 +11,7 @@
 | M3 | RN-04: recurso em manutenção não se reserva | A verificação de manutenção foi removida da regra de reserva (criação e alteração) | `ManutencaoDeRecursosApiTest`: `reservaQueTocaAManutencao` (3 casos), `materialEmManutencao`, `professorEmManutencao`, `tudoOuNadaComManutencao` e os demais de recusa | Execução de 2026-11-11 |
 | M4 | RN-03: dupla reserva | O `EXCLUDE` do banco foi removido (só no banco descartável do teste) | `ProtecaoDoBancoConcorrenciaTest` (20 inserções aceitas, esperado 1) e `DisputaPelaMesmaSalaConcorrenciaTest` (14 de 20 solicitações aceitas) | [T-37-vermelho.md](../evidencias/T-37-vermelho.md) |
 | M5 | RF-01 e RN-07: autorização | O `PUT /api/salas` foi aberto ao Solicitante | `MatrizDeAutorizacaoApiTest.celulaDeNegacao` (célula S-04 por Solicitante: esperado 403) | [T-49-matriz-de-autorizacao.md](../evidencias/T-49-matriz-de-autorizacao.md) |
+| M6 | RF-01 e RN-07 nas telas: só o Responsável aprova | Em `TelasSegurancaConfiguracao`, as rotas de aprovar, rejeitar, retirar e devolver deixaram de exigir o Responsável | `AutorizacaoDasTelasTest.matrizDeAutorizacao` (4 rotas) e `TelasDoResponsavelTest.soOResponsavelAprova` (6 falhas por asserção) | [T-44-telas.md](../evidencias/T-44-telas.md), seção 3 |
 
 ## Como repetir
 

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/base :: base(~{::title}, ~{::main})}">
+<head><title th:text="${tituloDaPagina}">Reserva</title></head>
+<body>
+<main class="container pb-4">
+    <h1 class="h3 mb-3" th:text="${tituloDaPagina}">Nova reserva</h1>
+    <form th:action="@{${acao}}" method="post" class="card card-body">
+        <div class="row g-3">
+            <div class="col-12 col-md-6">
+                <label class="form-label" for="inicio">Início (horário de Brasília)</label>
+                <input class="form-control" type="datetime-local" id="inicio" name="inicio" th:value="${inicio}" required>
+            </div>
+            <div class="col-12 col-md-6">
+                <label class="form-label" for="termino">Término (horário de Brasília)</label>
+                <input class="form-control" type="datetime-local" id="termino" name="termino" th:value="${termino}" required>
+            </div>
+            <div class="col-12">
+                <span class="form-label d-block">Recursos</span>
+                <p class="text-secondary small mb-2" th:if="${#lists.isEmpty(recursos)}">
+                    Nenhum recurso cadastrado ainda.</p>
+                <div class="form-check" th:each="r : ${recursos}">
+                    <input class="form-check-input" type="checkbox" name="recursos" th:id="'r-' + ${r.tipo()} + '-' + ${r.id()}" th:value="${r.tipo() + ':' + r.id()}" th:checked="${selecionados.contains(r.tipo() + ':' + r.id())}">
+                    <label class="form-check-label" th:for="'r-' + ${r.tipo()} + '-' + ${r.id()}"
+                           th:text="${@ap.tipo(r.tipo())} + ': ' + ${r.nome()}"></label>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Salvar</button>
+            <a class="btn btn-outline-secondary" th:href="@{/reservas}">Voltar</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>
