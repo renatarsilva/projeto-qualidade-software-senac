@@ -306,6 +306,7 @@ final class AmbienteDeReserva {
 
     /** Apaga só as reservas e os vínculos, mantendo recursos e usuários (entre as rodadas de uma disputa). */
     void limpaReservas() {
+        jdbc.update("DELETE FROM retirada");
         jdbc.execute("TRUNCATE TABLE auditoria");
         jdbc.update("DELETE FROM reserva_recurso");
         jdbc.update("DELETE FROM reserva");
