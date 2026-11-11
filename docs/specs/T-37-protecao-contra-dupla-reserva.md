@@ -149,7 +149,7 @@ Nenhum endpoint novo: o teste usa `POST /api/reservas` e `PUT /api/reservas/{id}
 - **Dado** 20 inserções simultâneas e diretas no banco (sem a aplicação), todas ativas, no mesmo recurso e período
 - **Quando** elas rodam ao mesmo tempo
 - **Então** exatamente 1 inserção é aceita e 19 são recusadas pelo `EXCLUDE`
-- **E** as 19 recusas têm `SQLState 23P01` (violação de exclusão), para provar que a falha veio do `EXCLUDE` e não de outro erro
+- **E** as 19 recusas têm `SQLState 23P01` (violação do `EXCLUDE`) ou `40P01` (deadlock entre inserções conflitantes, que o PostgreSQL também usa para recusar), para provar que a falha veio da proteção do banco e não de outro erro (DEF-02)
 
 ### CA-12: Estável em 5 execuções seguidas
 
@@ -193,7 +193,7 @@ Todos os casos de integração usam o `Clock` fixo de teste, PostgreSQL real e a
 | TC-11 (CT-02, repetições) | CA-12 | Estabilidade | TC-01 repetido 5 vezes seguidas na mesma execução (`@RepeatedTest(5)`), ambiente restaurado a cada vez, pool de 25 conexões | O mesmo resultado nas 5 | Integração |
 | TC-12 (sem caso no plano) | CA-03 | Classe inválida | Todas as respostas perdedoras do TC-01 | Todas 409, com `detail` de uma das mensagens da seção 4; nenhum 500; sem stack, classe, SQL nem nome do outro usuário | Integração |
 | TC-13 (sem caso no plano) | CA-09 | Conflito | Dois donos fazem `PUT` ao mesmo tempo para o mesmo horário livre | 1 × 200, 1 × 409; a recusada mantém o horário original | Integração |
-| TC-14 (sem caso no plano) | CA-11 | Conflito | 20 inserções diretas simultâneas, ativas, no mesmo recurso e período | 1 aceita; 19 recusadas pelo `EXCLUDE`, todas com SQLState `23P01` | Integração |
+| TC-14 (sem caso no plano) | CA-11 | Conflito | 20 inserções diretas simultâneas, ativas, no mesmo recurso e período | 1 aceita; 19 recusadas pelo banco, todas com SQLState `23P01` ou `40P01` | Integração |
 | TC-15 (sem caso no plano) | CA-13 | Mutação manual | Remover o `EXCLUDE` só no banco descartável do teste (nunca por migration) e rodar o TC-14; depois restaurar | O TC-14 falha por asserção; evidências em `docs/evidencias/T-37-vermelho.md` e `T-37-verde.md` | Manual |
 | TC-16 (CT-02, sem caso no plano) | CA-02 | Conflito | Consulta ao banco depois do TC-01 | 1 linha em `reserva` e 1 em `reserva_recurso` no intervalo; nenhuma linha das 19 recusadas | Integração |
 | TC-17 (sem caso no plano) | CA-14 | Conflito | A: [sala-102, projetor] e B: [projetor, sala-102], ao mesmo tempo | 1 × 201 e 1 × 409; nenhum 500; vínculos de uma só reserva | Integração |

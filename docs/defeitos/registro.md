@@ -5,6 +5,7 @@ Lista dos defeitos encontrados, priorizados e corrigidos. O processo está em [`
 | ID | Título | Severidade | Prioridade | Estado |
 |---|---|---|---|---|
 | DEF-01 | A arquitetura cita a task de código como evidência de teste | Baixa | P2 | Fechado |
+| DEF-02 | Deadlock do PostgreSQL sob concorrência vira 500 em vez de 409 | Crítica | P1 | Em verificação |
 
 ## DEF-01 · A arquitetura cita a task de código como evidência de teste
 
@@ -29,3 +30,27 @@ Lista dos defeitos encontrados, priorizados e corrigidos. O processo está em [`
 
 - Regra escrita no cabeçalho da matriz: a evidência é a task da fase red (feito no PR #22).
 - Item no checklist de revisão: "a evidência aponta para a task que escreve o teste?".
+
+## DEF-02 · Deadlock do PostgreSQL sob concorrência vira 500 em vez de 409
+
+- **Encontrado em:** bateria vermelha da T-37 (teste de concorrência), 2026-11-10
+- **Onde:** `ReservaService` (`gravando`) e `AgendaNoBanco`, na gravação da reserva
+- **Resultado obtido:** com duas ou mais solicitações simultâneas para o mesmo recurso e intervalo, o PostgreSQL pode abortar uma transação com `deadlock detected` (SQLState `40P01`) em vez de recusá-la com a violação do `EXCLUDE` (`23P01`). A aplicação só traduz `DataIntegrityViolationException`, então o deadlock chega ao cliente como **500 "Erro inesperado"**. Ele apareceu no teste das 2 solicitações (4 das 4 repetições), na sobreposição parcial, no "recusado pede outro horário" e no teste de mensagens das 20 solicitações; o resultado varia entre execuções (o das 20 solicitações passou nas 5 repetições dessa execução)
+- **Resultado esperado:** toda solicitação perdedora recebe 409 (spec T-37, CA-03 e CA-14), com a mensagem genérica "Esta operação conflita com outro registro" quando só o banco decide
+- **Severidade: Crítica.** A reserva continua única (o `EXCLUDE` protege), mas o contrato de recusa quebra sob concorrência, justamente no cenário do RN-03 e do limitador de nota
+- **Prioridade: P1.** Bloqueia a T-37 e o critério "1 aceita e N-1 recusadas com 409"
+- **Correção:** traduzir `PessimisticLockingFailureException` (`40P01`) para o 409 genérico e gravar os vínculos ordenados por `recurso_id` (green da T-37, ADR-0010)
+- **Verificação:** os testes `*ConcorrenciaTest` e `DeadlockNaGravacaoTest` passam; evidência em `docs/evidencias/T-37-vermelho.md` e `T-37-verde.md`
+
+### Causa raiz (5 porquês)
+
+1. Por que apareceu? Uma transação foi abortada pelo banco por deadlock e a aplicação respondeu 500.
+2. Por que o banco abortou? Com um `EXCLUDE`, duas inserções conflitantes e ainda não confirmadas esperam uma pela outra; o PostgreSQL detecta o ciclo e aborta uma delas com `40P01` (não com `23P01`).
+3. Por que a aplicação não tratou? O tratamento da T-23 previu só a violação de integridade (`23P01`), não o deadlock.
+4. Por que ninguém percebeu antes? Os testes da T-20 e da T-23 são sequenciais; só a disputa real de threads exercita esse caminho.
+5. O que muda no processo? Todo erro transitório de transação do banco (deadlock e falha de serialização) tem tradução e teste, e a ordem de gravação dos recursos é fixa.
+
+### Prevenção
+
+- Teste de concorrência com threads de verdade em toda proteção contra dupla reserva (T-37).
+- Gravação dos vínculos sempre ordenada por `recurso_id`.

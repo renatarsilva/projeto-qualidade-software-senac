@@ -28,6 +28,7 @@ final class AmbienteDeReserva {
 
     static final String EMAIL_DO_OUTRO = "outro-solicitante@exemplo.com";
     static final String DOMINIO_DA_MATRIZ = "@matriz.test";
+    static final String DOMINIO_DOS_CONCORRENTES = "@concorrencia.test";
     static final String NOME_DO_OUTRO = "Fulana Reservista";
 
     private final MockMvc mvc;
@@ -109,6 +110,24 @@ final class AmbienteDeReserva {
                 Long.class, NOME_DO_OUTRO, EMAIL_DO_OUTRO);
     }
 
+    /** Cria N solicitantes de teste para as disputas de concorrência (T-37) e devolve os ids, em ordem. */
+    List<Long> novosSolicitantes(int quantidade) {
+        List<Long> ids = new java.util.ArrayList<>();
+        for (int i = 1; i <= quantidade; i++) {
+            String email = String.format("solicitante-%03d%s", i, DOMINIO_DOS_CONCORRENTES);
+            ids.add(jdbc.queryForObject(
+                    "INSERT INTO usuario (nome, email, senha_hash, perfil, ativo) "
+                            + "VALUES (?, ?, 'hash-de-teste', 'SOLICITANTE', true) "
+                            + "ON CONFLICT (email) DO UPDATE SET ativo = true RETURNING id",
+                    Long.class, String.format("Solicitante concorrente %03d", i), email));
+        }
+        return ids;
+    }
+
+    String bearerDoUsuario(long usuarioId) {
+        return IdentidadesDeTeste.bearerDoUsuario(tokens, usuarioId, Perfil.SOLICITANTE);
+    }
+
     String bearerDoOutro() {
         return IdentidadesDeTeste.bearerDoUsuario(tokens, outroSolicitante(), Perfil.SOLICITANTE);
     }
@@ -139,6 +158,14 @@ final class AmbienteDeReserva {
 
     int reservas() {
         return jdbc.queryForObject("SELECT count(*) FROM reserva", Integer.class);
+    }
+
+    /** Vínculos que ocupam o recurso em algum instante do período: é a contagem "reservas ativas" da T-37, vinda do banco. */
+    int vinculosAtivosNo(RecursoPedido recurso, Instant inicio, Instant fim) {
+        return jdbc.queryForObject(
+                "SELECT count(*) FROM reserva_recurso WHERE recurso_id = ? AND ocupa "
+                        + "AND periodo && tstzrange(?::timestamptz, ?::timestamptz, '[)')",
+                Integer.class, recurso.id(), utc(inicio).toString(), utc(fim).toString());
     }
 
     int vinculos() {
@@ -267,6 +294,13 @@ final class AmbienteDeReserva {
 
     int totalDeAuditoria() {
         return jdbc.queryForObject("SELECT count(*) FROM auditoria", Integer.class);
+    }
+
+    /** Apaga só as reservas e os vínculos, mantendo recursos e usuários (entre as rodadas de uma disputa). */
+    void limpaReservas() {
+        jdbc.execute("TRUNCATE TABLE auditoria");
+        jdbc.update("DELETE FROM reserva_recurso");
+        jdbc.update("DELETE FROM reserva");
     }
 
     void limpa() {
