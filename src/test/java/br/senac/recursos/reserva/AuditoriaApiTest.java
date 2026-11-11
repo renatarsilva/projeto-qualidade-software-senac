@@ -42,7 +42,7 @@ class AuditoriaApiTest extends BaseDaApiDeReserva {
         assertThat(registros.get(0).get("estado_anterior")).isNull();
         assertThat(registros.get(0).get("estado_novo")).isEqualTo("SOLICITADA");
         assertThat(((Number) registros.get(0).get("usuario_id")).longValue()).isEqualTo(dono);
-        assertThat(((java.time.OffsetDateTime) registros.get(0).get("ocorrida_em")).toInstant()).isEqualTo(AGORA);
+        assertThat(((java.sql.Timestamp) registros.get(0).get("ocorrida_em")).toInstant()).isEqualTo(AGORA);
     }
 
     @Test
