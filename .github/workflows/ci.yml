@@ -1,11 +1,12 @@
 name: qualidade
 
-# Pipeline de CI (T-25). Roda em todo pull request e em todo push na main.
+# Pipeline de CI (T-25). Roda em todo pull request, em todo push na main e em toda tag de versão (v*).
 # O job `build` é o check que a proteção da main deve exigir (ver docs/processo/ci.md).
 on:
   pull_request:
   push:
     branches: [main]
+    tags: ['v*']
 
 # Só leitura: o pipeline não precisa escrever no repositório.
 permissions:
