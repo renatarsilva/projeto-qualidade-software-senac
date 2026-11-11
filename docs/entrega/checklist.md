@@ -6,7 +6,7 @@ Cada item tem a task dona e uma caixa de marcar. Só marque com a evidência em 
 
 ## 1. Limitadores de nota (bloqueiam a nota se falharem)
 
-- [x] **A aplicação executa** a partir de um clone limpo, seguindo só o README (T-55): a aplicação subiu com `./mvnw spring-boot:run` e o PostgreSQL em contêiner na carga de 2026-11-11 ([resultado-01.md](../performance/resultado-01.md)); o clone limpo da tag fica para o passo final
+- [x] **A aplicação executa** a partir de um clone limpo, seguindo só o README (T-55): a aplicação subiu com `./mvnw spring-boot:run` e o PostgreSQL em contêiner na carga de 2026-11-11 ([resultado-01.md](../performance/resultado-01.md)); **clone limpo conferido em 2026-11-11**: `git clone` do repositório público, `./mvnw verify` com 940 testes e 0 falhas e o gate de cobertura atendido, e `spring-boot:run` com as 3 variáveis do README (`401` sem token, login do administrador devolvendo token, Swagger UI com `200`)
 - [x] **CI presente e verde** (T-25): runs verdes na `main` e em todos os PRs, e o run vermelho intencional registrado. A tag `v1.0.0-rc1` ainda precisa ser criada (T-56)
 - [x] **Sem falha de autorização**: matriz de autorização e teste parametrizado passando, 176 casos (T-48, T-49)
 - [x] **Sem possibilidade de dupla reserva**: teste de concorrência passando e `EXCLUDE` do banco ativo (T-37)
@@ -15,7 +15,7 @@ Cada item tem a task dona e uma caixa de marcar. Só marque com a evidência em 
 
 | Item | Dono | Pronto |
 |---|---|---|
-| Clone limpo e checklist de entrega (este arquivo) | T-55, Caio | - [ ] (clone limpo a conferir) |
+| Clone limpo e checklist de entrega (este arquivo) | T-55, Caio | - [x] |
 | Tag `v1.0.0-rc1` criada, com CI verde e o run da tag aberto | T-56, Samuel | - [ ] |
 | `CHANGELOG.md` com a versão `v1.0.0-rc1` | T-56, Samuel | - [x] |
 | `docs/evidencias/README.md` com todas as evidências preenchidas | T-56, Samuel | - [x] |
