@@ -40,6 +40,7 @@
 | RT-01 | `POST /api/reservas/{reservaId}/retiradas` | 401 | 403 | 201 | 403 | `RetiradaAcessoConfiguracao` (T-42); só o Responsável registra (DP-04) |
 | RT-02 | `POST /api/reservas/{reservaId}/retiradas/{retiradaId}/devolucao` | 401 | 403 | 200 | 403 | idem |
 | RT-03 | `GET /api/reservas/{reservaId}/retiradas` | 401 | 403 | 200 | 200 | idem; o Administrador também consulta |
+| RL-01 | `GET /api/relatorios/utilizacao` | 401 | 403 | 200 | 200 | `RelatorioAcessoConfiguracao` (T-41); o Solicitante recebe 403 (NC-08) |
 | R-01 | `POST /api/reservas` | 401 | 201 | 403 | 403 | `ReservaAcessoConfiguracao` |
 | R-02 | `PUT /api/reservas/{id}` | 401 | 200 ★ | 403 | 403 | idem; o dono vem do token |
 | R-03 | `POST /api/reservas/{id}/cancelamento` | 401 | 200 ★ | 403 | 403 | idem |
