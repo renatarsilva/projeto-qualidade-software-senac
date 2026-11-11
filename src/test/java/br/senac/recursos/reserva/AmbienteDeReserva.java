@@ -54,6 +54,20 @@ final class AmbienteDeReserva {
         return new RecursoPedido(TipoDeRecurso.SALA, cadastra("/api/salas", corpo));
     }
 
+    /** Sala com capacidade e localização escolhidas (pesquisa de recursos, T-43). */
+    RecursoPedido salaCom(String nome, int capacidade, String localizacao) throws Exception {
+        String corpo = "{\"nome\":\"" + nome + "\",\"tipoSala\":\"Laboratório\",\"capacidade\":" + capacidade
+                + ",\"localizacao\":\"" + localizacao + "\",\"restrito\":false}";
+        return new RecursoPedido(TipoDeRecurso.SALA, cadastra("/api/salas", corpo));
+    }
+
+    /** Professor com as competências escolhidas. */
+    RecursoPedido professorCom(String nome, String... competencias) throws Exception {
+        String lista = Arrays.stream(competencias).map(c -> "\"" + c + "\"").collect(Collectors.joining(","));
+        String corpo = "{\"nome\":\"" + nome + "\",\"restrito\":false,\"competencias\":[" + lista + "]}";
+        return new RecursoPedido(TipoDeRecurso.PROFESSOR, cadastra("/api/professores", corpo));
+    }
+
     RecursoPedido professor(String nome) throws Exception {
         String corpo = "{\"nome\":\"" + nome + "\",\"restrito\":false,\"competencias\":[\"Java\"]}";
         return new RecursoPedido(TipoDeRecurso.PROFESSOR, cadastra("/api/professores", corpo));

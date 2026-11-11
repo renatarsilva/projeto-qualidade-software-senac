@@ -41,4 +41,16 @@ public class ReservaAcessoConfiguracao {
     RegraDeAcesso exclusaoDeReservas() {
         return RegraDeAcesso.soPara(HttpMethod.DELETE, "/api/reservas/*", Perfil.SOLICITANTE);
     }
+
+    // T-43: a posse (o Solicitante só vê as próprias reservas) é conferida no serviço.
+
+    @Bean
+    RegraDeAcesso listaDeReservas() {
+        return RegraDeAcesso.qualquerAutenticado(HttpMethod.GET, "/api/reservas");
+    }
+
+    @Bean
+    RegraDeAcesso consultaDeReserva() {
+        return RegraDeAcesso.qualquerAutenticado(HttpMethod.GET, "/api/reservas/*");
+    }
 }

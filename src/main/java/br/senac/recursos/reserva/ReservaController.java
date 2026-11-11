@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +37,18 @@ public class ReservaController {
     ResponseEntity<ReservaResponse> altera(Authentication autenticacao, @PathVariable long id,
             @RequestBody ReservaRequest corpo) {
         return ResponseEntity.ok(reservas.altera(donoDe(autenticacao), id, pedidoDe(corpo)));
+    }
+
+    // Esqueletos da T-43: respondem 204 em tudo, para os testes falharem por asserção até a implementação.
+
+    @GetMapping
+    ResponseEntity<Void> lista() {
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    ResponseEntity<Void> consulta(@PathVariable long id) {
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/estado")
