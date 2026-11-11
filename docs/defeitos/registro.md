@@ -5,7 +5,8 @@ Lista dos defeitos encontrados, priorizados e corrigidos. O processo está em [`
 | ID | Título | Severidade | Prioridade | Estado |
 |---|---|---|---|---|
 | DEF-01 | A arquitetura cita a task de código como evidência de teste | Baixa | P2 | Fechado |
-| DEF-02 | Deadlock do PostgreSQL sob concorrência vira 500 em vez de 409 | Crítica | P1 | Em verificação |
+| DEF-02 | Deadlock do PostgreSQL sob concorrência vira 500 em vez de 409 | Crítica | P1 | Fechado |
+| DEF-03 | SonarCloud reprova o Quality Gate: 1 bug (S9352) e 1 vulnerabilidade (S4502) críticos | Crítica | P1 | Em verificação |
 
 ## DEF-01 · A arquitetura cita a task de código como evidência de teste
 
@@ -54,3 +55,26 @@ Lista dos defeitos encontrados, priorizados e corrigidos. O processo está em [`
 
 - Teste de concorrência com threads de verdade em toda proteção contra dupla reserva (T-37).
 - Gravação dos vínculos sempre ordenada por `recurso_id`.
+
+## DEF-03 · SonarCloud reprova o Quality Gate com 1 bug e 1 vulnerabilidade críticos
+
+- **Encontrado em:** consulta ao SonarCloud na preparação da entrega, 2026-11-11 (Quality Gate em `ERROR`; cobertura 93,9 %, 0 code smells)
+- **Resultado obtido:** (1) bug crítico **S9352** em `OuvinteDeNotificacao`: "múltiplos beans casam com a dependência (`notificadorEmLog`, `notificadorHttp`)"; (2) vulnerabilidade crítica **S4502** em `SegurancaConfiguracao`: "CSRF desabilitado"
+- **Resultado esperado:** 0 bugs e 0 vulnerabilidades críticas (meta da entrega) e Quality Gate aprovado
+- **Severidade: Crítica** (pela classificação do Sonar e pela meta de 0 vulnerabilidades críticas). **Prioridade: P1** (a entrega é 12/11)
+- **Análise:** (1) em execução só um dos dois adaptadores existe, escolhido por configuração, mas a análise estática vê dois `@Component` do mesmo tipo e a injeção parece ambígua; é uma fragilidade real de estrutura. (2) O CSRF é desligado só na cadeia da API, que é sem estado, usa token Bearer e não usa cookie; é decisão do ADR-0007, e não vulnerabilidade, mas precisa estar **revisada e justificada** no código
+- **Correção:** (1) um único `@Bean Notificador` em `NotificacaoConfiguracao` escolhe o modo simulado ou o HTTP, e os dois `@Component` condicionais saem; teste novo do bean escolhido. (2) A linha ganha o comentário `NOSONAR java:S4502` com a justificativa e a referência ao ADR-0007
+- **Verificação:** `./mvnw verify` verde e o Quality Gate do SonarCloud da `main` depois do merge
+
+### Causa raiz (5 porquês)
+
+1. Por que apareceu? O SonarCloud analisou a `main` e marcou os dois pontos como críticos.
+2. Por que passou despercebido? O check do PR ficou verde, mas ninguém abriu o painel do SonarCloud para ler as issues, e o Quality Gate não era requisito do ruleset.
+3. Por que o bug existia? Dois `@Component` condicionais do mesmo tipo funcionam em execução, mas a análise estática não avalia as condições.
+4. Por que o CSRF não estava justificado? A decisão estava no ADR-0007, mas não no código, onde a ferramenta (e o revisor) olha.
+5. O que muda no processo? Ver o painel do SonarCloud antes de cada entrega e registrar no código a justificativa de toda regra de segurança desligada de propósito.
+
+### Prevenção
+
+- Escolher implementações alternativas em um único `@Bean`, e não com `@Component` condicionais.
+- Toda exceção a uma regra do Sonar leva comentário com o motivo e a referência da decisão.
