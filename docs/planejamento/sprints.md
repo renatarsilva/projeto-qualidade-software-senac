@@ -28,6 +28,23 @@ gantt
 
 > O site do professor não traz datas exatas, só o número das semanas. As datas de entrega e da prova oral acima são estimativas pela semana do calendário: confirmem em sala ou no Discord.
 
+## Planejado × realizado
+
+O plano abaixo distribui as tasks pelos três integrantes. Na execução, para cumprir o prazo da entrega, a **Renata assumiu a implementação das tasks de código** (regras, testes, banco, CI, carga) e os documentos finais, enquanto o **Samuel e o Caio concentraram-se na documentação de produto, nas specs, nas revisões por pares e no processo**. A distribuição planejada foi mantida em cada sprint por transparência, e a tabela **Realizado** de cada sprint registra o que o histórico do Git mostra.
+
+Os números abaixo saem do repositório e qualquer pessoa pode conferi-los com o comando indicado:
+
+| Medida | Renata | Samuel | Caio | Como conferir |
+|---|---|---|---|---|
+| Commits (sem merges) | **206** (81 %) | 27 | 20 | `git shortlog -sn --no-merges` |
+| Pull requests abertos | **39** | 4 | 10 | `gh pr list --state all --limit 100 --json author` |
+| Linhas de código-fonte alteradas em `src/` | **16.209** (todas) | 0 | 0 | `git log --numstat -- src` |
+| Specs de tasks criadas (de 15) | **14** | 1 (T-31) | 0 | histórico de `docs/specs/` |
+| Pipeline de CI, gate do JaCoCo e análise do SonarCloud | **configurados** | run vermelho intencional | | `git log -- .github/workflows/ci.yml` |
+| Commits de revisão e aprovação de specs | | **15** | **10** | `git log --grep "revisa\|aprova"` |
+
+A contribuição do Samuel e do Caio está na **qualidade do processo**: cada spec foi revisada e aprovada por outra pessoa antes de virar código (parecer na seção 9 de cada spec), e o Caio e o Samuel escreveram o PRD, as personas, o diagnóstico, o plano de teste e a spec de notificação externa.
+
 ## Rituais
 
 - **Planejamento** (primeiro dia da sprint, 15 min): confirmar o objetivo, quem pega o quê e as dependências.
@@ -51,7 +68,15 @@ gantt
 
 **Pronto quando:** os 3 rodam `./mvnw verify` verde; `main` protegida; PRD com RF, RNF e RN numerados; arquitetura com C4, sequências, ATAM e ADRs mergeados.
 
-**Resultado:** _a preencher na revisão da sprint_
+**Realizado** (conforme o histórico do Git):
+
+| Pessoa | Tasks entregues |
+|---|---|
+| Renata | T-02 proteção da `main` · T-10 arquitetura e C4 · T-11 modelo de dados · T-12 ATAM · T-13 ADRs e matriz |
+| Samuel | T-06 plano de teste |
+| Caio | T-03 diagnóstico · T-04 personas · T-05 utility tree · T-07 projeto Spring Boot · T-08 AIOX · T-09 PRD |
+
+**Resultado:** Concluída. O projeto, o PRD, a arquitetura (C4, sequências, ATAM), os ADRs e o plano de teste foram mergeados.
 
 ---
 
@@ -71,7 +96,17 @@ gantt
 
 **Riscos:** quem fizer a T-25 precisa do escopo `workflow` no token do GitHub (`gh auth refresh -h github.com -s workflow`). O secret `SONAR_TOKEN` só pode ser criado pela Renata (admin).
 
-**Resultado:** _a preencher na revisão da sprint_
+**Realizado** (conforme o histórico do Git):
+
+| Pessoa | Tasks entregues |
+|---|---|
+| Renata | Semana 36 inteira (T-14, T-15, T-16, T-17, T-18, T-19, T-20, T-21, T-22), **mais** T-23 e T-24 (código das reservas e do ciclo de vida), T-25 pipeline de CI, T-27 JaCoCo, T-29 SonarCloud, T-30 Testcontainers (base de toda a suíte de API) e o código e os testes da T-31 (adaptador, WireMock e ligação com as reservas) |
+| Samuel | Revisão e aprovação das specs T-16, T-18, T-21 e T-22 · run vermelho e verde do CI (T-25) · spec da T-31 |
+| Caio | Revisão e aprovação das specs T-15, T-17, T-20 e T-31 |
+
+**Não realizada:** T-26 (avaliação arquitetural em ciclo).
+
+**Resultado:** Concluída, exceto a T-26. Autenticação, cadastros, núcleo de reservas por TDD (commits `test(red)` e `feat(green)`), CI com JaCoCo 80/70 e SonarCloud, Testcontainers e WireMock.
 
 ---
 
@@ -89,7 +124,17 @@ gantt
 
 **Pronto quando:** aprovação, manutenção, dupla reserva e auditoria com spec liberada, testes e PR mergeado; teste de concorrência estável em 5 execuções; resultado de carga documentado.
 
-**Resultado:** _a preencher na revisão da sprint_
+**Realizado** (conforme o histórico do Git):
+
+| Pessoa | Tasks entregues |
+|---|---|
+| Renata | T-34 aprovação (dentro do ciclo de vida) · T-35 manutenção · T-37 dupla reserva e correção do DEF-02 · T-38 JMeter · T-39 status dos requisitos · T-40 auditoria · T-41 relatório de utilização · T-42 retirada e devolução · T-43 pesquisa e consulta de reservas · T-36 evidência de TDD |
+| Samuel | Parecer da spec da T-37 |
+| Caio | Revisões de PRs e de specs |
+
+**Não realizadas:** T-33 (BDD) e feature Cucumber, T-44 (layout e login).
+
+**Resultado:** Concluída para as regras críticas: aprovação, manutenção, dupla reserva (teste de concorrência estável) e auditoria, com spec liberada, testes e PR mergeado; carga documentada. O BDD com Cucumber e o layout ficaram de fora.
 
 ---
 
@@ -106,4 +151,15 @@ gantt
 
 **Pronto quando:** metas 80/70 atingidas, RTM com 100% dos requisitos críticos, tag `v1.0.0-rc1` com CI verde e formulário enviado.
 
-**Resultado:** _a preencher na revisão da sprint_
+**Realizado** (conforme o histórico do Git):
+
+| Pessoa | Tasks entregues |
+|---|---|
+| Renata | T-48 matriz de autorização · T-49 teste da matriz · T-50 mutação manual e RTM · T-51 OpenAPI · T-52 relatório de qualidade · T-53 perguntas da prova oral · T-55 checklist e demonstração · T-56 evidências e `CHANGELOG` · T-57 decisão de qualidade · correção do DEF-03 (SonarCloud) |
+| Samuel | Revisão e aprovação de PRs |
+| Caio | Revisão e aprovação de PRs |
+
+**Não realizadas:** T-45, T-46 e T-47 (telas e teste ponta a ponta), T-54 (ensaio da prova oral, que depende da equipe).
+**Falta para fechar a entrega:** tag `v1.0.0-rc1`, clone limpo e formulário.
+
+**Resultado:** Concluída quanto à API, às regras, às provas (autorização, concorrência, carga, mutação) e aos documentos. 940 testes, cobertura de 97,0 % de linhas e 86,0 % de branches, SonarCloud com Quality Gate aprovado. As telas responsivas não foram entregues (ver [decisão de qualidade](../decisao-qualidade.md)).

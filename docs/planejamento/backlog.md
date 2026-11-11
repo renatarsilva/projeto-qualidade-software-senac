@@ -5,6 +5,7 @@
 As tasks seguem as **semanas do cronograma da disciplina** (32 a 47) e cobrem tudo o que o professor pede em cada aula, aplicado ao projeto, mais os requisitos que nenhuma aula cobre (interface, retirada e devolução, pesquisa e OpenAPI). A semana 40 é a prova escrita, que não tem entrega no projeto.
 
 Cada task tem um **ID estável** (`T-NN`), que vai no nome da branch, nos commits e no título do PR. Este arquivo é a fonte das tasks: não há board.
+**Dono planejado × quem fez.** A coluna `Dono` é a distribuição **planejada**. O que foi realizado de fato, por pessoa e por sprint, conforme o histórico do Git, está em [sprints.md](sprints.md) (seção "Planejado × realizado") e na seção de autoria do [relatório de qualidade](../relatorio-qualidade.md).
 
 **Áreas:** Backend, Frontend, Testes, Infra e Documentação.
 
