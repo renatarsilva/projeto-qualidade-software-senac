@@ -11,7 +11,7 @@ Aponta, para cada limitador de nota e para cada requisito crítico, **o arquivo 
 | A aplicação executa | Clone limpo, seguir o README e abrir a aplicação | `README.md`; comando de subida descrito nele; run da tag `v1.0.0-rc1` | T-55, T-56 | sem evidência ainda |
 | CI presente | Pipeline roda em cada pull request e na tag | `.github/workflows/ci.yml`; run verde da tag; run vermelho intencional registrado | T-25, T-56 | sem evidência ainda |
 | Sem falha de autorização | Matriz perfil × operação com teste parametrizado | `docs/seguranca/matriz-autorizacao.md`; teste parametrizado; `docs/testes/mutacao-manual.md` | T-48, T-49, T-50 | [T-49-matriz-de-autorizacao.md](T-49-matriz-de-autorizacao.md) e a [matriz](../seguranca/matriz-autorizacao.md); mutação manual completa na T-50 |
-| Sem dupla reserva | Teste de 20 solicitações simultâneas e restrição do banco | Teste de concorrência; migração com `EXCLUDE`; ADR da proteção; `perf/reservas.jmx` | T-30, T-37, T-38 | sem evidência ainda |
+| Sem dupla reserva | Teste de 20 solicitações simultâneas e restrição do banco | Teste de concorrência; migração com `EXCLUDE`; ADR da proteção; `perf/reservas.jmx` | T-30, T-37, T-38 | [T-37-vermelho.md](T-37-vermelho.md) e [T-37-verde.md](T-37-verde.md); JMeter (T-38) ainda sem evidência |
 
 ## 2. Regras críticas (RN-01 a RN-09)
 
@@ -19,7 +19,7 @@ Aponta, para cada limitador de nota e para cada requisito crítico, **o arquivo 
 |---|---|---|---|---|
 | RN-01 término após o início | Testes unitários e do cadastro | Pacote de testes de reserva | T-20, T-23 | sem evidência ainda |
 | RN-02 sem sobreposição | Testes de regra e cobertura de ramo; restrição no banco | Testes de reserva; relatório do JaCoCo; teste com Testcontainers | T-20, T-23, T-28, T-30 | sem evidência ainda |
-| RN-03 solicitações simultâneas | Teste de concorrência | Teste com 20 solicitações; ADR da proteção | T-37 | sem evidência ainda |
+| RN-03 solicitações simultâneas | Teste de concorrência | Teste com 20 solicitações; ADR da proteção | T-37 | [T-37-vermelho.md](T-37-vermelho.md), [T-37-verde.md](T-37-verde.md) e [ADR-0010](../adr/0010-protecao-contra-dupla-reserva-no-banco.md) |
 | RN-04 manutenção bloqueia | Testes TDD estritos | `docs/testes/evidencia-tdd.md`; commits `test(red)` e `feat(green)` | T-35, T-36 | sem evidência ainda |
 | RN-05 e RN-06 estados | Tabela de transições (teste parametrizado) | Testes do ciclo de vida | T-21, T-24, T-59, T-60 | sem evidência ainda |
 | RN-07 só o Responsável aprova | Testes de aprovação e matriz de autorização | `docs/testes/bdd-aprovacao-bloqueio.md`; feature Cucumber | T-34, T-36, T-49 | sem evidência ainda |
