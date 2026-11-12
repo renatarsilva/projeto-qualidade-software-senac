@@ -44,4 +44,5 @@ Release candidate da entrega do trabalho final de Qualidade de Software (semana 
 
 - O teste de navegador (`e2e/`) roda à mão, e não no CI; nas telas, sala, material e professor só têm listagem e cadastro (a edição existe na API).
 - O **job periódico** das mudanças por tempo (T-60) ficou de fora.
+- Dois defeitos de baixa gravidade abertos e aceitos, achados no teste exploratório: **DEF-05** (relatório pela tela com data final `9999-12-31` dá 500) e **DEF-06** (`/error` aberto direto mostra 500). Ver [registro de defeitos](docs/defeitos/registro.md).
 - O teste de carga foi local. Ver [decisão de qualidade](docs/decisao-qualidade.md).

@@ -8,6 +8,8 @@ Lista dos defeitos encontrados, priorizados e corrigidos. O processo está em [`
 | DEF-02 | Deadlock do PostgreSQL sob concorrência vira 500 em vez de 409 | Crítica | P1 | Fechado |
 | DEF-03 | SonarCloud reprova o Quality Gate: 1 bug (S9352) e 1 vulnerabilidade (S4502) críticos | Crítica | P1 | Fechado |
 | DEF-04 | Nas telas, o acesso negado (403) aparece como erro 500 | Alta | P1 | Fechado |
+| DEF-05 | O relatório de utilização pela tela dá erro 500 com data final 9999-12-31 | Baixa | P3 | Aberto (aceito) |
+| DEF-06 | Abrir `/error` direto no navegador mostra "500 Erro inesperado" | Baixa | P3 | Aberto (aceito) |
 
 ## DEF-01 · A arquitetura cita a task de código como evidência de teste
 
@@ -102,3 +104,25 @@ Lista dos defeitos encontrados, priorizados e corrigidos. O processo está em [`
 
 - O teste `PaginaDeAcessoNegadoTest` simula o encaminhamento do `/error`.
 - O roteiro `e2e/fluxo-no-navegador.js` confere o acesso negado no Chrome de verdade.
+
+## DEF-05 · O relatório de utilização pela tela dá erro 500 com data final 9999-12-31
+
+- **Encontrado em:** teste exploratório da aplicação no ar (2026-11-12), em [teste-exploratorio.md](../testes/teste-exploratorio.md)
+- **Passos:** entrar como Responsável ou Administrador, abrir **Relatório** e pedir o período de `2026-01-01` até `9999-12-31`
+- **Resultado obtido:** a página "Erro inesperado" (500). O log mostra `DataIntegrityViolationException`
+- **Resultado esperado:** uma mensagem clara de período inválido, como acontece com data final antes da inicial
+- **Severidade: Baixa** (só com uma data absurda, que ninguém usa; nenhuma regra crítica; nenhum dado é perdido nem exposto). **Prioridade: P3**
+- **Análise:** a tela trata a data final como inclusiva e soma 1 dia. `9999-12-31` vira o ano 10000, que o PostgreSQL não aceita no formato enviado. Com `9999-12-30` e com `0001-01-01` o relatório funciona. A API (`/api/relatorios/utilizacao`) aceita `9999-12-31T00:00:00Z` sem erro
+- **Estado: Aberto, risco aceito.** Decisão do time em 2026-11-12: não alterar o código às vésperas da entrega, porque o caso só ocorre com data fora de qualquer uso real. A correção prevista é validar o limite da data final no `RelatorioService` com a mensagem de campo inválido, com um teste novo
+- **Verificação:** ainda não há correção a verificar
+
+## DEF-06 · Abrir `/error` direto no navegador mostra "500 Erro inesperado"
+
+- **Encontrado em:** teste exploratório da aplicação no ar (2026-11-12), em [teste-exploratorio.md](../testes/teste-exploratorio.md)
+- **Passos:** sem fazer login, digitar `http://localhost:8080/error` na barra de endereço
+- **Resultado obtido:** a página amigável "Erro inesperado", com status 500
+- **Resultado esperado:** "não encontrado" (404), já que ninguém chegou ali por uma falha
+- **Severidade: Baixa** (cosmético: a página não mostra detalhe interno, só o título e a mensagem amigável). **Prioridade: P3**
+- **Análise:** o `ErroController` trata o `/error` com os atributos que o servidor preenche quando há uma falha. Sem esses atributos (acesso direto), cai no ramo de "erro inesperado"
+- **Estado: Aberto, risco aceito.** Decisão do time em 2026-11-12: não alterar o código às vésperas da entrega. A correção prevista é tratar a ausência do código de status como 404
+- **Verificação:** ainda não há correção a verificar

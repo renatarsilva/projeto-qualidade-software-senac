@@ -28,6 +28,7 @@ As 556 anotações de teste viram 1043 execuções porque os testes **parametriz
 | Telas (sessão e CSRF reais, sem navegador) | 83 | Matriz rota × perfil das telas (29 rotas), menu por perfil, login e logout, reserva com erros claros, aprovação, retirada, cadastros, manutenção, relatório e o fluxo completo (TC-31) |
 | BDD com Cucumber (T-33, T-36) | 17 cenários | 3 features em português (aprovação, manutenção com a tabela de fronteiras, reservas e auditoria), executadas pela API com login e token de cada perfil: [bdd-aprovacao-bloqueio.md](testes/bdd-aprovacao-bloqueio.md) |
 | Ponta a ponta no servidor de verdade (T-47) | 3 | `FluxoPorHttpRealTest`: porta real, HTTP, cookie de sessão, redirecionamentos e CSRF; pega o que o MockMvc não vê (o DEF-04) |
+| Exploratório de usuário leigo (à mão, fora do `verify`) | 171 verificações | [teste-exploratorio.md](testes/teste-exploratorio.md): dados repetidos, inválidos e absurdos, horários iguais, burla de perfil, XSS e injeção na aplicação no ar |
 | Navegador real (Chrome, 375 px, fora do `verify`) | 31 verificações | [`e2e/`](../e2e/README.md): fluxo completo, sem rolagem horizontal; resultado em `docs/entrega/capturas/resultado.json` |
 | Carga (JMeter, fora do `verify`) | 7100 amostras | [resultado-01.md](performance/resultado-01.md) |
 
@@ -69,6 +70,9 @@ A ligação de cada requisito e de cada regra crítica com os testes que a compr
 |---|---|---|
 | DEF-02: deadlock do PostgreSQL sob concorrência virava erro 500 | O teste de concorrência da T-37 (9 falhas na primeira execução) | Fechado |
 | DEF-03: 1 bug e 1 vulnerabilidade críticos no SonarCloud | A análise estática no CI | Fechado |
+| DEF-04: o 403 das telas virava 500 | O teste manual da aplicação no ar (o MockMvc não via) | Fechado |
+| DEF-05: relatório com data final `9999-12-31` dá 500 | O teste exploratório (171 verificações) | Aberto, risco aceito |
+| DEF-06: `/error` direto mostra 500 | O teste exploratório | Aberto, risco aceito |
 
 Detalhe em [registro de defeitos](defeitos/registro.md).
 
