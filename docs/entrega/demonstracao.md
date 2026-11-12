@@ -108,4 +108,4 @@ Para ver o fluxo rodando sozinho no Chrome, em 375 px: `cd e2e && npm install &&
 
 ## Capturas de tela
 
-As capturas das telas (celular em 375 px e desktop) já estão em [`capturas/`](capturas/), geradas pelo roteiro do Chrome, junto com o `resultado.json` (31 verificações). Faltam as capturas que dependem do seu login, para guardar na mesma pasta: (1) o painel do SonarCloud com o Quality Gate aprovado, (2) o run verde do CI e (3) o relatório do JaCoCo (`target/site/jacoco/index.html`, depois de um `./mvnw verify`).
+As capturas das telas (celular em 375 px e desktop) já estão em [`capturas/`](capturas/), geradas pelo roteiro do Chrome, junto com o `resultado.json` (31 verificações). As capturas de qualidade (o painel do SonarCloud com o Quality Gate aprovado, o run verde do CI da tag `v1.0.0-rc3` e o relatório do JaCoCo) estão em [`capturas/qualidade/`](capturas/qualidade/). O índice de todas as capturas, com o que cada uma prova, é o [`capturas/README.md`](capturas/README.md).

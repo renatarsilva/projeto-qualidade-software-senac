@@ -58,7 +58,7 @@ Formulário: https://afonsolelis.github.io/aulas_senac/pages/qualidade2/entrega/
 - [x] [Relatório de testes](../relatorio-de-testes.md): 1043 testes, cobertura por pacote e o run do CI
 - [x] [Demonstração da aplicação](demonstracao.md): roteiro de 8 minutos executado de verdade, com as respostas reais
 - [x] Capturas das telas (celular e desktop) e `resultado.json` do roteiro do Chrome em `docs/entrega/capturas/` (T-44)
-- [ ] Capturas do SonarCloud, do run verde do CI e do relatório do JaCoCo (só você consegue: dependem do seu login) em `docs/entrega/capturas/`
+- [x] Capturas do SonarCloud (Quality Gate aprovado), do run verde do CI da tag `v1.0.0-rc3` e do relatório do JaCoCo em [`docs/entrega/capturas/qualidade/`](capturas/qualidade/) ([índice](capturas/README.md))
 
 ## 5. Autoria e prova oral
 
