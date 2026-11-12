@@ -80,6 +80,9 @@ Registra as decisões de qualidade que o time tomou, o que ficou de fora e os ri
 | A meta de 300 ms (RNF-09) veio do exemplo da Aula 10 | O grupo a validou na T-38 (DP-07) | [rnf.md](performance/rnf.md) |
 | A recusa do banco na disputa conta só o primeiro recurso do pedido como conflito evitado | O relatório conta tentativas, e não recursos | Spec T-41 |
 | Limite de 72 bytes da senha (BCrypt) | O sistema recusa acima disso, em vez de truncar | Spec T-15 (P-02) |
+| DEF-05: o relatório pela tela dá 500 com data final `9999-12-31` | Só com data fora de qualquer uso real; nenhuma regra crítica; não alteramos o código às vésperas da entrega | [DEF-05](defeitos/registro.md) |
+| DEF-06: `/error` aberto direto mostra 500 | Cosmético, sem detalhe interno; mesma razão | [DEF-06](defeitos/registro.md) |
+| Reserva sem limite de duração nem de antecedência máxima (aceita o ano 9999 e 29 dias seguidos) | O PRD não define esses limites e não inventamos regra de negócio | [teste-exploratorio.md](testes/teste-exploratorio.md) |
 
 ## 4. Resultados que fecham este documento
 
