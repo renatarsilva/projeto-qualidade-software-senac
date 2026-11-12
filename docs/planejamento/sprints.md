@@ -132,9 +132,10 @@ A contribuição do Samuel e do Caio está na **qualidade do processo**: cada sp
 | Samuel | Parecer da spec da T-37 |
 | Caio | Revisões de PRs e de specs |
 
-**Não realizadas:** T-33 (BDD) e feature Cucumber, T-44 (layout e login).
+**Realizadas depois, na véspera da entrega:** T-33 e T-36 (BDD com 17 cenários rodando no `verify`) e T-44 (layout e login, nas telas).
+**Não realizadas:** nenhuma desta sprint.
 
-**Resultado:** Concluída para as regras críticas: aprovação, manutenção, dupla reserva (teste de concorrência estável) e auditoria, com spec liberada, testes e PR mergeado; carga documentada. O BDD com Cucumber e o layout ficaram de fora.
+**Resultado:** Concluída para as regras críticas: aprovação, manutenção, dupla reserva (teste de concorrência estável) e auditoria, com spec liberada, testes e PR mergeado; carga documentada. O BDD e o layout entraram na véspera da entrega.
 
 ---
 
@@ -163,4 +164,4 @@ A contribuição do Samuel e do Caio está na **qualidade do processo**: cada sp
 **Não realizadas:** T-47 no CI (o roteiro do navegador roda à mão) e T-54 (ensaio da prova oral, que depende da equipe).
 **Falta para fechar a entrega:** tag `v1.0.0-rc1`, clone limpo e formulário.
 
-**Resultado:** Concluída quanto à API, às regras, às provas (autorização, concorrência, carga, mutação) e aos documentos. 1023 testes, cobertura de 95,9 % de linhas e 85,1 % de branches, SonarCloud com Quality Gate aprovado. As telas responsivas dos três perfis foram entregues na véspera (RF-13 e RNF-11).
+**Resultado:** Concluída quanto à API, às regras, às provas (autorização, concorrência, carga, mutação) e aos documentos. 1043 testes, cobertura de 96,0 % de linhas e 85,2 % de branches, SonarCloud com Quality Gate aprovado. As telas responsivas dos três perfis foram entregues na véspera (RF-13 e RNF-11).

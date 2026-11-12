@@ -2,7 +2,7 @@
 
 Roda o fluxo principal **no Chrome de verdade**, em 375 px de largura (celular), contra a aplicação no ar: login, cadastros do Administrador, pesquisa e reserva do Solicitante, conflito de horário, acesso negado, aprovação do Responsável, histórico e relatório. Confere também que nenhuma tela tem rolagem horizontal em 375 px (RNF-11) e tira as capturas de tela de `docs/entrega/capturas/`.
 
-**Não roda no CI** (o GitHub Actions do projeto não instala navegador): é executado à mão antes da entrega, e o resultado fica em [`docs/entrega/capturas/resultado.json`](../docs/entrega/capturas/resultado.json). O CI cobre as telas com os testes de `src/test/java/br/senac/recursos/web` (sessão e CSRF reais, sem navegador).
+**Não roda no CI** (o GitHub Actions do projeto não instala navegador): é executado à mão antes da entrega, e o resultado fica em [`docs/entrega/capturas/resultado.json`](../docs/entrega/capturas/resultado.json). O CI cobre o mesmo fluxo com o `FluxoPorHttpRealTest` (servidor de verdade, HTTP, sessão e CSRF, sem renderizar a página) e com os testes de `src/test/java/br/senac/recursos/web`.
 
 ## Como rodar
 

@@ -4,7 +4,68 @@ Projeto semestral da disciplina **Qualidade de Software** (TADS · Senac · 2026
 
 O sistema organiza a reserva de **salas, professores e materiais** de uma instituição de ensino, sem conflitos de horário. O foco da avaliação não é só fazer o sistema funcionar: é apresentar **evidências objetivas** de qualidade, segurança, rastreabilidade e desempenho.
 
-> **Status:** versão `v1.0.0-rc1` entregue. API completa com as regras críticas provadas por **1023 testes** (95,9 % de linhas, 85,1 % de branches), CI e SonarCloud verdes. As **telas responsivas dos três perfis** (Thymeleaf e Bootstrap) estão entregues e foram conferidas no Chrome em 375 px; o que ficou de fora está dito em [status dos requisitos](docs/status-requisitos.md). Para ver o sistema funcionando, siga a [demonstração](docs/entrega/demonstracao.md).
+> **Status:** versão `v1.0.0-rc1` entregue. API completa com as regras críticas provadas por **1043 testes** (96,0 % de linhas, 85,2 % de branches), CI e SonarCloud verdes. As **telas responsivas dos três perfis** (Thymeleaf e Bootstrap) estão entregues e foram conferidas no Chrome em 375 px; o que ficou de fora está dito em [status dos requisitos](docs/status-requisitos.md). Para ver o sistema funcionando, siga a [demonstração](docs/entrega/demonstracao.md).
+
+## Executar em 5 minutos (para quem avalia)
+
+**Você precisa de:** Java 21, Docker aberto e Git. O Maven não precisa instalar (o projeto traz o `mvnw`).
+
+**macOS ou Linux (um comando):**
+
+```bash
+git clone https://github.com/renatarsilva/projeto-qualidade-software-senac.git
+cd projeto-qualidade-software-senac
+./scripts/executar.sh
+```
+
+O script acha o Java 21, confere o Docker, define as variáveis com valores de demonstração e sobe a aplicação. Quando aparecer `Started OrganizacaoRecursosApplication`, abra **http://localhost:8080** e entre com:
+
+| E-mail | Senha |
+|---|---|
+| `admin@exemplo.com` | `senha-do-admin-123` |
+
+**Windows (PowerShell):**
+
+```powershell
+git clone https://github.com/renatarsilva/projeto-qualidade-software-senac.git
+cd projeto-qualidade-software-senac
+$env:JAVA_HOME = "C:\caminho\do\jdk-21"
+$env:APP_JWT_CHAVE = "chave-de-demonstracao-local-com-mais-de-32-caracteres"
+$env:APP_ADMIN_EMAIL = "admin@exemplo.com"
+$env:APP_ADMIN_SENHA = "senha-do-admin-123"
+.\mvnw.cmd spring-boot:run
+```
+
+### Roteiro de 3 minutos nas telas
+
+O menu do topo muda conforme o perfil. O administrador cadastra; o solicitante reserva; o responsável aprova.
+
+1. **Administrador:** em **Salas**, cadastre `sala-101`. Em **Usuários**, crie um **Solicitante** e um **Responsável** (senha com 8 a 72 caracteres). Clique em **Sair**.
+2. **Solicitante:** em **Nova reserva**, escolha um horário futuro (pelo menos 1 hora de antecedência), marque a sala e salve. A reserva nasce **Solicitada**.
+3. **Conflito:** peça a mesma sala em horário que se sobrepõe. A tela recusa com a mensagem da regra.
+4. **Responsável:** em **Aprovações**, aprove. Abra a reserva e veja o **Histórico de mudanças**.
+5. **Perfil errado:** como Solicitante, abra `http://localhost:8080/admin/salas`: **Acesso negado** (403).
+
+A documentação da API (Swagger) fica em http://localhost:8080/swagger-ui.html. O roteiro completo, com respostas reais, está em [docs/entrega/demonstracao.md](docs/entrega/demonstracao.md).
+
+### Rodar os testes
+
+```bash
+./mvnw verify
+```
+
+Precisa do Docker ligado (os testes sobem um PostgreSQL de verdade). Roda **1043 testes** em cerca de 4 minutos, incluindo os 17 cenários BDD (Cucumber) e o teste ponta a ponta, e confere o gate de cobertura (80 % de linhas, 70 % de branches). Relatórios: `target/site/jacoco/index.html` (cobertura) e [docs/relatorio-de-testes.md](docs/relatorio-de-testes.md).
+
+### Se der erro
+
+| Mensagem | O que fazer |
+|---|---|
+| `JAVA_HOME environment variable is not defined correctly` | Aponte `JAVA_HOME` para um JDK 21. No macOS: `export JAVA_HOME=$(/usr/libexec/java_home -v 21)` |
+| `Cannot connect to the Docker daemon` ou o script diz que o Docker não está ligado | Abra o Docker Desktop, espere ele iniciar e rode de novo |
+| `Port 8080 was already in use` | Feche o que usa a porta 8080 (outra execução do projeto) ou espere a anterior parar |
+| Falha ao baixar dependências na primeira vez | Confira a internet e rode de novo: o Maven baixa tudo na primeira execução (1 a 2 minutos) |
+
+Para parar a aplicação, use `Ctrl+C` no terminal.
 
 ## Como trabalhamos
 
@@ -207,7 +268,7 @@ O índice completo, com a situação de cada documento, está em [`docs/README.m
 |---|---|---|---|---|
 | 1 | 15/10 a 21/10 | 32 a 35 | Ambiente, diagnóstico, PRD, plano de teste, arquitetura e ATAM | ✅ |
 | 2 | 22/10 a 28/10 | 36 a 39 | Autenticação, cadastros, TDD das reservas, CI, JaCoCo, SonarCloud, Testcontainers e WireMock | ✅ (menos a T-26) |
-| 3 | 29/10 a 04/11 | 41 a 43 | Aprovação e manutenção (BDD), dupla reserva, carga, auditoria e relatórios | ✅ (menos BDD e layout) |
+| 3 | 29/10 a 04/11 | 41 a 43 | Aprovação e manutenção (BDD), dupla reserva, carga, auditoria e relatórios | ✅ |
 | 4 | 05/11 a 11/11 | 44 a 46 | Interface, autorização, RTM, relatório de qualidade e release `v1.0.0-rc1` | ✅ |
 
 Planejado e realizado de cada sprint em [sprints](docs/planejamento/sprints.md) e [backlog](docs/planejamento/backlog.md). Entrega na semana 46 e prova oral na semana 47.

@@ -24,6 +24,8 @@ Release candidate da entrega do trabalho final de Qualidade de Software (semana 
 - **Auditoria (T-40):** registro de toda mudança de estado, imutável por gatilho do banco, com consulta para Responsável e Administrador.
 - **Notificação externa (T-31):** adaptador HTTP com timeouts por configuração, modo simulado e envio depois do commit; testado com WireMock.
 - **Relatório de utilização (T-41):** horas por recurso, carga do professor e conflitos evitados, com oráculo calculado à mão.
+- **BDD executável (T-33, T-36):** 3 features em português com Cucumber (aprovação, manutenção com tabela de fronteiras, reservas e auditoria), 17 cenários que rodam no `verify` pela API, com o login e o token de cada perfil.
+- **Ponta a ponta no CI (T-47):** `FluxoPorHttpRealTest` sobe o servidor numa porta real e fala por HTTP, com cookie de sessão, redirecionamento e CSRF.
 - **Telas (T-44, T-45, T-46):** Thymeleaf e Bootstrap responsivos (conferido no Chrome em 375 px), login por formulário com sessão e CSRF, menu por perfil e autorização das rotas negada por padrão. Solicitante: pesquisa, reserva, alteração, cancelamento e check-in. Responsável: fila de aprovação, retirada, devolução e auditoria. Administrador: cadastros, usuários, manutenção e relatório. Mensagens de erro em linguagem clara.
 - **Documentação da API (T-51):** OpenAPI e Swagger UI com perfis permitidos e erros de cada endpoint.
 - **Qualidade:** CI com JaCoCo (gate de 80 % de linhas e 70 % de branches) e SonarCloud, matriz de autorização testada célula a célula (T-48, T-49), teste de carga com JMeter (T-38), mutação manual, RTM, status dos requisitos e relatório de qualidade.
@@ -41,5 +43,5 @@ Release candidate da entrega do trabalho final de Qualidade de Software (semana 
 ### Limitações conhecidas
 
 - O teste de navegador (`e2e/`) roda à mão, e não no CI; nas telas, sala, material e professor só têm listagem e cadastro (a edição existe na API).
-- O **job periódico** das mudanças por tempo (T-60) e o **BDD com Cucumber** ficaram de fora.
+- O **job periódico** das mudanças por tempo (T-60) ficou de fora.
 - O teste de carga foi local. Ver [decisão de qualidade](docs/decisao-qualidade.md).

@@ -35,6 +35,8 @@ Perguntas prováveis da semana 47, ligadas às decisões que o time já tomou. N
 | 28 | Como o sistema impede o Solicitante de abrir `/admin/salas` pela barra de endereço? E uma rota que ninguém declarou? | [TelasSegurancaConfiguracao](../../src/main/java/br/senac/recursos/web/TelasSegurancaConfiguracao.java); `AutorizacaoDasTelasTest` (TC-08 e TC-10) | A definir |
 | 29 | Por que as telas usam sessão e CSRF e a API usa token? E se o usuário for desativado com a sessão aberta? | ADR-0007; `ContaDaSessaoFilter`; `LoginEMenuDasTelasTest` (TC-32) | A definir |
 | 30 | O 403 virava 500 nas telas. Por que o MockMvc não pegou e como vocês acharam? | DEF-04 em `docs/defeitos/registro.md`; `PaginaDeAcessoNegadoTest` | A definir |
+| 31 | Como o BDD roda? Os cenários são executados ou só documentados? O que a mutação da fronteira da manutenção derruba? | `bdd-aprovacao-bloqueio.md`; `FeaturesDoCucumberTest` | A definir |
+| 32 | O que o teste E2E no CI vê que o MockMvc não vê? | `FluxoPorHttpRealTest`; DEF-04 | A definir |
 
 ## Perguntas que o professor costuma fazer (sem fonte ainda)
 

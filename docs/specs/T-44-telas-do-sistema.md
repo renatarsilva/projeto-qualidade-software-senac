@@ -29,7 +29,7 @@ Segue o [ADR-0006](../adr/0006-thymeleaf-no-mesmo-projeto.md) (Thymeleaf no mesm
 
 **Fora (e por quê):**
 - Edição e exclusão de sala, material e professor pela tela: a API tem; a tela só lista e cadastra (decisão de escopo; o uso demonstrável não depende disso).
-- Teste de navegador no CI: o GitHub Actions do projeto não instala navegador. O fluxo completo é provado no CI por testes com sessão e CSRF reais (CA-15) e, **fora do CI**, pelo roteiro `e2e/fluxo-no-navegador.js` no Chrome de verdade, em 375 px (31 verificações).
+- Navegador real no CI: o GitHub Actions do projeto não o instala. O fluxo completo é provado no CI por testes com sessão e CSRF reais (CA-15), pelo `FluxoPorHttpRealTest` (servidor de verdade por HTTP) e, **fora do CI**, pelo roteiro `e2e/fluxo-no-navegador.js` no Chrome de verdade, em 375 px (31 verificações).
 - Internacionalização, tema escuro e paginação: o volume é pequeno.
 
 ## 3. Regras de negócio

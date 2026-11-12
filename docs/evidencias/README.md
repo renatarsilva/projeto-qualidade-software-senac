@@ -22,7 +22,7 @@ Aponta, para cada limitador de nota e para cada requisito crítico, **o arquivo 
 | RN-03 solicitações simultâneas | Teste de concorrência | Teste com 20 solicitações; ADR da proteção | T-37 | [T-37-verde.md](T-37-verde.md); [ADR-0010](../adr/0010-protecao-contra-dupla-reserva-no-banco.md) |
 | RN-04 manutenção bloqueia | Testes TDD estritos | `docs/testes/evidencia-tdd.md`; commits `test(red)` e `feat(green)` | T-35, T-36 | `ManutencaoDeRecursosApiTest`, `ManutencaoEReservaSimultaneasApiTest`; mutação M3 |
 | RN-05 e RN-06 estados | Tabela de transições (teste parametrizado) | Testes do ciclo de vida | T-21, T-24, T-59, T-60 | `MatrizDeTransicoesTest` (49 combinações), `CaminhosAlternativosTest`; o job periódico (T-60) ficou pendente |
-| RN-07 só o Responsável aprova | Testes de aprovação e matriz de autorização | `docs/testes/bdd-aprovacao-bloqueio.md`; feature Cucumber | T-34, T-36, T-49 | `AutorizacaoDoPatchApiTest`, matriz de autorização |
+| RN-07 só o Responsável aprova | Testes de aprovação e matriz de autorização | `docs/testes/bdd-aprovacao-bloqueio.md`; `aprovacao.feature` | T-33, T-34, T-36, T-49 | `AutorizacaoDoPatchApiTest`, matriz de autorização, `aprovacao.feature` (5 cenários) |
 | RN-08 reserva iniciada não se apaga | Testes de exclusão e chave estrangeira | Testes do ciclo de vida; teste de integração com o banco | T-21, T-30, T-61 | `ExclusaoDeReservaTest`, `ImutabilidadeDaAuditoriaTest` (chave estrangeira) |
 | RN-09 auditoria | Teste de auditoria com rollback | Testes de auditoria | T-40 | `AuditoriaDasMudancasTest`, `RollbackDaAuditoriaApiTest`, `ImutabilidadeDaAuditoriaTest` |
 
@@ -30,7 +30,7 @@ Aponta, para cada limitador de nota e para cada requisito crítico, **o arquivo 
 
 | Meta | Como provar | Onde | Task | Evidência |
 |---|---|---|---|---|
-| Cobertura de linhas ≥ 80 % e de branches ≥ 70 % | Gate do JaCoCo no `verify` (o build falha abaixo da meta) | Relatório do JaCoCo; run do CI | T-27 | JaCoCo no `./mvnw verify` de 2026-11-11: **95,9 %** de linhas (1356/1398) e **85,1 %** de branches (467/543); o build falha abaixo de 80 % e 70 %. O SonarCloud mede 93,9 % |
+| Cobertura de linhas ≥ 80 % e de branches ≥ 70 % | Gate do JaCoCo no `verify` (o build falha abaixo da meta) | Relatório do JaCoCo; run do CI | T-27 | JaCoCo no `./mvnw verify` de 2026-11-11: **96,0 %** de linhas (1356/1398) e **85,2 %** de branches (467/543); o build falha abaixo de 80 % e 70 %. O SonarCloud mede 93,9 % |
 | 0 bugs ou vulnerabilidades críticas | Quality Gate do SonarCloud no pull request | Painel do SonarCloud | T-29 | SonarCloud da `main` em 2026-11-11: **0 bugs, 0 vulnerabilidades, 0 code smells, 0 hotspots**, duplicação 0,0 % e Quality Gate aprovado; o DEF-03 (2 pendências críticas) foi corrigido ([registro](../defeitos/registro.md)) |
 | Requisitos críticos na RTM a 100 % | Cada linha da RTM aponta uma evidência | [RTM](../RTM.md) | T-32, T-50 | [RTM](../RTM.md): RN-01 a RN-09 com status `green` e evidência |
 | Desempenho (candidata): p95 ≤ 300 ms com 50 usuários | Plano e execução do JMeter | `perf/reservas.jmx`; `docs/performance/rnf.md`; `docs/performance/resultado-01.md` | T-38 | [rnf.md](../performance/rnf.md), `perf/reservas.jmx`, [resultado-01.md](../performance/resultado-01.md): **atende** (p95 de 2 a 7 ms, 0 erro real) |
@@ -39,7 +39,7 @@ Aponta, para cada limitador de nota e para cada requisito crítico, **o arquivo 
 
 | Item | Como provar | Task | Evidência |
 |---|---|---|---|
-| Pelo menos uma funcionalidade com TDD ou BDD | Commit vermelho no histórico, feature Cucumber, `docs/testes/evidencia-tdd.md` | T-34 a T-36 | [evidencia-tdd.md](../testes/evidencia-tdd.md): 21 pares `test(red)` → `feat(green)` no histórico; BDD com Cucumber não foi feito |
+| Pelo menos uma funcionalidade com TDD ou BDD | Commit vermelho no histórico, feature Cucumber, `docs/testes/evidencia-tdd.md` | T-34 a T-36 | [evidencia-tdd.md](../testes/evidencia-tdd.md): 21 pares `test(red)` → `feat(green)` no histórico; BDD executável com Cucumber: 17 cenários em `src/test/resources/features/`, com mutação provada ([bdd-aprovacao-bloqueio.md](../testes/bdd-aprovacao-bloqueio.md)) |
 | Testcontainers para o banco | Testes de integração com PostgreSQL real | T-30 | Toda a suíte de API usa PostgreSQL real (`@TesteDeApiComBanco`, `TestcontainersConfiguration`) |
 | WireMock para integração externa | Casos INT-01 a INT-05 | T-31 | `NotificadorHttpWireMockTest` (INT-01 a INT-05, token que não vaza, timeouts) |
 | Validação de entrada e tratamento seguro de erros | Testes de erro sem termo proibido | T-22 | `ErrosDaApiTest`, `ErrosDasTelasTest`, `EntradaInvalidaSemVazamentoApiTest` com a lista `TermosProibidos` |

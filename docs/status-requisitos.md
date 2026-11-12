@@ -1,6 +1,6 @@
 # Status dos requisitos (entrega, 2026-11-11)
 
-> Task **T-39**. O estado de cada requisito oficial, com a evidência e o que ficou pendente. Fonte dos números: `./mvnw verify` na `main` (1023 testes, 0 falhas) e [RTM](RTM.md). Escrito com franqueza: o que não foi entregue está dito.
+> Task **T-39**. O estado de cada requisito oficial, com a evidência e o que ficou pendente. Fonte dos números: `./mvnw verify` na `main` (1043 testes, 0 falhas) e [RTM](RTM.md). Escrito com franqueza: o que não foi entregue está dito.
 
 Legenda: **Entregue** (código, testes e evidência), **Parcial** (a parte funcional está entregue e uma parte não), **Não entregue**.
 
@@ -14,7 +14,7 @@ Legenda: **Entregue** (código, testes e evidência), **Parcial** (a parte funci
 | RF-04 Criar, alterar e cancelar reservas | **Entregue** | Intervalo válido, antecedência de 1 h, alteração com prazo, cancelamento em três formas, check-in | Job que aplica as mudanças por tempo (T-60) | `IntervaloDaReservaTest`, `CicloDeVidaApiTest` |
 | RF-05 Detecção de sobreposição | **Entregue** | Sala, material e agenda do professor, tudo ou nada, `[início, fim)` | | `SobreposicaoNoMesmoRecursoTest` |
 | RF-06 Dupla reserva | **Entregue** | `EXCLUDE` do banco, ordem fixa dos recursos, deadlock traduzido para 409; 20 solicitantes simultâneos: 1 reserva | | [T-37](evidencias/T-37-verde.md), [carga](performance/resultado-01.md), ADR-0010 |
-| RF-07 Aprovação de recurso restrito | **Entregue** | Só o Responsável aprova e rejeita, em qualquer reserva; prazo de aprovação | Feature Cucumber | `AutorizacaoDoPatchApiTest` |
+| RF-07 Aprovação de recurso restrito | **Entregue** | Só o Responsável aprova e rejeita, em qualquer reserva; prazo de aprovação | Nenhuma | `AutorizacaoDoPatchApiTest`, `aprovacao.feature` (5 cenários) |
 | RF-08 Bloqueio por manutenção | **Entregue** | Registro e encerramento pelo Administrador, reserva recusada com fronteiras, reservas afetadas listadas, corrida resolvida por bloqueio de linha | | `ManutencaoDeRecursosApiTest` |
 | RF-09 Retirada e devolução | **Entregue** | Só o Responsável registra; só de reserva aprovada; devolução atrasada sinalizada | | `RetiradaDeMateriaisApiTest` |
 | RF-10 Histórico auditável | **Entregue** | Registro por mudança de estado, na mesma transação, imutável no banco; consulta só para Responsável e Administrador | | `Auditoria*Test` |
@@ -40,8 +40,8 @@ Legenda: **Entregue** (código, testes e evidência), **Parcial** (a parte funci
 
 | Requisito | Meta | Resultado | Estado |
 |---|---|---|---|
-| RNF-01 Cobertura de linhas | ≥ 80 % | **95,9 %** (JaCoCo) | Atendido |
-| RNF-02 Cobertura de branches | ≥ 70 % | **85,1 %** (JaCoCo) | Atendido |
+| RNF-01 Cobertura de linhas | ≥ 80 % | **96,0 %** (JaCoCo) | Atendido |
+| RNF-02 Cobertura de branches | ≥ 70 % | **85,2 %** (JaCoCo) | Atendido |
 | RNF-03 Rastreabilidade | 100 % dos críticos | RN-01 a RN-09 todas com evidência na [RTM](RTM.md) | Atendido |
 | RNF-04 Defeitos críticos | 0 | SonarCloud da `main`: 0 bugs, 0 vulnerabilidades, Quality Gate aprovado | Atendido |
 | RNF-05 Dupla reserva | 1 aceita, 0 duplicidades | 1 aceita e 0 duplicidades, em teste e em carga | Atendido |
@@ -61,6 +61,6 @@ Legenda: **Entregue** (código, testes e evidência), **Parcial** (a parte funci
 | Testcontainers (PostgreSQL real) e WireMock | Entregue |
 | JMeter (RNF, plano, execução, resultado) | Entregue |
 | GitHub Actions em PR, JaCoCo com gate 80/70, SonarCloud | Entregue (Quality Gate aprovado) |
-| TDD com evidência | Entregue ([evidencia-tdd.md](testes/evidencia-tdd.md)); BDD com Cucumber não |
+| TDD e BDD com evidência | Entregue: TDD ([evidencia-tdd.md](testes/evidencia-tdd.md)) e BDD executável com Cucumber, 17 cenários ([bdd-aprovacao-bloqueio.md](testes/bdd-aprovacao-bloqueio.md)) |
 | Mutação manual nas regras críticas | Entregue ([mutacao-manual.md](testes/mutacao-manual.md)) |
-| Teste end-to-end da interface | **Entregue fora do CI**: `e2e/fluxo-no-navegador.js` (Chrome real, 31 verificações); no CI, `FluxoCompletoPelasTelasTest` com sessão e CSRF |
+| Teste end-to-end | **Entregue no CI**: `FluxoPorHttpRealTest` (servidor de verdade, HTTP, sessão e CSRF). Também `e2e/fluxo-no-navegador.js` (Chrome real, 31 verificações), à mão |

@@ -2,7 +2,7 @@
 
 Liga cada requisito ao risco que ele protege, aos casos de teste que o comprovam, à task responsável e à evidência. A meta do RNF-03 é **100 % dos requisitos críticos com evidência** (as linhas em **negrito**, RN-01 a RN-09).
 
-> **Estado em 2026-11-11 (entrega):** 1023 testes automatizados passando; cada linha aponta a classe de teste ou o documento que a comprova. Quem escreve um teste atualiza a linha na mesma PR (task T-32 criou a estrutura; T-39 e T-50 fecham a matriz).
+> **Estado em 2026-11-11 (entrega):** 1043 testes automatizados passando; cada linha aponta a classe de teste ou o documento que a comprova. Quem escreve um teste atualiza a linha na mesma PR (task T-32 criou a estrutura; T-39 e T-50 fecham a matriz).
 
 ## Como ler
 
@@ -51,7 +51,7 @@ Não vêm da especificação oficial: foram decididas pelo time e registradas no
 | RF-04 criar, alterar e cancelar reservas | F3 | RN-01, RN-05, RN-06, RN-08, RN-13 a RN-15 | T-20, T-21, T-23, T-24 | green | `CriacaoDeReservaApiTest`, `AlteracaoDeReservaApiTest`, `CicloDeVidaApiTest`, `AlteracaoDeReservaTest`, `CancelamentoDaReservaTest` |
 | RF-05 sobreposição, inclusive na agenda do professor | F1 · CEN-01 · CT-01 | RN-02 | T-20, T-23, T-28 | green | `SobreposicaoNoMesmoRecursoTest` (sala, material e professor), `PedidoComVariosRecursosTest`, `ConflitoNoBancoDeReservaTest` |
 | RF-06 proteção contra dupla reserva | F2 · CEN-02 · CT-02 | RN-03 | T-37, T-38 | green | Mesmas evidências da RN-03: [T-37-verde.md](evidencias/T-37-verde.md) e [resultado-01.md](performance/resultado-01.md) (50 usuários: 1 reserva ativa por intervalo) |
-| RF-07 aprovação de recurso restrito | F4 · CEN-03 · CT-03 | RN-07 | T-33, T-34, T-36 | green | `AutorizacaoDoPatchApiTest`, `CicloDeVidaApiTest`, `NotificacaoDasMudancasApiTest`; só o Responsável aprova e rejeita. A feature Cucumber (T-33, T-36) ficou pendente |
+| RF-07 aprovação de recurso restrito | F4 · CEN-03 · CT-03 | RN-07 | T-33, T-34, T-36 | green | `AutorizacaoDoPatchApiTest`, `CicloDeVidaApiTest`, `NotificacaoDasMudancasApiTest`; só o Responsável aprova e rejeita. BDD executável: `aprovacao.feature` (5 cenários), ver [bdd-aprovacao-bloqueio.md](testes/bdd-aprovacao-bloqueio.md) |
 | RF-08 bloqueio por manutenção | F9 · R-01 | RN-04 | T-33, T-35, T-36 | green | `ManutencaoDeRecursosApiTest`, matriz de autorização (MT-01 a MT-03) |
 | RF-09 retirada e devolução de materiais | — | sem casos escritos | T-42 | green | `RetiradaDeMateriaisApiTest` (TC-01 a TC-15), matriz de autorização (RT-01 a RT-03) |
 | RF-10 histórico auditável | F6 · R-05 | RN-09 | T-40 | green | `AuditoriaDasMudancasTest`, `AuditoriaApiTest`, `RollbackDaAuditoriaApiTest`, `ImutabilidadeDaAuditoriaTest`; histórico de uma reserva cancelada (TC-18) |
@@ -64,8 +64,8 @@ Não vêm da especificação oficial: foram decididas pelo time e registradas no
 
 | Requisito | Meta | Risco / cenário | Task | Status | Evidência |
 |---|---|---|---|---|---|
-| RNF-01 cobertura de linhas | ≥ 80 % | — | T-27 | green | JaCoCo no `./mvnw verify` em 2026-11-11: **95,9 %** de linhas (1733 de 1807); gate de 80 % no `pom.xml` |
-| RNF-02 cobertura de branches | ≥ 70 % | — | T-27, T-28 | green | JaCoCo no `./mvnw verify` em 2026-11-11: **85,1 %** de branches (594 de 698); gate de 70 % no `pom.xml` |
+| RNF-01 cobertura de linhas | ≥ 80 % | — | T-27 | green | JaCoCo no `./mvnw verify` em 2026-11-11: **96,0 %** de linhas (1734 de 1807); gate de 80 % no `pom.xml` |
+| RNF-02 cobertura de branches | ≥ 70 % | — | T-27, T-28 | green | JaCoCo no `./mvnw verify` em 2026-11-11: **85,2 %** de branches (595 de 698); gate de 70 % no `pom.xml` |
 | RNF-03 rastreabilidade | 100 % dos críticos na RTM | — | T-32, T-39, T-50 | green | Este arquivo: RN-01 a RN-09 todas com status `green` e evidência (RN-05 e RN-06 com o job T-60 pendente) |
 | RNF-04 defeitos críticos | 0 | — | T-29 | green | SonarCloud da `main` em 2026-11-11: 0 bugs, 0 vulnerabilidades, 0 code smells, Quality Gate aprovado; o DEF-03 (2 pendências críticas) foi corrigido ([registro](defeitos/registro.md)) |
 | RNF-05 dupla reserva | 1 aceita, 0 duplicidades | F2 · CEN-02 | T-37, T-38 | green | [T-37-verde.md](evidencias/T-37-verde.md): 20 solicitantes, 1 aceita e 19 recusadas (409); banco com 0 duplicidades; [resultado-01.md](performance/resultado-01.md) |
