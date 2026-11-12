@@ -162,6 +162,6 @@ A contribuição do Samuel e do Caio está na **qualidade do processo**: cada sp
 
 **Também realizadas (na véspera da entrega):** T-44, T-45 e T-46, as telas dos três perfis (spec T-44, 83 testes, roteiro no Chrome real).
 **Não realizadas:** T-47 no CI (o roteiro do navegador roda à mão) e T-54 (ensaio da prova oral, que depende da equipe).
-**Falta para fechar a entrega:** tag `v1.0.0-rc1`, clone limpo e formulário.
+**Feito para fechar a entrega:** tag `v1.0.0-rc3` com o CI verde (as `rc1` e `rc2` ficaram em commits anteriores) e clone limpo. **Falta:** o formulário.
 
 **Resultado:** Concluída quanto à API, às regras, às provas (autorização, concorrência, carga, mutação) e aos documentos. 1043 testes, cobertura de 96,0 % de linhas e 85,2 % de branches, SonarCloud com Quality Gate aprovado. As telas responsivas dos três perfis foram entregues na véspera (RF-13 e RNF-11).

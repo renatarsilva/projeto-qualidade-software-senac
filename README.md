@@ -4,7 +4,7 @@ Projeto semestral da disciplina **Qualidade de Software** (TADS · Senac · 2026
 
 O sistema organiza a reserva de **salas, professores e materiais** de uma instituição de ensino, sem conflitos de horário. O foco da avaliação não é só fazer o sistema funcionar: é apresentar **evidências objetivas** de qualidade, segurança, rastreabilidade e desempenho.
 
-> **Status:** versão `v1.0.0-rc1` entregue. API completa com as regras críticas provadas por **1043 testes** (96,0 % de linhas, 85,2 % de branches), CI e SonarCloud verdes. As **telas responsivas dos três perfis** (Thymeleaf e Bootstrap) estão entregues e foram conferidas no Chrome em 375 px; o que ficou de fora está dito em [status dos requisitos](docs/status-requisitos.md). Para ver o sistema funcionando, siga a [demonstração](docs/entrega/demonstracao.md).
+> **Status:** versão `v1.0.0-rc3` entregue. API completa com as regras críticas provadas por **1043 testes** (96,0 % de linhas, 85,2 % de branches), CI e SonarCloud verdes. As **telas responsivas dos três perfis** (Thymeleaf e Bootstrap) estão entregues e foram conferidas no Chrome em 375 px; o que ficou de fora está dito em [status dos requisitos](docs/status-requisitos.md). Para ver o sistema funcionando, siga a [demonstração](docs/entrega/demonstracao.md).
 
 ## Executar em 5 minutos (para quem avalia)
 
@@ -269,7 +269,7 @@ O índice completo, com a situação de cada documento, está em [`docs/README.m
 | 1 | 15/10 a 21/10 | 32 a 35 | Ambiente, diagnóstico, PRD, plano de teste, arquitetura e ATAM | ✅ |
 | 2 | 22/10 a 28/10 | 36 a 39 | Autenticação, cadastros, TDD das reservas, CI, JaCoCo, SonarCloud, Testcontainers e WireMock | ✅ (menos a T-26) |
 | 3 | 29/10 a 04/11 | 41 a 43 | Aprovação e manutenção (BDD), dupla reserva, carga, auditoria e relatórios | ✅ |
-| 4 | 05/11 a 11/11 | 44 a 46 | Interface, autorização, RTM, relatório de qualidade e release `v1.0.0-rc1` | ✅ |
+| 4 | 05/11 a 11/11 | 44 a 46 | Interface, autorização, RTM, relatório de qualidade e release `v1.0.0-rc3` | ✅ |
 
 Planejado e realizado de cada sprint em [sprints](docs/planejamento/sprints.md) e [backlog](docs/planejamento/backlog.md). Entrega na semana 46 e prova oral na semana 47.
 

@@ -7,9 +7,9 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 Nada além da versão abaixo.
 
-## [1.0.0-rc1] - 2026-11-12
+## [1.0.0-rc3] - 2026-11-12
 
-Release candidate da entrega do trabalho final de Qualidade de Software (semana 46).
+Release candidate da entrega do trabalho final de Qualidade de Software (semana 46). As tags `v1.0.0-rc1` e `v1.0.0-rc2` ficaram em commits anteriores (sem as telas, o BDD e o E2E); **a versão entregue é a `v1.0.0-rc3`**.
 
 ### Adicionado
 
