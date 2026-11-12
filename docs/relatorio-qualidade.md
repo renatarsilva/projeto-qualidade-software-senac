@@ -40,8 +40,8 @@ Resume o que o time fez para garantir a qualidade do sistema de Organização de
 | Plano TDD (casos por regra) | Existe; todos os casos das regras críticas viraram testes | `docs/testes/plano-tdd.md` | T-19 |
 | Testes automatizados | **1043 testes, 0 falhas, 0 erros**, entre unitários, parametrizados, de integração e de API caixa-preta | `./mvnw verify` em 2026-11-11; run verde do CI na `main` | T-20 a T-51 |
 | Testcontainers e WireMock | Toda a suíte de API roda com PostgreSQL real; a notificação externa é testada com WireMock (INT-01 a INT-05, timeouts, token que não vaza) | `TesteDeApiComBanco`; `NotificadorHttpWireMockTest` | T-30, T-31 |
-| Cobertura (JaCoCo) | **96,0 % de linhas** (1356/1398) e **85,2 % de branches** (467/543); o build falha abaixo de 80 % e 70 % | `target/site/jacoco` depois do `verify` | T-27 |
-| Análise estática (SonarCloud) | **0 bugs, 0 vulnerabilidades, 0 code smells, 0 hotspots**, duplicação 0,0 %, cobertura 93,9 % (medida do Sonar), **Quality Gate aprovado** | Painel do SonarCloud da `main` | T-29 |
+| Cobertura (JaCoCo) | **96,0 % de linhas** (1734/1807) e **85,2 % de branches** (595/698); o build falha abaixo de 80 % e 70 % | `target/site/jacoco` depois do `verify` | T-27 |
+| Análise estática (SonarCloud) | **0 bugs, 0 vulnerabilidades, 0 code smells, 0 hotspots**, duplicação 0,0 %, cobertura 93,0 % (medida do Sonar em 2026-11-12, na `main` com as telas), **Quality Gate aprovado** | Painel do SonarCloud da `main` | T-29 |
 | Teste de concorrência (dupla reserva) | 20 solicitantes simultâneos: 1 aceita e 19 recusadas (409), 1 reserva ativa no banco, estável em 5 repetições e 8 execuções seguidas; sem a proteção, 20 inserções passam (vermelho provado) | [T-37-vermelho.md](evidencias/T-37-vermelho.md), [T-37-verde.md](evidencias/T-37-verde.md) | T-37 |
 | Teste de carga (JMeter) | 50 usuários, p95 de **2 a 7 ms** (meta 300 ms), **0 erro real**, 409 separado do erro, banco com 1 reserva ativa por intervalo | [resultado-01.md](performance/resultado-01.md) | T-38 |
 | TDD com evidência | 21 pares `test(red)` → `feat(green)` | [evidencia-tdd.md](testes/evidencia-tdd.md) | T-15 a T-51 |

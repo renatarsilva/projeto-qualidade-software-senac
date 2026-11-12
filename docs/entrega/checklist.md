@@ -7,7 +7,7 @@ Cada item tem a task dona e uma caixa de marcar. Só marque com a evidência em 
 ## 1. Limitadores de nota (bloqueiam a nota se falharem)
 
 - [x] **A aplicação executa** a partir de um clone limpo, seguindo só o README (T-55): a aplicação subiu com `./mvnw spring-boot:run` e o PostgreSQL em contêiner na carga de 2026-11-11 ([resultado-01.md](../performance/resultado-01.md)); **clone limpo conferido em 2026-11-11**: `git clone` do repositório público, `./mvnw verify` com 940 testes e 0 falhas e o gate de cobertura atendido, e `spring-boot:run` com as 3 variáveis do README (`401` sem token, login do administrador devolvendo token, Swagger UI com `200`)
-- [x] **CI presente e verde** (T-25): runs verdes na `main` e em todos os PRs, e o run vermelho intencional registrado. A tag `v1.0.0-rc1` foi criada em `7716d48` e o run dela também ficou verde (T-56)
+- [x] **CI presente e verde** (T-25): runs verdes na `main` e em todos os PRs, e o run vermelho intencional registrado. A tag `v1.0.0-rc3` foi criada em `cdec55f` e o run dela também ficou verde (T-56); as `rc1` e `rc2` ficaram em commits anteriores
 - [x] **Sem falha de autorização**: matriz de autorização e teste parametrizado passando, 176 casos (T-48, T-49)
 - [x] **Sem possibilidade de dupla reserva**: teste de concorrência passando e `EXCLUDE` do banco ativo (T-37)
 
@@ -16,8 +16,8 @@ Cada item tem a task dona e uma caixa de marcar. Só marque com a evidência em 
 | Item | Dono | Pronto |
 |---|---|---|
 | Clone limpo e checklist de entrega (este arquivo) | T-55, Caio | - [x] |
-| Tag `v1.0.0-rc1` criada, com CI verde e o run da tag aberto | T-56 | - [x] tag em `7716d48`; [run verde da tag](https://github.com/renatarsilva/projeto-qualidade-software-senac/actions/runs/43030268930) |
-| `CHANGELOG.md` com a versão `v1.0.0-rc1` | T-56, Samuel | - [x] |
+| Tag `v1.0.0-rc3` criada, com CI verde e o run da tag aberto | T-56 | - [x] tag em `cdec55f` (a ponta da `main` com telas, BDD e E2E); [run verde da tag](https://github.com/renatarsilva/projeto-qualidade-software-senac/actions/runs/43152809596) |
+| `CHANGELOG.md` com a versão `v1.0.0-rc3` | T-56 | - [x] |
 | `docs/evidencias/README.md` com todas as evidências preenchidas | T-56, Samuel | - [x] |
 | `docs/decisao-qualidade.md` completo | T-57, Renata | - [x] |
 | Envio no formulário do Hub: um integrante envia pelo grupo, com a turma, o nome completo dos 3 integrantes e o link do repositório | T-57, Renata | - [ ] |
