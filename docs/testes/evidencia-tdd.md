@@ -42,5 +42,5 @@
 
 ## O que não houve
 
-- **BDD com Cucumber** (T-33 e T-36) não foi feito: a especificação aceita **TDD ou BDD**, e o time cumpriu pelo TDD. A tabela de fronteiras do BDD ficou nos próprios testes parametrizados.
+- **BDD com Cucumber** (T-33 e T-36): feito **depois** do código, como especificação executável e rede de proteção, e não como guia do código (as regras nasceram por TDD estrito). São 3 features em português e 17 cenários rodando no `verify`; a mutação da fronteira da manutenção derruba o cenário certo. Ver [bdd-aprovacao-bloqueio.md](bdd-aprovacao-bloqueio.md).
 - Houve duas exceções de processo, registradas com honestidade: na T-37 o código foi escrito antes do commit vermelho (o vermelho foi provado removendo o `EXCLUDE` do banco descartável, ver [T-37-vermelho.md](../evidencias/T-37-vermelho.md)), e na T-40 o primeiro commit `test(red)` (`269f344`) guardou só a spec; o vermelho de verdade é o `573278f`.

@@ -38,7 +38,7 @@ Formulário: https://afonsolelis.github.io/aulas_senac/pages/qualidade2/entrega/
 | 37 | `.github/workflows/ci.yml`, run vermelho intencional registrado, `docs/avaliacao-arquitetural/ciclo-01.md` | T-25, T-26 | - [ ] (falta `docs/avaliacao-arquitetural/ciclo-01.md`) |
 | 38 | Gate de cobertura 80/70 no `verify`, cobertura de ramo na sobreposição, Quality Gate do SonarCloud no PR | T-27 a T-29 | - [x] |
 | 39 | Integração externa isolada com WireMock (INT-01 a INT-05), banco em container, RTM | T-30, T-31, T-32 | - [x] |
-| 41 | `docs/testes/bdd-aprovacao-bloqueio.md`, commits `test(red)`, `feat(green)` e `refactor`, feature Cucumber, `docs/testes/evidencia-tdd.md` | T-33 a T-36 | - [ ] (TDD com evidência em `docs/testes/evidencia-tdd.md`; BDD e feature Cucumber não foram feitos) |
+| 41 | `docs/testes/bdd-aprovacao-bloqueio.md`, commits `test(red)`, `feat(green)` e `refactor`, feature Cucumber, `docs/testes/evidencia-tdd.md` | T-33 a T-36 | - [x] (TDD com evidência em `evidencia-tdd.md`; BDD com 3 features e 17 cenários rodando no `verify`) |
 | 42 | Teste de 20 solicitações simultâneas, ADR da proteção, `perf/reservas.jmx`, `docs/performance/rnf.md` e `resultado-01.md` | T-37, T-38 | - [x] |
 | 43 | `docs/status-requisitos.md`, auditoria com rollback testado, relatório de utilização com oráculo à mão | T-39 a T-41 | - [x] |
 | 44 | `docs/seguranca/matriz-autorizacao.md`, teste parametrizado, `docs/testes/mutacao-manual.md`, RTM a 100 % | T-48 a T-50 | - [x] |
@@ -55,7 +55,7 @@ Formulário: https://afonsolelis.github.io/aulas_senac/pages/qualidade2/entrega/
 
 ## 4.1 Demonstração e relatório de testes
 
-- [x] [Relatório de testes](../relatorio-de-testes.md): 1023 testes, cobertura por pacote e o run do CI
+- [x] [Relatório de testes](../relatorio-de-testes.md): 1043 testes, cobertura por pacote e o run do CI
 - [x] [Demonstração da aplicação](demonstracao.md): roteiro de 8 minutos executado de verdade, com as respostas reais
 - [x] Capturas das telas (celular e desktop) e `resultado.json` do roteiro do Chrome em `docs/entrega/capturas/` (T-44)
 - [ ] Capturas do SonarCloud, do run verde do CI e do relatório do JaCoCo (só você consegue: dependem do seu login) em `docs/entrega/capturas/`

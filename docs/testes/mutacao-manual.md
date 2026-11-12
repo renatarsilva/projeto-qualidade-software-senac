@@ -12,6 +12,8 @@
 | M4 | RN-03: dupla reserva | O `EXCLUDE` do banco foi removido (só no banco descartável do teste) | `ProtecaoDoBancoConcorrenciaTest` (20 inserções aceitas, esperado 1) e `DisputaPelaMesmaSalaConcorrenciaTest` (14 de 20 solicitações aceitas) | [T-37-vermelho.md](../evidencias/T-37-vermelho.md) |
 | M5 | RF-01 e RN-07: autorização | O `PUT /api/salas` foi aberto ao Solicitante | `MatrizDeAutorizacaoApiTest.celulaDeNegacao` (célula S-04 por Solicitante: esperado 403) | [T-49-matriz-de-autorizacao.md](../evidencias/T-49-matriz-de-autorizacao.md) |
 | M6 | RF-01 e RN-07 nas telas: só o Responsável aprova | Em `TelasSegurancaConfiguracao`, as rotas de aprovar, rejeitar, retirar e devolver deixaram de exigir o Responsável | `AutorizacaoDasTelasTest.matrizDeAutorizacao` (4 rotas) e `TelasDoResponsavelTest.soOResponsavelAprova` (6 falhas por asserção) | [T-44-telas.md](../evidencias/T-44-telas.md), seção 3 |
+| M7 | RN-04 e RN-01: fronteira da manutenção `[início, fim)` | Em `ManutencaoNoBanco`, o intervalo `[)` virou `[]` | `manutencao.feature`: cenário "termina exatamente no início" (esperado 201, veio 409) | [bdd-aprovacao-bloqueio.md](bdd-aprovacao-bloqueio.md), seção 4 |
+| M8 | RF-13 e autorização nas telas: 403 com página amigável | No `ErroController`, o ramo do 403 foi desligado (o DEF-04 de volta) | `FluxoPorHttpRealTest` (2 testes: esperado 403, veio 500); o MockMvc não pega | Execução de 2026-11-11 |
 
 ## Como repetir
 

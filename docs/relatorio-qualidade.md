@@ -2,7 +2,7 @@
 
 Resume o que o time fez para garantir a qualidade do sistema de Organização de Recursos, com a **fonte de cada número**. Na prova oral o professor pede a origem de qualquer número citado, então nenhum valor entra aqui sem arquivo ou run que o comprove. Task T-52.
 
-> **Estado em 2026-11-11 (entrega):** números medidos na `main` pelo `./mvnw verify` (1023 testes) e pelo painel do SonarCloud.
+> **Estado em 2026-11-11 (entrega):** números medidos na `main` pelo `./mvnw verify` (1043 testes) e pelo painel do SonarCloud.
 
 ## 1. Resumo
 
@@ -10,7 +10,7 @@ Resume o que o time fez para garantir a qualidade do sistema de Organização de
 |---|---|
 | O sistema | Aplicação Java 21 e Spring Boot 3.5 que reserva salas, professores e materiais sem conflito de horário |
 | O que foi entregue | Os 14 requisitos, com as **telas responsivas dos três perfis** (Thymeleaf e Bootstrap, login por sessão com CSRF) e a API: cadastros, pesquisa, reservas com todo o ciclo de vida, dupla reserva impedida no banco, manutenção, retirada e devolução, auditoria imutável, notificação, relatório de utilização e documentação OpenAPI. Detalhe em [status dos requisitos](status-requisitos.md) |
-| O que ficou fora | Job periódico das mudanças por tempo (T-60), feature Cucumber (BDD), teste de navegador no CI (o roteiro do Chrome roda à mão), edição de cadastros pelas telas. Ver [decisão de qualidade](decisao-qualidade.md), seção 2 |
+| O que ficou fora | Job periódico das mudanças por tempo (T-60), navegador real no CI (o roteiro do Chrome roda à mão; o CI tem o E2E por HTTP), edição de cadastros pelas telas. Ver [decisão de qualidade](decisao-qualidade.md), seção 2 |
 | Equipe | Renata (@renatarsilva), Samuel (@Samwel-Merces), Caio (@CaiosAguiar) |
 
 ## 2. Problema e riscos
@@ -35,12 +35,12 @@ Resume o que o time fez para garantir a qualidade do sistema de Organização de
 | Item | Resultado | Fonte | Task |
 |---|---|---|---|
 | Plano de teste | Existe | `docs/plano-de-teste.md` | T-06 |
-| Relatório de testes consolidado | 1023 testes por tipo e por pacote, cobertura por pacote e o run do CI | [relatorio-de-testes.md](relatorio-de-testes.md) | T-52 |
+| Relatório de testes consolidado | 1043 testes por tipo e por pacote, cobertura por pacote e o run do CI | [relatorio-de-testes.md](relatorio-de-testes.md) | T-52 |
 | Demonstração da aplicação | Roteiro de 8 minutos executado de verdade | [entrega/demonstracao.md](entrega/demonstracao.md) | T-54 |
 | Plano TDD (casos por regra) | Existe; todos os casos das regras críticas viraram testes | `docs/testes/plano-tdd.md` | T-19 |
-| Testes automatizados | **1023 testes, 0 falhas, 0 erros**, entre unitários, parametrizados, de integração e de API caixa-preta | `./mvnw verify` em 2026-11-11; run verde do CI na `main` | T-20 a T-51 |
+| Testes automatizados | **1043 testes, 0 falhas, 0 erros**, entre unitários, parametrizados, de integração e de API caixa-preta | `./mvnw verify` em 2026-11-11; run verde do CI na `main` | T-20 a T-51 |
 | Testcontainers e WireMock | Toda a suíte de API roda com PostgreSQL real; a notificação externa é testada com WireMock (INT-01 a INT-05, timeouts, token que não vaza) | `TesteDeApiComBanco`; `NotificadorHttpWireMockTest` | T-30, T-31 |
-| Cobertura (JaCoCo) | **95,9 % de linhas** (1356/1398) e **85,1 % de branches** (467/543); o build falha abaixo de 80 % e 70 % | `target/site/jacoco` depois do `verify` | T-27 |
+| Cobertura (JaCoCo) | **96,0 % de linhas** (1356/1398) e **85,2 % de branches** (467/543); o build falha abaixo de 80 % e 70 % | `target/site/jacoco` depois do `verify` | T-27 |
 | Análise estática (SonarCloud) | **0 bugs, 0 vulnerabilidades, 0 code smells, 0 hotspots**, duplicação 0,0 %, cobertura 93,9 % (medida do Sonar), **Quality Gate aprovado** | Painel do SonarCloud da `main` | T-29 |
 | Teste de concorrência (dupla reserva) | 20 solicitantes simultâneos: 1 aceita e 19 recusadas (409), 1 reserva ativa no banco, estável em 5 repetições e 8 execuções seguidas; sem a proteção, 20 inserções passam (vermelho provado) | [T-37-vermelho.md](evidencias/T-37-vermelho.md), [T-37-verde.md](evidencias/T-37-verde.md) | T-37 |
 | Teste de carga (JMeter) | 50 usuários, p95 de **2 a 7 ms** (meta 300 ms), **0 erro real**, 409 separado do erro, banco com 1 reserva ativa por intervalo | [resultado-01.md](performance/resultado-01.md) | T-38 |
@@ -74,7 +74,7 @@ Resume o que o time fez para garantir a qualidade do sistema de Organização de
 
 ## 8. Limitações e riscos aceitos
 
-Ver [decisão de qualidade](decisao-qualidade.md), seções 2 e 3. Em resumo: o **job periódico** (T-60) e o **BDD com Cucumber** ficaram de fora, e o teste de carga foi **local** (aplicação, banco e JMeter na mesma máquina), então prova a folga em relação à meta e o comportamento sob disputa, e não a capacidade de produção.
+Ver [decisão de qualidade](decisao-qualidade.md), seções 2 e 3. Em resumo: o **job periódico** (T-60) ficou de fora, e o teste de carga foi **local** (aplicação, banco e JMeter na mesma máquina), então prova a folga em relação à meta e o comportamento sob disputa, e não a capacidade de produção.
 
 ## 9. Autoria
 

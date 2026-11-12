@@ -20,9 +20,9 @@ Uma primeira rodada deu 11 erros por `NullPointerException`: eram do próprio te
 | Resultado | Valor |
 |---|---|
 | Testes das telas | 83, **todos verdes** (82 do ciclo mais o `PaginaDeAcessoNegadoTest`, do DEF-04) |
-| Suíte inteira (`./mvnw verify`) | **1023 testes, 0 falhas**; gate de cobertura atendido |
+| Suíte inteira (`./mvnw verify`) | **1043 testes, 0 falhas**; gate de cobertura atendido |
 | Cobertura do pacote `web` | 90,5 % das linhas (373 de 412) e 75,2 % dos branches (112 de 149) |
-| Cobertura do projeto | 95,9 % das linhas e 85,1 % dos branches |
+| Cobertura do projeto | 96,0 % das linhas e 85,2 % dos branches |
 
 ## 3. Mutação manual da regra crítica
 
